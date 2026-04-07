@@ -122,11 +122,12 @@ def Hxtype(k):
 
 def eHxtype(k):
     return linalg.eigh(Hxtype(k))[0]
-Eig_gx = array(list(map(eHxtype,gx)))
-Eig_xy = array(list(map(eHxtype,xy)))
-Eig_yg = array(list(map(eHxtype,yg)))
-Eig_gm = array(list(map(eHxtype,gm)))
-Eig_mg = array(list(map(eHxtype,mg)))
+def run_band_and_topology_demo():
+    Eig_gx = array(list(map(eHxtype,gx)))
+    Eig_xy = array(list(map(eHxtype,xy)))
+    Eig_yg = array(list(map(eHxtype,yg)))
+    Eig_gm = array(list(map(eHxtype,gm)))
+    Eig_mg = array(list(map(eHxtype,mg)))
 
 def _occ_evecs(k, n_occ):
     # columns of evecs are eigenvectors
@@ -179,44 +180,48 @@ def chern_number_fukui(nk=31, n_occ=4, k_origin=None):
     ch = F12.sum() / (2j * pi)
     return float(ch.real)
 
-eig_vbm0 = hstack((Eig_gx[:,0],Eig_xy[:,0],Eig_yg[:,0],Eig_gm[:,0],Eig_mg[:,0]))
-eig_vbm1 = hstack((Eig_gx[:,1],Eig_xy[:,1],Eig_yg[:,1],Eig_gm[:,1],Eig_mg[:,1]))
-eig_vbm2 = hstack((Eig_gx[:,2],Eig_xy[:,2],Eig_yg[:,2],Eig_gm[:,2],Eig_mg[:,2]))
-eig_vbm3 = hstack((Eig_gx[:,3],Eig_xy[:,3],Eig_yg[:,3],Eig_gm[:,3],Eig_mg[:,3]))
-eig_cbm0 = hstack((Eig_gx[:,4],Eig_xy[:,4],Eig_yg[:,4],Eig_gm[:,4],Eig_mg[:,4]))
-eig_cbm1 = hstack((Eig_gx[:,5],Eig_xy[:,5],Eig_yg[:,5],Eig_gm[:,5],Eig_mg[:,5]))
-eig_cbm2 = hstack((Eig_gx[:,6],Eig_xy[:,6],Eig_yg[:,6],Eig_gm[:,6],Eig_mg[:,6]))
-eig_cbm3 = hstack((Eig_gx[:,7],Eig_xy[:,7],Eig_yg[:,7],Eig_gm[:,7],Eig_mg[:,7]))
+    eig_vbm0 = hstack((Eig_gx[:,0],Eig_xy[:,0],Eig_yg[:,0],Eig_gm[:,0],Eig_mg[:,0]))
+    eig_vbm1 = hstack((Eig_gx[:,1],Eig_xy[:,1],Eig_yg[:,1],Eig_gm[:,1],Eig_mg[:,1]))
+    eig_vbm2 = hstack((Eig_gx[:,2],Eig_xy[:,2],Eig_yg[:,2],Eig_gm[:,2],Eig_mg[:,2]))
+    eig_vbm3 = hstack((Eig_gx[:,3],Eig_xy[:,3],Eig_yg[:,3],Eig_gm[:,3],Eig_mg[:,3]))
+    eig_cbm0 = hstack((Eig_gx[:,4],Eig_xy[:,4],Eig_yg[:,4],Eig_gm[:,4],Eig_mg[:,4]))
+    eig_cbm1 = hstack((Eig_gx[:,5],Eig_xy[:,5],Eig_yg[:,5],Eig_gm[:,5],Eig_mg[:,5]))
+    eig_cbm2 = hstack((Eig_gx[:,6],Eig_xy[:,6],Eig_yg[:,6],Eig_gm[:,6],Eig_mg[:,6]))
+    eig_cbm3 = hstack((Eig_gx[:,7],Eig_xy[:,7],Eig_yg[:,7],Eig_gm[:,7],Eig_mg[:,7]))
 
 
 
-plt.figure(figsize=(6, 5))
-plt.xlim(0, 1001)
+    plt.figure(figsize=(6, 5))
+    plt.xlim(0, 1001)
 
-plt.plot(eig_vbm0, color='red')
-plt.plot(eig_vbm1, color='blue')
-plt.plot(eig_vbm2, color='pink')
-plt.plot(eig_vbm3, color='purple')
-plt.plot(eig_cbm0, color='orange')
-plt.plot(eig_cbm1, color='green')
-plt.plot(eig_cbm2, color='cyan')
-plt.plot(eig_cbm3, color='magenta')
+    plt.plot(eig_vbm0, color='red')
+    plt.plot(eig_vbm1, color='blue')
+    plt.plot(eig_vbm2, color='pink')
+    plt.plot(eig_vbm3, color='purple')
+    plt.plot(eig_cbm0, color='orange')
+    plt.plot(eig_cbm1, color='green')
+    plt.plot(eig_cbm2, color='cyan')
+    plt.plot(eig_cbm3, color='magenta')
 
 
-plt.xticks([0, 500, 1000,1500,2000,2501], [r'$\Gamma$', 'X','Y', r'$\Gamma$','M', r'$\Gamma$'])
-plt.ylabel('Energy')
-plt.show()
+    plt.xticks([0, 500, 1000,1500,2000,2501], [r'$\Gamma$', 'X','Y', r'$\Gamma$','M', r'$\Gamma$'])
+    plt.ylabel('Energy')
+    plt.show()
 
 # ---------------- Topology diagnostics (2D) ----------------
 # For this 8-band model, half-filling is usually n_occ=4 (tune if your gap is elsewhere).
 # - If TR is broken (e.g. J != 0), the relevant invariant is typically the Chern number.
 # - If TR is preserved (e.g. J == 0 and SOC doesn't break it), you can compute Z2 via Wilson loop (not implemented here yet).
-try:
-    ch = chern_number_fukui(nk=41, n_occ=4)
-    print(f"[Topology] Chern number (nk=41, n_occ=4) ≈ {ch:.6f}")
-    if abs(ch) < 0.5:
-        print("[Topology] Likely trivial (C≈0) for chosen filling, assuming the system is gapped.")
-    else:
-        print("[Topology] Likely topological (C≠0) for chosen filling, assuming the system is gapped.")
-except Exception as e:
-    print(f"[Topology] Chern number computation failed: {e}")
+    try:
+        ch = chern_number_fukui(nk=41, n_occ=4)
+        print(f"[Topology] Chern number (nk=41, n_occ=4) ≈ {ch:.6f}")
+        if abs(ch) < 0.5:
+            print("[Topology] Likely trivial (C≈0) for chosen filling, assuming the system is gapped.")
+        else:
+            print("[Topology] Likely topological (C≠0) for chosen filling, assuming the system is gapped.")
+    except Exception as e:
+        print(f"[Topology] Chern number computation failed: {e}")
+
+
+if __name__ == "__main__":
+    run_band_and_topology_demo()
