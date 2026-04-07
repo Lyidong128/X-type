@@ -134,8 +134,10 @@ def plot_chern_relationship(rows: list[dict[str, float]], save_path: Path) -> No
     axes[0].set_ylabel("Chern number")
     scalar_mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
     scalar_mappable.set_array([])
-    fig.colorbar(scalar_mappable, ax=axes.ravel().tolist(), label="Gap")
-    fig.subplots_adjust(left=0.07, right=0.92, bottom=0.14, top=0.90, wspace=0.28)
+    fig.subplots_adjust(left=0.07, right=0.88, bottom=0.14, top=0.90, wspace=0.28)
+    # Use a dedicated axis for colorbar to keep placement stable.
+    cax = fig.add_axes([0.90, 0.16, 0.02, 0.70])
+    fig.colorbar(scalar_mappable, cax=cax, label="Gap")
     fig.savefig(save_path, dpi=150)
     plt.close(fig)
 
