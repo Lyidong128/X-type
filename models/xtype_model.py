@@ -122,12 +122,6 @@ def Hxtype(k):
 
 def eHxtype(k):
     return linalg.eigh(Hxtype(k))[0]
-def run_band_and_topology_demo():
-    Eig_gx = array(list(map(eHxtype,gx)))
-    Eig_xy = array(list(map(eHxtype,xy)))
-    Eig_yg = array(list(map(eHxtype,yg)))
-    Eig_gm = array(list(map(eHxtype,gm)))
-    Eig_mg = array(list(map(eHxtype,mg)))
 
 def _occ_evecs(k, n_occ):
     # columns of evecs are eigenvectors
@@ -179,6 +173,13 @@ def chern_number_fukui(nk=31, n_occ=4, k_origin=None):
 
     ch = F12.sum() / (2j * pi)
     return float(ch.real)
+
+def run_band_and_topology_demo():
+    Eig_gx = array(list(map(eHxtype,gx)))
+    Eig_xy = array(list(map(eHxtype,xy)))
+    Eig_yg = array(list(map(eHxtype,yg)))
+    Eig_gm = array(list(map(eHxtype,gm)))
+    Eig_mg = array(list(map(eHxtype,mg)))
 
     eig_vbm0 = hstack((Eig_gx[:,0],Eig_xy[:,0],Eig_yg[:,0],Eig_gm[:,0],Eig_mg[:,0]))
     eig_vbm1 = hstack((Eig_gx[:,1],Eig_xy[:,1],Eig_yg[:,1],Eig_gm[:,1],Eig_mg[:,1]))
