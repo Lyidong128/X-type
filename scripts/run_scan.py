@@ -5,6 +5,8 @@ from itertools import product
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib import colors as mcolors
 import numpy as np
 
 
@@ -103,15 +105,36 @@ def plot_chern_relationship(rows: list[dict[str, float]], save_path: Path) -> No
     lm = np.array([row["lm"] for row in rows], dtype=float)
     chern = np.array([row["chern"] for row in rows], dtype=float)
     gap = np.array([row["gap"] for row in rows], dtype=float)
+    gap_min = float(np.min(gap))
+    gap_max = float(np.max(gap))
+    if gap_min < 0.0 < gap_max:
+        # Use symmetric diverging normalization for signed gap values.
+        bound = max(abs(gap_min), abs(gap_max))
+        norm = mcolors.TwoSlopeNorm(vmin=-bound, vcenter=0.0, vmax=bound)
+        cmap = "coolwarm"
+    else:
+        norm = mcolors.Normalize(vmin=gap_min, vmax=gap_max)
+        cmap = "viridis"
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
     scatter_config = [("v", v), ("t", t), ("lm", lm)]
     for ax, (label, values) in zip(axes, scatter_config):
-        sc = ax.scatter(values, chern, c=gap, cmap="viridis", s=55, edgecolors="black", linewidths=0.3)
+        ax.scatter(
+            values,
+            chern,
+            c=gap,
+            cmap=cmap,
+            norm=norm,
+            s=55,
+            edgecolors="black",
+            linewidths=0.3,
+        )
         ax.set_xlabel(label)
         ax.grid(alpha=0.25)
     axes[0].set_ylabel("Chern number")
-    fig.colorbar(sc, ax=axes.ravel().tolist(), label="Gap")
+    scalar_mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
+    scalar_mappable.set_array([])
+    fig.colorbar(scalar_mappable, ax=axes.ravel().tolist(), label="Gap")
     fig.subplots_adjust(left=0.07, right=0.92, bottom=0.14, top=0.90, wspace=0.28)
     fig.savefig(save_path, dpi=150)
     plt.close(fig)
