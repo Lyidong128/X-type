@@ -78,117 +78,96 @@ def set_model_params(model, v: float, t: float, lm: float, w: float = 1.0, j: fl
     model.J = float(j)
 
 
-def build_onsite_cell_matrix(t: float, v: float, lm: float, j: float) -> np.ndarray:
-    h0 = np.zeros((4, 4), dtype=complex)
-    h0[0, 1] = t
-    h0[0, 2] = t
-    h0[0, 3] = v
-    h0[1, 0] = t
-    h0[1, 2] = v
-    h0[1, 3] = t
-    h0[2, 0] = t
-    h0[2, 1] = v
-    h0[2, 3] = t
-    h0[3, 0] = v
-    h0[3, 1] = t
-    h0[3, 2] = t
+def assign_edge_corner_states(
+    rows: list[dict[str, float]],
+    logs_path: Path,
+    gap_threshold: float = 0.1,
+    chern_jump_threshold: float = 0.5,
+) -> int:
+    """
+    Classify edge/corner states from spectral and topology changes.
+    edge_state: small gap OR local Chern jump.
+    corner_state: edge_state with jumps along at least two parameter axes.
+    """
+    if not rows:
+        return 0
 
-    h1 = np.zeros((4, 4), dtype=complex)
-    h1[0, 1] = 1j * lm
-    h1[0, 2] = -1j * lm
-    h1[2, 3] = -1j * lm
-    h1[3, 2] = 1j * lm
-    h1[3, 1] = -1j * lm
-    h1[1, 0] = -1j * lm
-    h1[2, 0] = 1j * lm
-    h1[1, 3] = 1j * lm
+    index: dict[tuple[float, float, float], dict[str, float]] = {
+        (float(row["v"]), float(row["t"]), float(row["lm"])): row for row in rows
+    }
+    unique_v = sorted({float(row["v"]) for row in rows})
+    unique_t = sorted({float(row["t"]) for row in rows})
+    unique_lm = sorted({float(row["lm"]) for row in rows})
 
-    h3 = np.diag([j, -j, j, -j]).astype(complex)
-    s0 = np.eye(2, dtype=complex)
-    sz = np.array([[1, 0], [0, -1]], dtype=complex)
-    return np.kron(h0, s0) + np.kron(h1, sz) + np.kron(h3, sz)
+    special_count = 0
+    for row in rows:
+        v = float(row["v"])
+        t = float(row["t"])
+        lm = float(row["lm"])
+        gap = float(row["gap"])
+        chern = float(row["chern"])
 
+        chern_jump_axes = 0
+        max_chern_delta = 0.0
+        for axis, value, axis_values in (
+            ("v", v, unique_v),
+            ("t", t, unique_t),
+            ("lm", lm, unique_lm),
+        ):
+            axis_has_jump = False
+            value_index = axis_values.index(value)
+            for direction in (-1, 1):
+                neighbor_index = value_index + direction
+                if not (0 <= neighbor_index < len(axis_values)):
+                    continue
+                neighbor_value = axis_values[neighbor_index]
+                if axis == "v":
+                    neighbor_key = (neighbor_value, t, lm)
+                elif axis == "t":
+                    neighbor_key = (v, neighbor_value, lm)
+                else:
+                    neighbor_key = (v, t, neighbor_value)
 
-def _state_index(x: int, y: int, orb: int, spin: int, nx: int) -> int:
-    return ((y * nx + x) * 8) + (orb * 2 + spin)
+                neighbor = index.get(neighbor_key)
+                if neighbor is None:
+                    continue
+                delta = abs(chern - float(neighbor["chern"]))
+                max_chern_delta = max(max_chern_delta, delta)
+                if delta >= chern_jump_threshold:
+                    axis_has_jump = True
+            if axis_has_jump:
+                chern_jump_axes += 1
 
+        is_gap_small = abs(gap) < gap_threshold
+        has_chern_jump = max_chern_delta >= chern_jump_threshold
+        edge_state = int(is_gap_small or has_chern_jump)
+        corner_state = int(edge_state and chern_jump_axes >= 2)
+        row["edge_state"] = edge_state
+        row["corner_state"] = corner_state
 
-def build_obc_hamiltonian(
-    v: float,
-    t: float,
-    lm: float,
-    w: float = 1.0,
-    j: float = 0.0,
-    nx: int = 4,
-    ny: int = 4,
-) -> np.ndarray:
-    dim = nx * ny * 8
-    ham = np.zeros((dim, dim), dtype=complex)
-    onsite = build_onsite_cell_matrix(t=t, v=v, lm=lm, j=j)
+        if is_gap_small:
+            log_message(
+                logs_path,
+                f"special_point type=small_gap v={v} t={t} lm={lm} gap={gap} threshold={gap_threshold}",
+            )
+        if has_chern_jump:
+            log_message(
+                logs_path,
+                (
+                    "special_point type=chern_jump "
+                    f"v={v} t={t} lm={lm} max_delta={max_chern_delta} "
+                    f"threshold={chern_jump_threshold} axes={chern_jump_axes}"
+                ),
+            )
+        if corner_state:
+            log_message(
+                logs_path,
+                f"special_point type=corner_candidate v={v} t={t} lm={lm} jump_axes={chern_jump_axes}",
+            )
+        if edge_state or corner_state:
+            special_count += 1
 
-    for y in range(ny):
-        for x in range(nx):
-            start = (y * nx + x) * 8
-            ham[start : start + 8, start : start + 8] += onsite
-
-            # Inter-cell coupling along x: orb(0, x,y) <-> orb(3, x-1,y)
-            if x > 0:
-                for spin in range(2):
-                    i = _state_index(x, y, 0, spin, nx)
-                    jx = _state_index(x - 1, y, 3, spin, nx)
-                    ham[i, jx] += w
-                    ham[jx, i] += w
-
-            # Inter-cell coupling along y: orb(1, x,y) <-> orb(2, x,y-1)
-            if y > 0:
-                for spin in range(2):
-                    i = _state_index(x, y, 1, spin, nx)
-                    jy = _state_index(x, y - 1, 2, spin, nx)
-                    ham[i, jy] += w
-                    ham[jy, i] += w
-
-    return ham
-
-
-def classify_edge_corner_states(
-    v: float,
-    t: float,
-    lm: float,
-    w: float = 1.0,
-    j: float = 0.0,
-    nx: int = 4,
-    ny: int = 4,
-) -> tuple[int, int]:
-    ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
-    eigvals, eigvecs = np.linalg.eigh(ham)
-    candidate_count = min(10, eigvals.size)
-    candidate_indices = np.argsort(np.abs(eigvals))[:candidate_count]
-
-    edge_cells = [iy * nx + ix for iy in range(ny) for ix in range(nx) if ix in (0, nx - 1) or iy in (0, ny - 1)]
-    corner_cells = [0, nx - 1, (ny - 1) * nx, (ny - 1) * nx + (nx - 1)]
-
-    edge_state = 0
-    corner_state = 0
-    edge_threshold = 0.88
-    corner_threshold = 0.45
-
-    for idx in candidate_indices:
-        vec = eigvecs[:, idx]
-        cell_prob = np.zeros(nx * ny, dtype=float)
-        for cell_id in range(nx * ny):
-            start = cell_id * 8
-            cell_prob[cell_id] = float(np.sum(np.abs(vec[start : start + 8]) ** 2))
-
-        edge_weight = float(np.sum(cell_prob[edge_cells]))
-        corner_weight = float(np.sum(cell_prob[corner_cells]))
-        if edge_weight >= edge_threshold:
-            edge_state = 1
-        if corner_weight >= corner_threshold:
-            corner_state = 1
-        if edge_state and corner_state:
-            break
-
-    return edge_state, corner_state
+    return special_count
 
 
 def compute_band_data(model_module) -> np.ndarray:
@@ -348,9 +327,8 @@ def recalculate_invalid_rows(
             set_model_params(model, v=v, t=t, lm=lm, w=1.0, j=0.0)
             row["gap"] = compute_bulk_gap(model, nk=11, n_occ=4)
             row["chern"] = compute_chern_number(model, nk=21, n_occ=4)
-            edge_state, corner_state = classify_edge_corner_states(v=v, t=t, lm=lm, w=1.0, j=0.0, nx=4, ny=4)
-            row["edge_state"] = int(edge_state)
-            row["corner_state"] = int(corner_state)
+            row["edge_state"] = 0
+            row["corner_state"] = 0
             log_message(logs_path, f"repair_success row={idx + 1} v={v} t={t} lm={lm}")
         except Exception as error:  # pragma: no cover
             log_message(
@@ -378,44 +356,6 @@ def write_results_csv(results_path: Path, rows: list[dict[str, float]]) -> None:
                     "corner_state": row["corner_state"],
                 }
             )
-
-
-def detect_special_points(
-    rows: list[dict[str, float]],
-    logs_path: Path,
-    gap_threshold: float = 0.1,
-    chern_jump_threshold: float = 0.5,
-) -> int:
-    special_count = 0
-    sorted_rows = sorted(rows, key=lambda r: (r["v"], r["t"], r["lm"]))
-    previous_row = None
-    for row in sorted_rows:
-        v = float(row["v"])
-        t = float(row["t"])
-        lm = float(row["lm"])
-        gap = float(row["gap"])
-        chern = float(row["chern"])
-        if abs(gap) < gap_threshold:
-            log_message(
-                logs_path,
-                f"special_point type=small_gap v={v} t={t} lm={lm} gap={gap} threshold={gap_threshold}",
-            )
-            special_count += 1
-        if previous_row is not None:
-            chern_delta = abs(chern - float(previous_row["chern"]))
-            if chern_delta >= chern_jump_threshold:
-                log_message(
-                    logs_path,
-                    (
-                        "special_point type=chern_jump "
-                        f"v={v} t={t} lm={lm} chern={chern} "
-                        f"prev_v={previous_row['v']} prev_t={previous_row['t']} prev_lm={previous_row['lm']} "
-                        f"prev_chern={previous_row['chern']} delta={chern_delta}"
-                    ),
-                )
-                special_count += 1
-        previous_row = row
-    return special_count
 
 
 def run_parameter_scan() -> dict[str, int | str]:
@@ -451,7 +391,6 @@ def run_parameter_scan() -> dict[str, int | str]:
             set_model_params(model, v=float(v), t=float(t), lm=float(lm), w=1.0, j=0.0)
             gap = compute_bulk_gap(model, nk=11, n_occ=4)
             chern = compute_chern_number(model, nk=21, n_occ=4)
-            edge_state, corner_state = classify_edge_corner_states(v=float(v), t=float(t), lm=float(lm), w=1.0, j=0.0, nx=4, ny=4)
             rows.append(
                 {
                     "v": float(v),
@@ -459,8 +398,8 @@ def run_parameter_scan() -> dict[str, int | str]:
                     "lm": float(lm),
                     "gap": gap,
                     "chern": chern,
-                    "edge_state": int(edge_state),
-                    "corner_state": int(corner_state),
+                    "edge_state": 0,
+                    "corner_state": 0,
                 }
             )
 
@@ -481,6 +420,7 @@ def run_parameter_scan() -> dict[str, int | str]:
                 f"compute_failed idx={idx} v={v} t={t} lm={lm} error={error!r}",
             )
 
+    special_count = assign_edge_corner_states(rows=rows, logs_path=logs_path)
     write_results_csv(results_path, rows)
 
     validation_errors, invalid_indices = validate_rows(rows)
@@ -488,6 +428,7 @@ def run_parameter_scan() -> dict[str, int | str]:
         for error in validation_errors:
             log_message(logs_path, f"validation_error {error}")
         recalculate_invalid_rows(model, rows, invalid_indices, logs_path)
+        special_count = assign_edge_corner_states(rows=rows, logs_path=logs_path)
         write_results_csv(results_path, rows)
         validation_errors, invalid_indices = validate_rows(rows)
         if validation_errors:
@@ -508,7 +449,6 @@ def run_parameter_scan() -> dict[str, int | str]:
             save_path=figures_dir / "corner_state_vs_parameters.png",
             title="Corner state vs parameters",
         )
-        special_count = detect_special_points(rows=rows, logs_path=logs_path)
 
     if failure_count == 0 and not validation_errors and special_count == 0 and logs_path.exists():
         logs_path.unlink()
