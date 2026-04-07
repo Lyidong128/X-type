@@ -112,7 +112,7 @@ def plot_chern_relationship(rows: list[dict[str, float]], save_path: Path) -> No
         ax.grid(alpha=0.25)
     axes[0].set_ylabel("Chern number")
     fig.colorbar(sc, ax=axes.ravel().tolist(), label="Gap")
-    fig.tight_layout()
+    fig.subplots_adjust(left=0.07, right=0.92, bottom=0.14, top=0.90, wspace=0.28)
     fig.savefig(save_path, dpi=150)
     plt.close(fig)
 
