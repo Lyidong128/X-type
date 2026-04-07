@@ -342,6 +342,48 @@ def plot_topology_phase_map(rows: list[dict[str, float]], save_path: Path) -> No
     plt.close(fig)
 
 
+def plot_pairwise_phase_map(
+    rows: list[dict[str, float]],
+    x_key: str,
+    y_key: str,
+    fixed_key: str,
+    save_path: Path,
+) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    phase_map = {"trivial": 0, "TI": 1, "HOTI": 2}
+    cmap = mcolors.ListedColormap(["#8c8c8c", "#1f77b4", "#d62728"])
+    norm = mcolors.BoundaryNorm([-0.5, 0.5, 1.5, 2.5], cmap.N)
+
+    fixed_values = sorted({float(row[fixed_key]) for row in rows})
+    x_values = sorted({float(row[x_key]) for row in rows})
+    y_values = sorted({float(row[y_key]) for row in rows})
+
+    fig, axes = plt.subplots(1, len(fixed_values), figsize=(4.2 * len(fixed_values), 4), sharex=True, sharey=True)
+    if len(fixed_values) == 1:
+        axes = [axes]
+
+    for ax, fixed_value in zip(axes, fixed_values):
+        subset = [row for row in rows if abs(float(row[fixed_key]) - fixed_value) < 1e-9]
+        x = np.array([float(row[x_key]) for row in subset], dtype=float)
+        y = np.array([float(row[y_key]) for row in subset], dtype=float)
+        phases = np.array([phase_map[classify_phase(row)] for row in subset], dtype=float)
+        ax.scatter(x, y, c=phases, cmap=cmap, norm=norm, s=240, marker="s", edgecolors="black", linewidths=0.4)
+        ax.set_title(f"{fixed_key}={fixed_value:.1f}")
+        ax.set_xticks(x_values)
+        ax.set_yticks(y_values)
+        ax.set_xlabel(x_key)
+        ax.grid(alpha=0.25)
+    axes[0].set_ylabel(y_key)
+    fig.suptitle(f"Pairwise phase map: ({x_key}, {y_key}) at fixed {fixed_key}")
+    fig.subplots_adjust(left=0.06, right=0.89, bottom=0.14, top=0.84, wspace=0.22)
+    cax = fig.add_axes([0.91, 0.18, 0.02, 0.60])
+    cbar = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax)
+    cbar.set_ticks([0, 1, 2])
+    cbar.set_ticklabels(["trivial", "TI", "HOTI"])
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
 def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_path: Path, summary: dict[str, int | str]) -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with PdfPages(report_path) as pdf:
@@ -373,6 +415,9 @@ def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_
 
         for name in [
             "topology_phase_map.png",
+            "phase_map_v_t_by_lm.png",
+            "phase_map_v_lm_by_t.png",
+            "phase_map_t_lm_by_v.png",
             "chern_vs_parameters.png",
             "edge_state_vs_parameters.png",
             "corner_state_vs_parameters.png",
@@ -529,6 +574,9 @@ def run_parameter_scan() -> dict[str, int | str]:
         plot_state_relationship(rows, "edge_state", figures_dir / "edge_state_vs_parameters.png", "Edge state vs parameters")
         plot_state_relationship(rows, "corner_state", figures_dir / "corner_state_vs_parameters.png", "Corner state vs parameters")
         plot_topology_phase_map(rows, figures_dir / "topology_phase_map.png")
+        plot_pairwise_phase_map(rows, "v", "t", "lm", figures_dir / "phase_map_v_t_by_lm.png")
+        plot_pairwise_phase_map(rows, "v", "lm", "t", figures_dir / "phase_map_v_lm_by_t.png")
+        plot_pairwise_phase_map(rows, "t", "lm", "v", figures_dir / "phase_map_t_lm_by_v.png")
 
     summary = {
         "total": total_count,
