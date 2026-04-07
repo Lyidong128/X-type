@@ -1,0 +1,15 @@
+special_point type=small_gap v=0.0 t=0.0 lm=0.5 gap=-7.363859260972749e-16 threshold=0.1
+special_point type=small_gap v=0.0 t=0.5 lm=0.0 gap=-9.246520377345352e-16 threshold=0.1
+special_point type=small_gap v=0.0 t=0.5 lm=0.5 gap=-2.6795375277751073e-16 threshold=0.1
+special_point type=small_gap v=0.0 t=0.5 lm=1.0 gap=-6.01212569936255e-16 threshold=0.1
+special_point type=small_gap v=0.0 t=1.0 lm=0.5 gap=-8.094233822648517e-16 threshold=0.1
+special_point type=small_gap v=0.5 t=0.0 lm=0.5 gap=-1.9984014443252818e-15 threshold=0.1
+special_point type=small_gap v=0.5 t=0.5 lm=0.0 gap=-1.4988010832439613e-15 threshold=0.1
+special_point type=small_gap v=0.5 t=0.5 lm=1.0 gap=5.551115123125783e-17 threshold=0.1
+special_point type=small_gap v=0.5 t=1.0 lm=0.5 gap=-5.551115123125783e-17 threshold=0.1
+special_point type=small_gap v=1.0 t=0.0 lm=0.0 gap=2.4492935982947064e-16 threshold=0.1
+special_point type=small_gap v=1.0 t=0.0 lm=0.5 gap=-4.1614915653858935e-16 threshold=0.1
+special_point type=small_gap v=1.0 t=0.0 lm=1.0 gap=-1.6134352437965543e-15 threshold=0.1
+special_point type=small_gap v=1.0 t=0.5 lm=0.0 gap=-6.021041009493909e-16 threshold=0.1
+special_point type=small_gap v=1.0 t=1.0 lm=0.0 gap=-1.872445951057756e-15 threshold=0.1
+special_point type=small_gap v=1.0 t=1.0 lm=1.0 gap=1.2367404674373022e-16 threshold=0.1
