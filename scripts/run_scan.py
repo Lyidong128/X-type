@@ -158,6 +158,126 @@ def set_model_params(model, v: float, t: float, lm: float, w: float = 1.0, j: fl
     model.J = float(j)
 
 
+def _state_index(x: int, y: int, orb: int, spin: int, nx: int) -> int:
+    return ((y * nx + x) * 8) + (orb * 2 + spin)
+
+
+def build_onsite_cell_matrix(t: float, v: float, lm: float, j: float) -> np.ndarray:
+    h0 = np.zeros((4, 4), dtype=complex)
+    h0[0, 1] = t
+    h0[0, 2] = t
+    h0[0, 3] = v
+    h0[1, 0] = t
+    h0[1, 2] = v
+    h0[1, 3] = t
+    h0[2, 0] = t
+    h0[2, 1] = v
+    h0[2, 3] = t
+    h0[3, 0] = v
+    h0[3, 1] = t
+    h0[3, 2] = t
+
+    h1 = np.zeros((4, 4), dtype=complex)
+    h1[0, 1] = 1j * lm
+    h1[0, 2] = -1j * lm
+    h1[2, 3] = -1j * lm
+    h1[3, 2] = 1j * lm
+    h1[3, 1] = -1j * lm
+    h1[1, 0] = -1j * lm
+    h1[2, 0] = 1j * lm
+    h1[1, 3] = 1j * lm
+
+    h3 = np.diag([j, -j, j, -j]).astype(complex)
+    s0 = np.eye(2, dtype=complex)
+    sz = np.array([[1, 0], [0, -1]], dtype=complex)
+    return np.kron(h0, s0) + np.kron(h1, sz) + np.kron(h3, sz)
+
+
+def build_obc_hamiltonian(
+    v: float,
+    t: float,
+    lm: float,
+    w: float = 1.0,
+    j: float = 0.0,
+    nx: int = 6,
+    ny: int = 6,
+) -> np.ndarray:
+    dim = nx * ny * 8
+    ham = np.zeros((dim, dim), dtype=complex)
+    onsite = build_onsite_cell_matrix(t=t, v=v, lm=lm, j=j)
+
+    for y in range(ny):
+        for x in range(nx):
+            start = (y * nx + x) * 8
+            ham[start : start + 8, start : start + 8] += onsite
+
+            if x > 0:
+                for spin in range(2):
+                    i = _state_index(x, y, 0, spin, nx)
+                    jx = _state_index(x - 1, y, 3, spin, nx)
+                    ham[i, jx] += w
+                    ham[jx, i] += w
+
+            if y > 0:
+                for spin in range(2):
+                    i = _state_index(x, y, 1, spin, nx)
+                    jy = _state_index(x, y - 1, 2, spin, nx)
+                    ham[i, jy] += w
+                    ham[jy, i] += w
+    return ham
+
+
+def compute_obc_spectrum_and_probability(
+    v: float,
+    t: float,
+    lm: float,
+    w: float = 1.0,
+    j: float = 0.0,
+    nx: int = 6,
+    ny: int = 6,
+) -> tuple[np.ndarray, int, float, np.ndarray]:
+    ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
+    eigvals, eigvecs = np.linalg.eigh(ham)
+    target_idx = int(np.argmin(np.abs(eigvals)))
+    target_energy = float(np.real(eigvals[target_idx]))
+    vec = eigvecs[:, target_idx]
+
+    cell_prob = np.zeros(nx * ny, dtype=float)
+    for cell_id in range(nx * ny):
+        start = cell_id * 8
+        cell_prob[cell_id] = float(np.sum(np.abs(vec[start : start + 8]) ** 2))
+    prob_grid = cell_prob.reshape((ny, nx))
+    return eigvals, target_idx, target_energy, prob_grid
+
+
+def plot_obc_spectrum(eigvals: np.ndarray, save_path: Path, title: str) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    indices = np.arange(eigvals.size)
+    ax.scatter(indices, np.real(eigvals), s=8, c="tab:blue")
+    ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
+    ax.set_xlabel("Eigenstate index")
+    ax.set_ylabel("Energy")
+    ax.set_title(title)
+    ax.grid(alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_obc_wavefunction(prob_grid: np.ndarray, target_energy: float, save_path: Path, title: str) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(5, 4))
+    im = ax.imshow(prob_grid, origin="lower", cmap="magma")
+    ax.set_title(f"{title}\n|psi|^2 of mode near E={target_energy:.3e}")
+    ax.set_xlabel("x cell")
+    ax.set_ylabel("y cell")
+    fig.colorbar(im, ax=ax, label="Probability density")
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
 def assign_edge_corner_states(
     rows: list[dict[str, float]],
     logs_path: Path,
@@ -384,6 +504,76 @@ def plot_pairwise_phase_map(
     plt.close(fig)
 
 
+def select_obc_diagnostic_points(rows: list[dict[str, float]], max_points: int = 6) -> list[dict[str, float]]:
+    selected: list[dict[str, float]] = []
+    seen: set[tuple[float, float, float]] = set()
+
+    def add_row(row: dict[str, float]) -> None:
+        key = normalize_key(row["v"], row["t"], row["lm"])
+        if key in seen:
+            return
+        selected.append(row)
+        seen.add(key)
+
+    for phase in ("trivial", "TI", "HOTI"):
+        for row in rows:
+            if classify_phase(row) == phase:
+                add_row(row)
+                break
+
+    for row in sorted(rows, key=lambda r: abs(float(r["gap"]))):
+        if len(selected) >= max_points:
+            break
+        add_row(row)
+
+    return selected
+
+
+def generate_obc_diagnostics(
+    rows: list[dict[str, float]],
+    figures_dir: Path,
+    logs_path: Path,
+    nx: int = 6,
+    ny: int = 6,
+) -> list[str]:
+    generated: list[str] = []
+    for row in select_obc_diagnostic_points(rows, max_points=6):
+        v = float(row["v"])
+        t = float(row["t"])
+        lm = float(row["lm"])
+        spectrum_path = figures_dir / f"obc_spectrum_v{v:.1f}_t{t:.1f}_lm{lm:.1f}.png"
+        wavefunc_path = figures_dir / f"obc_wavefunc_v{v:.1f}_t{t:.1f}_lm{lm:.1f}.png"
+
+        if spectrum_path.exists() and wavefunc_path.exists():
+            continue
+
+        try:
+            eigvals, _, target_energy, prob_grid = compute_obc_spectrum_and_probability(
+                v=v, t=t, lm=lm, w=1.0, j=0.0, nx=nx, ny=ny
+            )
+            if not spectrum_path.exists():
+                plot_obc_spectrum(
+                    eigvals=eigvals,
+                    save_path=spectrum_path,
+                    title=f"OBC spectrum (v={v:.1f}, t={t:.1f}, lm={lm:.1f})",
+                )
+                generated.append(str(spectrum_path))
+            if not wavefunc_path.exists():
+                plot_obc_wavefunction(
+                    prob_grid=prob_grid,
+                    target_energy=target_energy,
+                    save_path=wavefunc_path,
+                    title=f"OBC wavefunction (v={v:.1f}, t={t:.1f}, lm={lm:.1f})",
+                )
+                generated.append(str(wavefunc_path))
+        except Exception as error:  # pragma: no cover
+            log_message(
+                logs_path,
+                f"obc_diagnostic_failed v={v} t={t} lm={lm} error={error!r}",
+            )
+    return generated
+
+
 def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_path: Path, summary: dict[str, int | str]) -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with PdfPages(report_path) as pdf:
@@ -413,7 +603,7 @@ def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_
         pdf.savefig(fig)
         plt.close(fig)
 
-        for name in [
+        figure_paths = [
             "topology_phase_map.png",
             "phase_map_v_t_by_lm.png",
             "phase_map_v_lm_by_t.png",
@@ -421,15 +611,19 @@ def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_
             "chern_vs_parameters.png",
             "edge_state_vs_parameters.png",
             "corner_state_vs_parameters.png",
-        ]:
-            path = figures_dir / name
+        ]
+        selected_paths = [figures_dir / name for name in figure_paths if (figures_dir / name).exists()]
+        selected_paths.extend(sorted(figures_dir.glob("obc_spectrum_*.png")))
+        selected_paths.extend(sorted(figures_dir.glob("obc_wavefunc_*.png")))
+
+        for path in selected_paths:
             if not path.exists():
                 continue
             img = plt.imread(path)
             fig, ax = plt.subplots(figsize=(11, 7))
             ax.imshow(img)
             ax.axis("off")
-            ax.set_title(name)
+            ax.set_title(path.name)
             pdf.savefig(fig)
             plt.close(fig)
 
@@ -577,6 +771,9 @@ def run_parameter_scan() -> dict[str, int | str]:
         plot_pairwise_phase_map(rows, "v", "t", "lm", figures_dir / "phase_map_v_t_by_lm.png")
         plot_pairwise_phase_map(rows, "v", "lm", "t", figures_dir / "phase_map_v_lm_by_t.png")
         plot_pairwise_phase_map(rows, "t", "lm", "v", figures_dir / "phase_map_t_lm_by_v.png")
+        obc_generated_paths = generate_obc_diagnostics(rows, figures_dir, logs_path, nx=6, ny=6)
+    else:
+        obc_generated_paths = []
 
     summary = {
         "total": total_count,
@@ -584,6 +781,7 @@ def run_parameter_scan() -> dict[str, int | str]:
         "failure": failure_count + len(validation_errors),
         "special_points": special_count,
         "cached": cached_count,
+        "obc_generated": len(obc_generated_paths),
         "results_path": str(results_path),
         "logs_path": str(logs_path),
         "figures_path": str(figures_dir),
@@ -611,6 +809,7 @@ if __name__ == "__main__":
     print(f"cached={summary['cached']}")
     print(f"failure={summary['failure']}")
     print(f"special_points={summary['special_points']}")
+    print(f"obc_generated={summary['obc_generated']}")
     print(f"results={summary['results_path']}")
     print(f"figures={summary['figures_path']}")
     print(f"report={summary['report_path']}")
