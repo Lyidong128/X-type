@@ -25,6 +25,23 @@ RESULT_FIELDS = [
     "Z2_topology",
 ]
 
+SPECIAL_POINT_FIELDS = [
+    "v",
+    "t",
+    "lm",
+    "gap",
+    "chern",
+    "Wilson_loop",
+    "Z2_topology",
+    "edge_state",
+    "corner_state",
+    "is_small_gap",
+    "is_chern_jump",
+    "chern_jump_axes",
+    "max_chern_delta",
+    "selection_reason",
+]
+
 SCAN_MIN = 0.0
 SCAN_MAX = 1.0
 DEFAULT_SCAN_STEP = 0.25
@@ -360,15 +377,16 @@ def assign_edge_corner_states(
     logs_path: Path,
     gap_threshold: float = 0.1,
     chern_jump_threshold: float = 0.5,
-) -> int:
+) -> tuple[int, list[dict[str, float | int | str]]]:
     if not rows:
-        return 0
+        return 0, []
     index = {normalize_key(row["v"], row["t"], row["lm"]): row for row in rows}
     unique_v = sorted({float(row["v"]) for row in rows})
     unique_t = sorted({float(row["t"]) for row in rows})
     unique_lm = sorted({float(row["lm"]) for row in rows})
 
     special_count = 0
+    special_records: list[dict[str, float | int | str]] = []
     for row in rows:
         v = float(row["v"])
         t = float(row["t"])
@@ -416,7 +434,74 @@ def assign_edge_corner_states(
             log_message(logs_path, f"special_point type=corner_candidate v={v} t={t} lm={lm}")
         if edge_state or corner_state:
             special_count += 1
-    return special_count
+            reasons = []
+            if is_gap_small:
+                reasons.append("small_gap")
+            if has_chern_jump:
+                reasons.append("chern_jump")
+            if corner_state:
+                reasons.append("corner_candidate")
+            special_records.append(
+                {
+                    "v": v,
+                    "t": t,
+                    "lm": lm,
+                    "gap": gap,
+                    "chern": chern,
+                    "Wilson_loop": float(row["Wilson_loop"]),
+                    "Z2_topology": int(row["Z2_topology"]),
+                    "edge_state": edge_state,
+                    "corner_state": corner_state,
+                    "is_small_gap": int(is_gap_small),
+                    "is_chern_jump": int(has_chern_jump),
+                    "chern_jump_axes": int(chern_jump_axes),
+                    "max_chern_delta": float(max_chern_delta),
+                    "selection_reason": "+".join(reasons),
+                }
+            )
+    return special_count, special_records
+
+
+def write_special_points_outputs(
+    special_points_dir: Path,
+    special_records: list[dict[str, float | int | str]],
+    gap_threshold: float,
+    chern_jump_threshold: float,
+) -> None:
+    special_points_dir.mkdir(parents=True, exist_ok=True)
+
+    csv_path = special_points_dir / "special_points.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=SPECIAL_POINT_FIELDS)
+        writer.writeheader()
+        for row in special_records:
+            writer.writerow({key: row.get(key, "") for key in SPECIAL_POINT_FIELDS})
+
+    criteria_path = special_points_dir / "selection_criteria.txt"
+    with criteria_path.open("w", encoding="utf-8") as f:
+        f.write("Special-point selection criteria\n")
+        f.write("--------------------------------\n")
+        f.write(f"1) small_gap: abs(gap) < {gap_threshold}\n")
+        f.write(
+            "2) chern_jump: max Chern delta against nearest neighbors "
+            f"on v/t/lm axes >= {chern_jump_threshold}\n"
+        )
+        f.write("3) edge_state = 1 when (small_gap OR chern_jump)\n")
+        f.write("4) corner_state = 1 when edge_state=1 and chern_jump_axes >= 2\n")
+        f.write(
+            "5) selection_reason stores trigger tags joined by '+' "
+            "(small_gap, chern_jump, corner_candidate)\n"
+        )
+
+    summary_path = special_points_dir / "summary.txt"
+    small_gap_count = sum(int(row["is_small_gap"]) for row in special_records)
+    chern_jump_count = sum(int(row["is_chern_jump"]) for row in special_records)
+    corner_count = sum(int(row["corner_state"]) for row in special_records)
+    with summary_path.open("w", encoding="utf-8") as f:
+        f.write(f"total_special_points={len(special_records)}\n")
+        f.write(f"small_gap_count={small_gap_count}\n")
+        f.write(f"chern_jump_count={chern_jump_count}\n")
+        f.write(f"corner_candidate_count={corner_count}\n")
 
 
 def compute_band_data(model_module) -> np.ndarray:
@@ -763,8 +848,10 @@ def run_parameter_scan() -> dict[str, int | str]:
     project_root = Path(__file__).resolve().parents[1]
     output_dir = project_root / "outputs"
     figures_dir = output_dir / "figures"
+    special_points_dir = output_dir / "special_points"
     output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
+    special_points_dir.mkdir(parents=True, exist_ok=True)
 
     results_path = output_dir / "results.csv"
     logs_path = output_dir / "logs.txt"
@@ -779,6 +866,12 @@ def run_parameter_scan() -> dict[str, int | str]:
 
     scan_step = env_float("SCAN_STEP", DEFAULT_SCAN_STEP)
     scan_step = scan_step if scan_step > 0 else DEFAULT_SCAN_STEP
+    gap_threshold = env_float("SPECIAL_GAP_THRESHOLD", 0.1)
+    if gap_threshold <= 0:
+        gap_threshold = 0.1
+    chern_jump_threshold = env_float("CHERN_JUMP_THRESHOLD", 0.5)
+    if chern_jump_threshold <= 0:
+        chern_jump_threshold = 0.5
     values = build_scan_values(SCAN_MIN, SCAN_MAX, scan_step)
     scan_points = list(product(values, values, values))
 
@@ -826,7 +919,18 @@ def run_parameter_scan() -> dict[str, int | str]:
             failure_count += 1
             log_message(logs_path, f"compute_failed idx={idx} v={v} t={t} lm={lm} error={error!r}")
 
-    special_count = assign_edge_corner_states(rows=rows, logs_path=logs_path)
+    special_count, special_records = assign_edge_corner_states(
+        rows=rows,
+        logs_path=logs_path,
+        gap_threshold=gap_threshold,
+        chern_jump_threshold=chern_jump_threshold,
+    )
+    write_special_points_outputs(
+        special_points_dir=special_points_dir,
+        special_records=special_records,
+        gap_threshold=gap_threshold,
+        chern_jump_threshold=chern_jump_threshold,
+    )
     write_results_csv(results_path, rows)
 
     validation_errors, invalid_indices = validate_rows(rows)
@@ -834,7 +938,18 @@ def run_parameter_scan() -> dict[str, int | str]:
         for error in validation_errors:
             log_message(logs_path, f"validation_error {error}")
         recalculate_invalid_rows(model, rows, invalid_indices, logs_path)
-        special_count = assign_edge_corner_states(rows=rows, logs_path=logs_path)
+        special_count, special_records = assign_edge_corner_states(
+            rows=rows,
+            logs_path=logs_path,
+            gap_threshold=gap_threshold,
+            chern_jump_threshold=chern_jump_threshold,
+        )
+        write_special_points_outputs(
+            special_points_dir=special_points_dir,
+            special_records=special_records,
+            gap_threshold=gap_threshold,
+            chern_jump_threshold=chern_jump_threshold,
+        )
         write_results_csv(results_path, rows)
         validation_errors, _ = validate_rows(rows)
         for error in validation_errors:
@@ -863,6 +978,7 @@ def run_parameter_scan() -> dict[str, int | str]:
         "success": success_count,
         "failure": failure_count + len(validation_errors),
         "special_points": special_count,
+        "special_points_dir": str(special_points_dir),
         "cached": cached_count,
         "obc_generated": len(obc_generated_paths),
         "results_path": str(results_path),
@@ -892,6 +1008,7 @@ if __name__ == "__main__":
     print(f"cached={summary['cached']}")
     print(f"failure={summary['failure']}")
     print(f"special_points={summary['special_points']}")
+    print(f"special_points_dir={summary['special_points_dir']}")
     print(f"obc_generated={summary['obc_generated']}")
     print(f"results={summary['results_path']}")
     print(f"figures={summary['figures_path']}")
