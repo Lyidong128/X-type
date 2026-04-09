@@ -191,4 +191,3 @@ special_point type=small_gap v=1.0 t=0.75 lm=0.0 gap=-6.072133247030263e-16
 special_point type=chern_jump v=1.0 t=0.75 lm=1.0 max_delta=0.9999999999999997 axes=1
 special_point type=small_gap v=1.0 t=1.0 lm=0.0 gap=-1.872445951057756e-15
 special_point type=small_gap v=1.0 t=1.0 lm=1.0 gap=1.2367404674373022e-16
-obc_diagnostic_failed v=0.0 t=0.0 lm=0.0 error=RuntimeError('Factor is exactly singular')
