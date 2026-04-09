@@ -9,6 +9,8 @@ from matplotlib import cm
 from matplotlib import colors as mcolors
 from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
+from scipy import sparse
+from scipy.sparse.linalg import eigsh
 
 
 RESULT_FIELDS = [
@@ -23,6 +25,12 @@ RESULT_FIELDS = [
     "Z2_topology",
 ]
 
+SCAN_MIN = 0.0
+SCAN_MAX = 1.0
+DEFAULT_SCAN_STEP = 0.25
+DEFAULT_OBC_NX = 20
+DEFAULT_OBC_NY = 20
+
 
 def build_scan_values(start: float, stop: float, step: float) -> list[float]:
     values = []
@@ -32,6 +40,26 @@ def build_scan_values(start: float, stop: float, step: float) -> list[float]:
         values.append(round(current, 10))
         current += step
     return values
+
+
+def env_float(name: str, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
+def env_int(name: str, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        return default
 
 
 def load_xtype_model(model_path: Path):
@@ -227,6 +255,44 @@ def build_obc_hamiltonian(
     return ham
 
 
+def build_obc_hamiltonian_sparse(
+    v: float,
+    t: float,
+    lm: float,
+    w: float = 1.0,
+    j: float = 0.0,
+    nx: int = 20,
+    ny: int = 20,
+) -> sparse.csr_matrix:
+    dim = nx * ny * 8
+    ham = sparse.lil_matrix((dim, dim), dtype=complex)
+    onsite = build_onsite_cell_matrix(t=t, v=v, lm=lm, j=j)
+
+    for y in range(ny):
+        for x in range(nx):
+            start = (y * nx + x) * 8
+            for i in range(8):
+                for j_idx in range(8):
+                    value = onsite[i, j_idx]
+                    if value != 0:
+                        ham[start + i, start + j_idx] += value
+
+            if x > 0:
+                for spin in range(2):
+                    i_idx = _state_index(x, y, 0, spin, nx)
+                    jx = _state_index(x - 1, y, 3, spin, nx)
+                    ham[i_idx, jx] += w
+                    ham[jx, i_idx] += w
+
+            if y > 0:
+                for spin in range(2):
+                    i_idx = _state_index(x, y, 1, spin, nx)
+                    jy = _state_index(x, y - 1, 2, spin, nx)
+                    ham[i_idx, jy] += w
+                    ham[jy, i_idx] += w
+    return ham.tocsr()
+
+
 def compute_obc_spectrum_and_probability(
     v: float,
     t: float,
@@ -236,11 +302,22 @@ def compute_obc_spectrum_and_probability(
     nx: int = 6,
     ny: int = 6,
 ) -> tuple[np.ndarray, int, float, np.ndarray]:
-    ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
-    eigvals, eigvecs = np.linalg.eigh(ham)
-    target_idx = int(np.argmin(np.abs(eigvals)))
-    target_energy = float(np.real(eigvals[target_idx]))
-    vec = eigvecs[:, target_idx]
+    if nx * ny <= 64:
+        ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
+        eigvals, eigvecs = np.linalg.eigh(ham)
+        target_idx = int(np.argmin(np.abs(eigvals)))
+        target_energy = float(np.real(eigvals[target_idx]))
+        vec = eigvecs[:, target_idx]
+    else:
+        ham_sparse = build_obc_hamiltonian_sparse(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
+        mode_count = min(120, ham_sparse.shape[0] - 2)
+        eigvals, eigvecs = eigsh(ham_sparse, k=mode_count, sigma=0.0, which="LM")
+        sort_idx = np.argsort(np.real(eigvals))
+        eigvals = np.real(eigvals[sort_idx])
+        eigvecs = eigvecs[:, sort_idx]
+        target_idx = int(np.argmin(np.abs(eigvals)))
+        target_energy = float(eigvals[target_idx])
+        vec = eigvecs[:, target_idx]
 
     cell_prob = np.zeros(nx * ny, dtype=float)
     for cell_id in range(nx * ny):
@@ -256,7 +333,7 @@ def plot_obc_spectrum(eigvals: np.ndarray, save_path: Path, title: str) -> None:
     indices = np.arange(eigvals.size)
     ax.scatter(indices, np.real(eigvals), s=8, c="tab:blue")
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
-    ax.set_xlabel("Eigenstate index")
+    ax.set_xlabel("Mode index")
     ax.set_ylabel("Energy")
     ax.set_title(title)
     ax.grid(alpha=0.25)
@@ -533,16 +610,16 @@ def generate_obc_diagnostics(
     rows: list[dict[str, float]],
     figures_dir: Path,
     logs_path: Path,
-    nx: int = 6,
-    ny: int = 6,
+    nx: int = 20,
+    ny: int = 20,
 ) -> list[str]:
     generated: list[str] = []
-    for row in select_obc_diagnostic_points(rows, max_points=6):
+    for row in select_obc_diagnostic_points(rows, max_points=4):
         v = float(row["v"])
         t = float(row["t"])
         lm = float(row["lm"])
-        spectrum_path = figures_dir / f"obc_spectrum_v{v:.1f}_t{t:.1f}_lm{lm:.1f}.png"
-        wavefunc_path = figures_dir / f"obc_wavefunc_v{v:.1f}_t{t:.1f}_lm{lm:.1f}.png"
+        spectrum_path = figures_dir / f"obc_spectrum_v{v:.1f}_t{t:.1f}_lm{lm:.1f}_nx{nx}_ny{ny}.png"
+        wavefunc_path = figures_dir / f"obc_wavefunc_v{v:.1f}_t{t:.1f}_lm{lm:.1f}_nx{nx}_ny{ny}.png"
 
         if spectrum_path.exists() and wavefunc_path.exists():
             continue
@@ -700,10 +777,10 @@ def run_parameter_scan() -> dict[str, int | str]:
     if logs_path.exists():
         logs_path.unlink()
 
-    scan_points = load_scan_points_from_results(results_path)
-    if not scan_points:
-        values = build_scan_values(0.0, 1.0, 0.5)
-        scan_points = list(product(values, values, values))
+    scan_step = env_float("SCAN_STEP", DEFAULT_SCAN_STEP)
+    scan_step = scan_step if scan_step > 0 else DEFAULT_SCAN_STEP
+    values = build_scan_values(SCAN_MIN, SCAN_MAX, scan_step)
+    scan_points = list(product(values, values, values))
 
     cache = load_cached_rows(results_path, logs_path)
     rows: list[dict[str, float]] = []
@@ -771,7 +848,13 @@ def run_parameter_scan() -> dict[str, int | str]:
         plot_pairwise_phase_map(rows, "v", "t", "lm", figures_dir / "phase_map_v_t_by_lm.png")
         plot_pairwise_phase_map(rows, "v", "lm", "t", figures_dir / "phase_map_v_lm_by_t.png")
         plot_pairwise_phase_map(rows, "t", "lm", "v", figures_dir / "phase_map_t_lm_by_v.png")
-        obc_generated_paths = generate_obc_diagnostics(rows, figures_dir, logs_path, nx=6, ny=6)
+        obc_nx = env_int("OBC_NX", DEFAULT_OBC_NX)
+        obc_ny = env_int("OBC_NY", DEFAULT_OBC_NY)
+        if obc_nx < 2:
+            obc_nx = DEFAULT_OBC_NX
+        if obc_ny < 2:
+            obc_ny = DEFAULT_OBC_NY
+        obc_generated_paths = generate_obc_diagnostics(rows, figures_dir, logs_path, nx=obc_nx, ny=obc_ny)
     else:
         obc_generated_paths = []
 
