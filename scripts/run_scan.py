@@ -47,6 +47,9 @@ SCAN_MAX = 1.0
 DEFAULT_SCAN_STEP = 0.25
 DEFAULT_OBC_NX = 20
 DEFAULT_OBC_NY = 20
+DEFAULT_OBC_MODE_COUNT = 48
+DEFAULT_RIBBON_NX = 20
+DEFAULT_RIBBON_NK = 61
 
 
 def build_scan_values(start: float, stop: float, step: float) -> list[float]:
@@ -203,6 +206,10 @@ def set_model_params(model, v: float, t: float, lm: float, w: float = 1.0, j: fl
     model.J = float(j)
 
 
+def format_param_token(value: float) -> str:
+    return f"{value:.2f}".replace("-", "m").replace(".", "p")
+
+
 def _state_index(x: int, y: int, orb: int, spin: int, nx: int) -> int:
     return ((y * nx + x) * 8) + (orb * 2 + spin)
 
@@ -318,6 +325,7 @@ def compute_obc_spectrum_and_probability(
     j: float = 0.0,
     nx: int = 6,
     ny: int = 6,
+    mode_count: int = DEFAULT_OBC_MODE_COUNT,
 ) -> tuple[np.ndarray, int, float, np.ndarray]:
     if nx * ny <= 64:
         ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
@@ -327,8 +335,8 @@ def compute_obc_spectrum_and_probability(
         vec = eigvecs[:, target_idx]
     else:
         ham_sparse = build_obc_hamiltonian_sparse(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
-        mode_count = min(120, ham_sparse.shape[0] - 2)
-        eigvals, eigvecs = eigsh(ham_sparse, k=mode_count, sigma=0.0, which="LM")
+        target_k = min(max(8, mode_count), ham_sparse.shape[0] - 2)
+        eigvals, eigvecs = eigsh(ham_sparse, k=target_k, sigma=0.0, which="LM")
         sort_idx = np.argsort(np.real(eigvals))
         eigvals = np.real(eigvals[sort_idx])
         eigvecs = eigvecs[:, sort_idx]
@@ -351,6 +359,87 @@ def plot_obc_spectrum(eigvals: np.ndarray, save_path: Path, title: str) -> None:
     ax.scatter(indices, np.real(eigvals), s=8, c="tab:blue")
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
     ax.set_xlabel("Mode index")
+    ax.set_ylabel("Energy")
+    ax.set_title(title)
+    ax.grid(alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
+def build_onsite_cell_matrix_ribbon(t: float, v: float, lm: float, j: float, w: float, ky: float) -> np.ndarray:
+    h0 = np.zeros((4, 4), dtype=complex)
+    h0[0, 1] = t
+    h0[0, 2] = t
+    h0[0, 3] = v
+    h0[1, 0] = t
+    h0[1, 2] = v + w * np.exp(-1j * ky)
+    h0[1, 3] = t
+    h0[2, 0] = t
+    h0[2, 1] = v + w * np.exp(1j * ky)
+    h0[2, 3] = t
+    h0[3, 0] = v
+    h0[3, 1] = t
+    h0[3, 2] = t
+
+    h1 = np.zeros((4, 4), dtype=complex)
+    h1[0, 1] = 1j * lm
+    h1[0, 2] = -1j * lm
+    h1[2, 3] = -1j * lm
+    h1[3, 2] = 1j * lm
+    h1[3, 1] = -1j * lm
+    h1[1, 0] = -1j * lm
+    h1[2, 0] = 1j * lm
+    h1[1, 3] = 1j * lm
+
+    h3 = np.diag([j, -j, j, -j]).astype(complex)
+    s0 = np.eye(2, dtype=complex)
+    sz = np.array([[1, 0], [0, -1]], dtype=complex)
+    return np.kron(h0, s0) + np.kron(h1, sz) + np.kron(h3, sz)
+
+
+def build_ribbon_hamiltonian(v: float, t: float, lm: float, ky: float, w: float = 1.0, j: float = 0.0, nx: int = 20) -> np.ndarray:
+    dim = 8 * nx
+    ham = np.zeros((dim, dim), dtype=complex)
+    onsite = build_onsite_cell_matrix_ribbon(t=t, v=v, lm=lm, j=j, w=w, ky=ky)
+    tx = np.zeros((8, 8), dtype=complex)
+    for spin in range(2):
+        tx[0 * 2 + spin, 3 * 2 + spin] = w
+
+    for x in range(nx):
+        start = x * 8
+        ham[start : start + 8, start : start + 8] += onsite
+        if x > 0:
+            prev = (x - 1) * 8
+            ham[start : start + 8, prev : prev + 8] += tx
+            ham[prev : prev + 8, start : start + 8] += tx.conj().T
+    return ham
+
+
+def compute_ribbon_spectrum(
+    v: float,
+    t: float,
+    lm: float,
+    w: float = 1.0,
+    j: float = 0.0,
+    nx: int = DEFAULT_RIBBON_NX,
+    nk: int = DEFAULT_RIBBON_NK,
+) -> tuple[np.ndarray, np.ndarray]:
+    ky_values = np.linspace(-np.pi, np.pi, nk)
+    eigvals = []
+    for ky in ky_values:
+        ham = build_ribbon_hamiltonian(v=v, t=t, lm=lm, ky=ky, w=w, j=j, nx=nx)
+        eigvals.append(np.linalg.eigvalsh(ham).real)
+    return ky_values, np.array(eigvals)
+
+
+def plot_ribbon_spectrum(ky_values: np.ndarray, eigvals: np.ndarray, save_path: Path, title: str) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    for band_idx in range(eigvals.shape[1]):
+        ax.plot(ky_values / np.pi, eigvals[:, band_idx], linewidth=0.6, color="tab:blue")
+    ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
+    ax.set_xlabel(r"$k_y/\pi$")
     ax.set_ylabel("Energy")
     ax.set_title(title)
     ax.grid(alpha=0.25)
@@ -502,6 +591,154 @@ def write_special_points_outputs(
         f.write(f"small_gap_count={small_gap_count}\n")
         f.write(f"chern_jump_count={chern_jump_count}\n")
         f.write(f"corner_candidate_count={corner_count}\n")
+
+
+def write_special_point_note_chinese(
+    note_path: Path,
+    record: dict[str, float | int | str],
+    gap_threshold: float,
+    chern_jump_threshold: float,
+) -> None:
+    note_path.parent.mkdir(parents=True, exist_ok=True)
+    with note_path.open("w", encoding="utf-8") as f:
+        f.write("特殊点说明（自动生成）\n")
+        f.write("====================\n")
+        f.write(
+            f"参数：v={float(record['v']):.2f}, t={float(record['t']):.2f}, "
+            f"lm={float(record['lm']):.2f}\n"
+        )
+        f.write(
+            f"物理量：gap={float(record['gap']):.6e}, "
+            f"chern={float(record['chern']):.6e}, "
+            f"Wilson_loop={float(record['Wilson_loop']):.6f}, "
+            f"Z2={int(record['Z2_topology'])}\n"
+        )
+        f.write(
+            f"状态：edge_state={int(record['edge_state'])}, "
+            f"corner_state={int(record['corner_state'])}\n\n"
+        )
+        f.write("该点被选为“特殊点”的原因：\n")
+        f.write(
+            f"1) small_gap 判据：abs(gap) < {gap_threshold}，"
+            f"当前 is_small_gap={int(record['is_small_gap'])}\n"
+        )
+        f.write(
+            "2) chern_jump 判据：参数最近邻上的最大 Chern 跳变 >= "
+            f"{chern_jump_threshold}，当前 is_chern_jump={int(record['is_chern_jump'])}，"
+            f"max_chern_delta={float(record['max_chern_delta']):.6e}，"
+            f"chern_jump_axes={int(record['chern_jump_axes'])}\n"
+        )
+        f.write(
+            "3) selection_reason："
+            f"{record['selection_reason']}\n"
+        )
+        f.write(
+            "\n本目录文件含义：\n"
+            "- band.png：周期边界下体能带\n"
+            "- ribbon.png：ribbon 几何下 E-k_y 色散\n"
+            "- obc_spectrum.png：OBC 近零能谱（E vs 模态索引）\n"
+            "- obc_wavefunction.png：近零模在实空间的概率分布\n"
+        )
+
+
+def generate_special_point_artifacts(
+    model,
+    special_records: list[dict[str, float | int | str]],
+    special_points_dir: Path,
+    logs_path: Path,
+    gap_threshold: float,
+    chern_jump_threshold: float,
+    obc_nx: int,
+    obc_ny: int,
+    obc_mode_count: int,
+    ribbon_nx: int,
+    ribbon_nk: int,
+) -> int:
+    points_dir = special_points_dir / "points"
+    points_dir.mkdir(parents=True, exist_ok=True)
+
+    generated_point_count = 0
+    for record in special_records:
+        v = float(record["v"])
+        t = float(record["t"])
+        lm = float(record["lm"])
+        point_name = (
+            f"v_{format_param_token(v)}_t_{format_param_token(t)}_lm_{format_param_token(lm)}"
+        )
+        point_dir = points_dir / point_name
+        point_dir.mkdir(parents=True, exist_ok=True)
+
+        band_path = point_dir / "band.png"
+        ribbon_path = point_dir / "ribbon.png"
+        obc_spectrum_path = point_dir / "obc_spectrum.png"
+        obc_wavefunc_path = point_dir / "obc_wavefunction.png"
+        note_path = point_dir / "说明.txt"
+
+        try:
+            set_model_params(model, v=v, t=t, lm=lm, w=1.0, j=0.0)
+            if not band_path.exists():
+                band_data = compute_band_data(model)
+                plot_band_structure(
+                    eigvals=band_data,
+                    save_path=band_path,
+                    title=f"Band (v={v:.2f}, t={t:.2f}, lm={lm:.2f})",
+                )
+
+            if not ribbon_path.exists():
+                ky_values, ribbon_eigs = compute_ribbon_spectrum(
+                    v=v,
+                    t=t,
+                    lm=lm,
+                    w=1.0,
+                    j=0.0,
+                    nx=ribbon_nx,
+                    nk=ribbon_nk,
+                )
+                plot_ribbon_spectrum(
+                    ky_values=ky_values,
+                    eigvals=ribbon_eigs,
+                    save_path=ribbon_path,
+                    title=f"Ribbon (v={v:.2f}, t={t:.2f}, lm={lm:.2f})",
+                )
+
+            if not obc_spectrum_path.exists() or not obc_wavefunc_path.exists():
+                eigvals, _, target_energy, prob_grid = compute_obc_spectrum_and_probability(
+                    v=v,
+                    t=t,
+                    lm=lm,
+                    w=1.0,
+                    j=0.0,
+                    nx=obc_nx,
+                    ny=obc_ny,
+                    mode_count=obc_mode_count,
+                )
+                if not obc_spectrum_path.exists():
+                    plot_obc_spectrum(
+                        eigvals=eigvals,
+                        save_path=obc_spectrum_path,
+                        title=f"OBC spectrum (v={v:.2f}, t={t:.2f}, lm={lm:.2f})",
+                    )
+                if not obc_wavefunc_path.exists():
+                    plot_obc_wavefunction(
+                        prob_grid=prob_grid,
+                        target_energy=target_energy,
+                        save_path=obc_wavefunc_path,
+                        title=f"OBC wavefunction (v={v:.2f}, t={t:.2f}, lm={lm:.2f})",
+                    )
+
+            write_special_point_note_chinese(
+                note_path=note_path,
+                record=record,
+                gap_threshold=gap_threshold,
+                chern_jump_threshold=chern_jump_threshold,
+            )
+            generated_point_count += 1
+        except Exception as error:  # pragma: no cover
+            log_message(
+                logs_path,
+                f"special_point_artifact_failed v={v} t={t} lm={lm} error={error!r}",
+            )
+    return generated_point_count
 
 
 def compute_band_data(model_module) -> np.ndarray:
@@ -697,6 +934,7 @@ def generate_obc_diagnostics(
     logs_path: Path,
     nx: int = 20,
     ny: int = 20,
+    mode_count: int = DEFAULT_OBC_MODE_COUNT,
 ) -> list[str]:
     generated: list[str] = []
     for row in select_obc_diagnostic_points(rows, max_points=4):
@@ -711,7 +949,14 @@ def generate_obc_diagnostics(
 
         try:
             eigvals, _, target_energy, prob_grid = compute_obc_spectrum_and_probability(
-                v=v, t=t, lm=lm, w=1.0, j=0.0, nx=nx, ny=ny
+                v=v,
+                t=t,
+                lm=lm,
+                w=1.0,
+                j=0.0,
+                nx=nx,
+                ny=ny,
+                mode_count=mode_count,
             )
             if not spectrum_path.exists():
                 plot_obc_spectrum(
@@ -965,13 +1210,44 @@ def run_parameter_scan() -> dict[str, int | str]:
         plot_pairwise_phase_map(rows, "t", "lm", "v", figures_dir / "phase_map_t_lm_by_v.png")
         obc_nx = env_int("OBC_NX", DEFAULT_OBC_NX)
         obc_ny = env_int("OBC_NY", DEFAULT_OBC_NY)
+        obc_mode_count = env_int("OBC_MODE_COUNT", DEFAULT_OBC_MODE_COUNT)
+        ribbon_nx = env_int("RIBBON_NX", DEFAULT_RIBBON_NX)
+        ribbon_nk = env_int("RIBBON_NK", DEFAULT_RIBBON_NK)
         if obc_nx < 2:
             obc_nx = DEFAULT_OBC_NX
         if obc_ny < 2:
             obc_ny = DEFAULT_OBC_NY
-        obc_generated_paths = generate_obc_diagnostics(rows, figures_dir, logs_path, nx=obc_nx, ny=obc_ny)
+        if obc_mode_count < 8:
+            obc_mode_count = DEFAULT_OBC_MODE_COUNT
+        if ribbon_nx < 2:
+            ribbon_nx = DEFAULT_RIBBON_NX
+        if ribbon_nk < 10:
+            ribbon_nk = DEFAULT_RIBBON_NK
+
+        obc_generated_paths = generate_obc_diagnostics(
+            rows,
+            figures_dir,
+            logs_path,
+            nx=obc_nx,
+            ny=obc_ny,
+            mode_count=obc_mode_count,
+        )
+        special_point_artifacts = generate_special_point_artifacts(
+            model=model,
+            special_records=special_records,
+            special_points_dir=special_points_dir,
+            logs_path=logs_path,
+            gap_threshold=gap_threshold,
+            chern_jump_threshold=chern_jump_threshold,
+            obc_nx=obc_nx,
+            obc_ny=obc_ny,
+            obc_mode_count=obc_mode_count,
+            ribbon_nx=ribbon_nx,
+            ribbon_nk=ribbon_nk,
+        )
     else:
         obc_generated_paths = []
+        special_point_artifacts = 0
 
     summary = {
         "total": total_count,
@@ -981,6 +1257,7 @@ def run_parameter_scan() -> dict[str, int | str]:
         "special_points_dir": str(special_points_dir),
         "cached": cached_count,
         "obc_generated": len(obc_generated_paths),
+        "special_point_artifacts": special_point_artifacts,
         "results_path": str(results_path),
         "logs_path": str(logs_path),
         "figures_path": str(figures_dir),
@@ -1010,6 +1287,7 @@ if __name__ == "__main__":
     print(f"special_points={summary['special_points']}")
     print(f"special_points_dir={summary['special_points_dir']}")
     print(f"obc_generated={summary['obc_generated']}")
+    print(f"special_point_artifacts={summary['special_point_artifacts']}")
     print(f"results={summary['results_path']}")
     print(f"figures={summary['figures_path']}")
     print(f"report={summary['report_path']}")
