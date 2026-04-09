@@ -1,0 +1,7 @@
+Special-point selection criteria
+--------------------------------
+1) small_gap: abs(gap) < 0.1
+2) chern_jump: max Chern delta against nearest neighbors on v/t/lm axes >= 0.5
+3) edge_state = 1 when (small_gap OR chern_jump)
+4) corner_state = 1 when edge_state=1 and chern_jump_axes >= 2
+5) selection_reason stores trigger tags joined by '+' (small_gap, chern_jump, corner_candidate)
