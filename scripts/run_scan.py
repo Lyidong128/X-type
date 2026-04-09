@@ -336,7 +336,11 @@ def compute_obc_spectrum_and_probability(
     else:
         ham_sparse = build_obc_hamiltonian_sparse(v=v, t=t, lm=lm, w=w, j=j, nx=nx, ny=ny)
         target_k = min(max(8, mode_count), ham_sparse.shape[0] - 2)
-        eigvals, eigvecs = eigsh(ham_sparse, k=target_k, sigma=0.0, which="LM")
+        try:
+            eigvals, eigvecs = eigsh(ham_sparse, k=target_k, sigma=0.0, which="LM")
+        except RuntimeError:
+            # Fallback for singular factorization near exact zero modes.
+            eigvals, eigvecs = eigsh(ham_sparse, k=target_k, which="SM")
         sort_idx = np.argsort(np.real(eigvals))
         eigvals = np.real(eigvals[sort_idx])
         eigvecs = eigvecs[:, sort_idx]
