@@ -825,6 +825,33 @@ def plot_state_relationship(rows: list[dict[str, float]], state_key: str, save_p
     plt.close(fig)
 
 
+def plot_wilson_relationship(rows: list[dict[str, float]], save_path: Path) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    v = np.array([row["v"] for row in rows], dtype=float)
+    t = np.array([row["t"] for row in rows], dtype=float)
+    lm = np.array([row["lm"] for row in rows], dtype=float)
+    wilson = np.array([row["Wilson_loop"] for row in rows], dtype=float)
+    z2 = np.array([row["Z2_topology"] for row in rows], dtype=float)
+
+    cmap = mcolors.ListedColormap(["#8c8c8c", "#1f77b4"])
+    norm = mcolors.BoundaryNorm([-0.5, 0.5, 1.5], cmap.N)
+
+    fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
+    for ax, (label, values) in zip(axes, [("v", v), ("t", t), ("lm", lm)]):
+        ax.scatter(values, wilson, c=z2, cmap=cmap, norm=norm, s=55, edgecolors="black", linewidths=0.3)
+        ax.set_xlabel(label)
+        ax.grid(alpha=0.25)
+    axes[0].set_ylabel("Wilson loop winding")
+    fig.suptitle("Wilson loop vs parameters (color: Z2)")
+    fig.subplots_adjust(left=0.07, right=0.88, bottom=0.14, top=0.86, wspace=0.28)
+    cax = fig.add_axes([0.90, 0.16, 0.02, 0.66])
+    cbar = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax)
+    cbar.set_ticks([0, 1])
+    cbar.set_ticklabels(["Z2=0", "Z2=1"])
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
 def classify_phase(row: dict[str, float]) -> str:
     chern = float(row["chern"])
     z2 = int(row["Z2_topology"])
@@ -1020,6 +1047,7 @@ def generate_report_pdf(rows: list[dict[str, float]], figures_dir: Path, report_
             "phase_map_v_lm_by_t.png",
             "phase_map_t_lm_by_v.png",
             "chern_vs_parameters.png",
+            "wilson_vs_parameters.png",
             "edge_state_vs_parameters.png",
             "corner_state_vs_parameters.png",
         ]
@@ -1206,6 +1234,7 @@ def run_parameter_scan() -> dict[str, int | str]:
 
     if rows:
         plot_chern_relationship(rows, figures_dir / "chern_vs_parameters.png")
+        plot_wilson_relationship(rows, figures_dir / "wilson_vs_parameters.png")
         plot_state_relationship(rows, "edge_state", figures_dir / "edge_state_vs_parameters.png", "Edge state vs parameters")
         plot_state_relationship(rows, "corner_state", figures_dir / "corner_state_vs_parameters.png", "Corner state vs parameters")
         plot_topology_phase_map(rows, figures_dir / "topology_phase_map.png")
