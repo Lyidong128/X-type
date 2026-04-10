@@ -1,193 +1,374 @@
 skip_cached idx=1 v=0.0 t=0.0 lm=0.0
-skip_cached idx=2 v=0.0 t=0.0 lm=0.25
-skip_cached idx=3 v=0.0 t=0.0 lm=0.5
-skip_cached idx=4 v=0.0 t=0.0 lm=0.75
-skip_cached idx=5 v=0.0 t=0.0 lm=1.0
-skip_cached idx=6 v=0.0 t=0.25 lm=0.0
-skip_cached idx=7 v=0.0 t=0.25 lm=0.25
-skip_cached idx=8 v=0.0 t=0.25 lm=0.5
-skip_cached idx=9 v=0.0 t=0.25 lm=0.75
-skip_cached idx=10 v=0.0 t=0.25 lm=1.0
-skip_cached idx=11 v=0.0 t=0.5 lm=0.0
-skip_cached idx=12 v=0.0 t=0.5 lm=0.25
-skip_cached idx=13 v=0.0 t=0.5 lm=0.5
-skip_cached idx=14 v=0.0 t=0.5 lm=0.75
-skip_cached idx=15 v=0.0 t=0.5 lm=1.0
-skip_cached idx=16 v=0.0 t=0.75 lm=0.0
-skip_cached idx=17 v=0.0 t=0.75 lm=0.25
-skip_cached idx=18 v=0.0 t=0.75 lm=0.5
-skip_cached idx=19 v=0.0 t=0.75 lm=0.75
-skip_cached idx=20 v=0.0 t=0.75 lm=1.0
-skip_cached idx=21 v=0.0 t=1.0 lm=0.0
-skip_cached idx=22 v=0.0 t=1.0 lm=0.25
-skip_cached idx=23 v=0.0 t=1.0 lm=0.5
-skip_cached idx=24 v=0.0 t=1.0 lm=0.75
-skip_cached idx=25 v=0.0 t=1.0 lm=1.0
-skip_cached idx=26 v=0.25 t=0.0 lm=0.0
-skip_cached idx=27 v=0.25 t=0.0 lm=0.25
-skip_cached idx=28 v=0.25 t=0.0 lm=0.5
-skip_cached idx=29 v=0.25 t=0.0 lm=0.75
-skip_cached idx=30 v=0.25 t=0.0 lm=1.0
-skip_cached idx=31 v=0.25 t=0.25 lm=0.0
-skip_cached idx=32 v=0.25 t=0.25 lm=0.25
-skip_cached idx=33 v=0.25 t=0.25 lm=0.5
-skip_cached idx=34 v=0.25 t=0.25 lm=0.75
-skip_cached idx=35 v=0.25 t=0.25 lm=1.0
-skip_cached idx=36 v=0.25 t=0.5 lm=0.0
-skip_cached idx=37 v=0.25 t=0.5 lm=0.25
-skip_cached idx=38 v=0.25 t=0.5 lm=0.5
-skip_cached idx=39 v=0.25 t=0.5 lm=0.75
-skip_cached idx=40 v=0.25 t=0.5 lm=1.0
-skip_cached idx=41 v=0.25 t=0.75 lm=0.0
-skip_cached idx=42 v=0.25 t=0.75 lm=0.25
-skip_cached idx=43 v=0.25 t=0.75 lm=0.5
-skip_cached idx=44 v=0.25 t=0.75 lm=0.75
-skip_cached idx=45 v=0.25 t=0.75 lm=1.0
-skip_cached idx=46 v=0.25 t=1.0 lm=0.0
-skip_cached idx=47 v=0.25 t=1.0 lm=0.25
-skip_cached idx=48 v=0.25 t=1.0 lm=0.5
-skip_cached idx=49 v=0.25 t=1.0 lm=0.75
-skip_cached idx=50 v=0.25 t=1.0 lm=1.0
-skip_cached idx=51 v=0.5 t=0.0 lm=0.0
-skip_cached idx=52 v=0.5 t=0.0 lm=0.25
-skip_cached idx=53 v=0.5 t=0.0 lm=0.5
-skip_cached idx=54 v=0.5 t=0.0 lm=0.75
-skip_cached idx=55 v=0.5 t=0.0 lm=1.0
-skip_cached idx=56 v=0.5 t=0.25 lm=0.0
-skip_cached idx=57 v=0.5 t=0.25 lm=0.25
-skip_cached idx=58 v=0.5 t=0.25 lm=0.5
-skip_cached idx=59 v=0.5 t=0.25 lm=0.75
-skip_cached idx=60 v=0.5 t=0.25 lm=1.0
-skip_cached idx=61 v=0.5 t=0.5 lm=0.0
-skip_cached idx=62 v=0.5 t=0.5 lm=0.25
-skip_cached idx=63 v=0.5 t=0.5 lm=0.5
-skip_cached idx=64 v=0.5 t=0.5 lm=0.75
-skip_cached idx=65 v=0.5 t=0.5 lm=1.0
-skip_cached idx=66 v=0.5 t=0.75 lm=0.0
-skip_cached idx=67 v=0.5 t=0.75 lm=0.25
-skip_cached idx=68 v=0.5 t=0.75 lm=0.5
-skip_cached idx=69 v=0.5 t=0.75 lm=0.75
-skip_cached idx=70 v=0.5 t=0.75 lm=1.0
-skip_cached idx=71 v=0.5 t=1.0 lm=0.0
-skip_cached idx=72 v=0.5 t=1.0 lm=0.25
-skip_cached idx=73 v=0.5 t=1.0 lm=0.5
-skip_cached idx=74 v=0.5 t=1.0 lm=0.75
-skip_cached idx=75 v=0.5 t=1.0 lm=1.0
-skip_cached idx=76 v=0.75 t=0.0 lm=0.0
-skip_cached idx=77 v=0.75 t=0.0 lm=0.25
-skip_cached idx=78 v=0.75 t=0.0 lm=0.5
-skip_cached idx=79 v=0.75 t=0.0 lm=0.75
-skip_cached idx=80 v=0.75 t=0.0 lm=1.0
-skip_cached idx=81 v=0.75 t=0.25 lm=0.0
-skip_cached idx=82 v=0.75 t=0.25 lm=0.25
-skip_cached idx=83 v=0.75 t=0.25 lm=0.5
-skip_cached idx=84 v=0.75 t=0.25 lm=0.75
-skip_cached idx=85 v=0.75 t=0.25 lm=1.0
-skip_cached idx=86 v=0.75 t=0.5 lm=0.0
-skip_cached idx=87 v=0.75 t=0.5 lm=0.25
-skip_cached idx=88 v=0.75 t=0.5 lm=0.5
-skip_cached idx=89 v=0.75 t=0.5 lm=0.75
-skip_cached idx=90 v=0.75 t=0.5 lm=1.0
-skip_cached idx=91 v=0.75 t=0.75 lm=0.0
-skip_cached idx=92 v=0.75 t=0.75 lm=0.25
-skip_cached idx=93 v=0.75 t=0.75 lm=0.5
-skip_cached idx=94 v=0.75 t=0.75 lm=0.75
-skip_cached idx=95 v=0.75 t=0.75 lm=1.0
-skip_cached idx=96 v=0.75 t=1.0 lm=0.0
-skip_cached idx=97 v=0.75 t=1.0 lm=0.25
-skip_cached idx=98 v=0.75 t=1.0 lm=0.5
-skip_cached idx=99 v=0.75 t=1.0 lm=0.75
-skip_cached idx=100 v=0.75 t=1.0 lm=1.0
-skip_cached idx=101 v=1.0 t=0.0 lm=0.0
-skip_cached idx=102 v=1.0 t=0.0 lm=0.25
-skip_cached idx=103 v=1.0 t=0.0 lm=0.5
-skip_cached idx=104 v=1.0 t=0.0 lm=0.75
-skip_cached idx=105 v=1.0 t=0.0 lm=1.0
-skip_cached idx=106 v=1.0 t=0.25 lm=0.0
-skip_cached idx=107 v=1.0 t=0.25 lm=0.25
-skip_cached idx=108 v=1.0 t=0.25 lm=0.5
-skip_cached idx=109 v=1.0 t=0.25 lm=0.75
-skip_cached idx=110 v=1.0 t=0.25 lm=1.0
-skip_cached idx=111 v=1.0 t=0.5 lm=0.0
-skip_cached idx=112 v=1.0 t=0.5 lm=0.25
-skip_cached idx=113 v=1.0 t=0.5 lm=0.5
-skip_cached idx=114 v=1.0 t=0.5 lm=0.75
-skip_cached idx=115 v=1.0 t=0.5 lm=1.0
-skip_cached idx=116 v=1.0 t=0.75 lm=0.0
-skip_cached idx=117 v=1.0 t=0.75 lm=0.25
-skip_cached idx=118 v=1.0 t=0.75 lm=0.5
-skip_cached idx=119 v=1.0 t=0.75 lm=0.75
-skip_cached idx=120 v=1.0 t=0.75 lm=1.0
-skip_cached idx=121 v=1.0 t=1.0 lm=0.0
-skip_cached idx=122 v=1.0 t=1.0 lm=0.25
-skip_cached idx=123 v=1.0 t=1.0 lm=0.5
-skip_cached idx=124 v=1.0 t=1.0 lm=0.75
-skip_cached idx=125 v=1.0 t=1.0 lm=1.0
+skip_cached idx=6 v=0.0 t=0.0 lm=0.5
+skip_cached idx=11 v=0.0 t=0.0 lm=1.0
+skip_cached idx=56 v=0.0 t=0.5 lm=0.0
+skip_cached idx=61 v=0.0 t=0.5 lm=0.5
+skip_cached idx=66 v=0.0 t=0.5 lm=1.0
+skip_cached idx=111 v=0.0 t=1.0 lm=0.0
+skip_cached idx=116 v=0.0 t=1.0 lm=0.5
+skip_cached idx=121 v=0.0 t=1.0 lm=1.0
+skip_cached idx=606 v=0.5 t=0.0 lm=0.0
+skip_cached idx=611 v=0.5 t=0.0 lm=0.5
+skip_cached idx=616 v=0.5 t=0.0 lm=1.0
+skip_cached idx=661 v=0.5 t=0.5 lm=0.0
+skip_cached idx=666 v=0.5 t=0.5 lm=0.5
+skip_cached idx=671 v=0.5 t=0.5 lm=1.0
+skip_cached idx=716 v=0.5 t=1.0 lm=0.0
+skip_cached idx=721 v=0.5 t=1.0 lm=0.5
+skip_cached idx=726 v=0.5 t=1.0 lm=1.0
+skip_cached idx=1211 v=1.0 t=0.0 lm=0.0
+skip_cached idx=1216 v=1.0 t=0.0 lm=0.5
+skip_cached idx=1221 v=1.0 t=0.0 lm=1.0
+skip_cached idx=1266 v=1.0 t=0.5 lm=0.0
+skip_cached idx=1271 v=1.0 t=0.5 lm=0.5
+skip_cached idx=1276 v=1.0 t=0.5 lm=1.0
+skip_cached idx=1321 v=1.0 t=1.0 lm=0.0
+skip_cached idx=1326 v=1.0 t=1.0 lm=0.5
+skip_cached idx=1331 v=1.0 t=1.0 lm=1.0
 special_point type=small_gap v=0.0 t=0.0 lm=0.5 gap=-7.363859260972749e-16
-special_point type=small_gap v=0.0 t=0.25 lm=0.5 gap=-1.0747251990465181e-15
+special_point type=small_gap v=0.0 t=0.1 lm=0.5 gap=-1.5574709561725398e-15
+special_point type=chern_jump v=0.0 t=0.1 lm=1.0 max_delta=0.9999999999999994 axes=1
+special_point type=small_gap v=0.0 t=0.2 lm=0.5 gap=-3.530832067218416e-16
+special_point type=chern_jump v=0.0 t=0.2 lm=0.7 max_delta=1.0 axes=1
+special_point type=chern_jump v=0.0 t=0.2 lm=0.9 max_delta=0.9999999999999998 axes=1
+special_point type=small_gap v=0.0 t=0.3 lm=0.5 gap=-1.004296187742555e-15
+special_point type=chern_jump v=0.0 t=0.3 lm=0.6 max_delta=1.0 axes=1
+special_point type=chern_jump v=0.0 t=0.3 lm=0.7 max_delta=1.0000000000000002 axes=3
+special_point type=corner_candidate v=0.0 t=0.3 lm=0.7
+special_point type=chern_jump v=0.0 t=0.3 lm=0.8 max_delta=0.9999999999999998 axes=1
+special_point type=small_gap v=0.0 t=0.4 lm=0.5 gap=-1.1085075567806953e-15
+special_point type=chern_jump v=0.0 t=0.4 lm=0.7 max_delta=1.0 axes=1
 special_point type=small_gap v=0.0 t=0.5 lm=0.0 gap=-9.246520377345352e-16
-special_point type=small_gap v=0.0 t=0.5 lm=0.25 gap=-1.9407890862319454e-15
+special_point type=small_gap v=0.0 t=0.5 lm=0.1 gap=-7.886446013010754e-16
+special_point type=small_gap v=0.0 t=0.5 lm=0.2 gap=-4.379148013447344e-16
+special_point type=small_gap v=0.0 t=0.5 lm=0.3 gap=-6.449025199889795e-16
+special_point type=small_gap v=0.0 t=0.5 lm=0.4 gap=-8.308121764321789e-16
 special_point type=small_gap v=0.0 t=0.5 lm=0.5 gap=-2.6795375277751073e-16
-special_point type=small_gap v=0.0 t=0.5 lm=0.75 gap=-8.649058061994258e-16
-special_point type=chern_jump v=0.0 t=0.5 lm=0.75 max_delta=1.0000000000000007 axes=1
+special_point type=small_gap v=0.0 t=0.5 lm=0.6 gap=-1.1914127323494468e-15
+special_point type=small_gap v=0.0 t=0.5 lm=0.7 gap=-1.1962979246705728e-15
+special_point type=small_gap v=0.0 t=0.5 lm=0.8 gap=-1.1280113548301116e-15
+special_point type=small_gap v=0.0 t=0.5 lm=0.9 gap=-1.6362684672787278e-15
 special_point type=small_gap v=0.0 t=0.5 lm=1.0 gap=-6.01212569936255e-16
-special_point type=small_gap v=0.0 t=0.75 lm=0.5 gap=-2.6934358319157005e-16
+special_point type=small_gap v=0.0 t=0.6 lm=0.5 gap=-1.4025366375646498e-15
+special_point type=chern_jump v=0.0 t=0.7 lm=0.4 max_delta=0.9999999999999999 axes=1
+special_point type=small_gap v=0.0 t=0.7 lm=0.5 gap=-6.232455619048058e-16
+special_point type=small_gap v=0.0 t=0.8 lm=0.5 gap=-6.993653380750374e-16
+special_point type=chern_jump v=0.0 t=0.9 lm=0.2 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.0 t=0.9 lm=0.5 gap=-1.4460599658788308e-15
 special_point type=small_gap v=0.0 t=1.0 lm=0.5 gap=-8.094233822648517e-16
-special_point type=small_gap v=0.25 t=0.0 lm=0.5 gap=-8.881784197001252e-16
-special_point type=small_gap v=0.25 t=0.25 lm=0.5 gap=-5.828670879282072e-16
-special_point type=chern_jump v=0.25 t=0.25 lm=0.75 max_delta=1.0000000000000007 axes=1
-special_point type=small_gap v=0.25 t=0.5 lm=0.0 gap=-4.440892098500626e-16
-special_point type=small_gap v=0.25 t=0.5 lm=0.25 gap=-9.43689570931383e-16
-special_point type=chern_jump v=0.25 t=0.5 lm=0.5 max_delta=1.0000000000000004 axes=1
-special_point type=small_gap v=0.25 t=0.5 lm=0.75 gap=-1.6653345369377348e-16
-special_point type=chern_jump v=0.25 t=0.5 lm=0.75 max_delta=1.0000000000000007 axes=3
-special_point type=corner_candidate v=0.25 t=0.5 lm=0.75
-special_point type=small_gap v=0.25 t=0.5 lm=1.0 gap=-1.5543122344752192e-15
-special_point type=chern_jump v=0.25 t=0.5 lm=1.0 max_delta=1.0000000000000004 axes=1
-special_point type=small_gap v=0.25 t=0.75 lm=0.5 gap=-3.0531133177191805e-16
-special_point type=chern_jump v=0.25 t=0.75 lm=0.75 max_delta=1.0000000000000007 axes=2
-special_point type=corner_candidate v=0.25 t=0.75 lm=0.75
-special_point type=small_gap v=0.25 t=1.0 lm=0.5 gap=-1.2212453270876722e-15
+special_point type=small_gap v=0.1 t=0.0 lm=0.5 gap=-6.245004513516506e-16
+special_point type=chern_jump v=0.1 t=0.0 lm=1.0 max_delta=0.9999999999999993 axes=1
+special_point type=small_gap v=0.1 t=0.1 lm=0.5 gap=-7.632783294297951e-16
+special_point type=chern_jump v=0.1 t=0.1 lm=0.9 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.1 t=0.1 lm=0.9
+special_point type=chern_jump v=0.1 t=0.1 lm=1.0 max_delta=0.9999999999999998 axes=3
+special_point type=corner_candidate v=0.1 t=0.1 lm=1.0
+special_point type=small_gap v=0.1 t=0.2 lm=0.5 gap=-8.187894806610529e-16
+special_point type=chern_jump v=0.1 t=0.2 lm=0.8 max_delta=0.9999999999999997 axes=1
+special_point type=chern_jump v=0.1 t=0.2 lm=0.9 max_delta=1.0000000000000002 axes=3
+special_point type=corner_candidate v=0.1 t=0.2 lm=0.9
+special_point type=chern_jump v=0.1 t=0.2 lm=1.0 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.1 t=0.2 lm=1.0
+special_point type=small_gap v=0.1 t=0.3 lm=0.5 gap=-3.191891195797325e-16
+special_point type=chern_jump v=0.1 t=0.3 lm=0.7 max_delta=1.0000000000000002 axes=1
+special_point type=chern_jump v=0.1 t=0.3 lm=0.9 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.1 t=0.3 lm=0.9
+special_point type=small_gap v=0.1 t=0.4 lm=0.5 gap=-5.134781488891349e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.0 gap=-5.134781488891349e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.1 gap=-1.942890293094024e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.2 gap=-2.914335439641036e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.3 gap=-6.661338147750939e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.4 gap=1.249000902703301e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.6 gap=-1.27675647831893e-15
+special_point type=small_gap v=0.1 t=0.5 lm=0.7 gap=-9.575673587391975e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.8 gap=-5.828670879282072e-16
+special_point type=small_gap v=0.1 t=0.5 lm=0.9 gap=-9.853229343548264e-16
+special_point type=small_gap v=0.1 t=0.5 lm=1.0 gap=-2.2343238370581275e-15
+special_point type=chern_jump v=0.1 t=0.6 lm=0.4 max_delta=0.9999999999999999 axes=1
+special_point type=small_gap v=0.1 t=0.6 lm=0.5 gap=-5.412337245047638e-16
+special_point type=chern_jump v=0.1 t=0.7 lm=0.3 max_delta=0.9999999999999996 axes=1
+special_point type=chern_jump v=0.1 t=0.7 lm=0.4 max_delta=1.0 axes=3
+special_point type=corner_candidate v=0.1 t=0.7 lm=0.4
+special_point type=small_gap v=0.1 t=0.7 lm=0.5 gap=-6.938893903907228e-16
+special_point type=chern_jump v=0.1 t=0.7 lm=0.5 max_delta=1.0 axes=1
+special_point type=chern_jump v=0.1 t=0.8 lm=0.2 max_delta=1.0000000000000002 axes=1
+special_point type=chern_jump v=0.1 t=0.8 lm=0.4 max_delta=1.0 axes=1
+special_point type=small_gap v=0.1 t=0.8 lm=0.5 gap=-1.3322676295501878e-15
+special_point type=chern_jump v=0.1 t=0.9 lm=0.1 max_delta=1.0000000000000004 axes=1
+special_point type=chern_jump v=0.1 t=0.9 lm=0.2 max_delta=1.0000000000000004 axes=3
+special_point type=corner_candidate v=0.1 t=0.9 lm=0.2
+special_point type=chern_jump v=0.1 t=0.9 lm=0.3 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.1 t=0.9 lm=0.5 gap=-1.2628786905111156e-15
+special_point type=chern_jump v=0.1 t=1.0 lm=0.2 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.1 t=1.0 lm=0.2
+special_point type=small_gap v=0.1 t=1.0 lm=0.5 gap=-2.6922908347160046e-15
+special_point type=small_gap v=0.2 t=0.0 lm=0.5 gap=-8.049116928532385e-16
+special_point type=small_gap v=0.2 t=0.1 lm=0.5 gap=-7.216449660063518e-16
+special_point type=chern_jump v=0.2 t=0.1 lm=1.0 max_delta=0.9999999999999997 axes=1
+special_point type=small_gap v=0.2 t=0.2 lm=0.5 gap=-1.1934897514720433e-15
+special_point type=chern_jump v=0.2 t=0.2 lm=0.9 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.2 t=0.2 lm=0.9
+special_point type=small_gap v=0.2 t=0.3 lm=0.5 gap=-1.2212453270876722e-15
+special_point type=chern_jump v=0.2 t=0.3 lm=0.8 max_delta=1.0000000000000004 axes=1
+special_point type=chern_jump v=0.2 t=0.3 lm=0.9 max_delta=1.0000000000000004 axes=3
+special_point type=corner_candidate v=0.2 t=0.3 lm=0.9
+special_point type=chern_jump v=0.2 t=0.3 lm=1.0 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.2 t=0.4 lm=0.4 gap=1.7879020248953197e-16
+special_point type=small_gap v=0.2 t=0.4 lm=0.6 gap=-1.3941279305901484e-15
+special_point type=chern_jump v=0.2 t=0.4 lm=0.9 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.2 t=0.5 lm=0.0 gap=-4.996003610813204e-16
+special_point type=small_gap v=0.2 t=0.5 lm=0.1 gap=-4.996003610813204e-16
+special_point type=small_gap v=0.2 t=0.5 lm=0.2 gap=-4.718447854656915e-16
+special_point type=small_gap v=0.2 t=0.5 lm=0.3 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.2 t=0.5 lm=0.7 gap=-5.273559366969494e-16
+special_point type=small_gap v=0.2 t=0.5 lm=0.8 gap=-1.1657341758564144e-15
+special_point type=small_gap v=0.2 t=0.5 lm=0.9 gap=-1.304512053934559e-15
+special_point type=small_gap v=0.2 t=0.5 lm=1.0 gap=-9.71445146547012e-16
+special_point type=small_gap v=0.2 t=0.6 lm=0.4 gap=-2.7925872527599646e-16
+special_point type=small_gap v=0.2 t=0.6 lm=0.6 gap=-1.0501627391564889e-16
+special_point type=chern_jump v=0.2 t=0.6 lm=0.7 max_delta=1.0 axes=1
+special_point type=chern_jump v=0.2 t=0.7 lm=0.4 max_delta=0.9999999999999999 axes=1
+special_point type=small_gap v=0.2 t=0.7 lm=0.5 gap=-7.771561172376096e-16
+special_point type=small_gap v=0.2 t=0.8 lm=0.5 gap=-8.326672684688674e-16
+special_point type=chern_jump v=0.2 t=0.9 lm=0.2 max_delta=1.0 axes=2
+special_point type=corner_candidate v=0.2 t=0.9 lm=0.2
+special_point type=small_gap v=0.2 t=0.9 lm=0.5 gap=-8.881784197001252e-16
+special_point type=chern_jump v=0.2 t=1.0 lm=0.1 max_delta=0.9999999999999999 axes=1
+special_point type=chern_jump v=0.2 t=1.0 lm=0.2 max_delta=1.0 axes=3
+special_point type=corner_candidate v=0.2 t=1.0 lm=0.2
+special_point type=chern_jump v=0.2 t=1.0 lm=0.3 max_delta=1.0 axes=2
+special_point type=corner_candidate v=0.2 t=1.0 lm=0.3
+special_point type=small_gap v=0.2 t=1.0 lm=0.5 gap=-1.1379786002407855e-15
+special_point type=small_gap v=0.3 t=0.0 lm=0.5 gap=-5.551115123125783e-16
+special_point type=small_gap v=0.3 t=0.1 lm=0.5 gap=-1.1102230246251565e-16
+special_point type=small_gap v=0.3 t=0.2 lm=0.5 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.3 t=0.3 lm=0.4 gap=8.326672684688674e-17
+special_point type=small_gap v=0.3 t=0.3 lm=0.6 gap=-1.096345236817342e-15
+special_point type=chern_jump v=0.3 t=0.3 lm=0.9 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.3 t=0.4 lm=0.3 gap=1.6653345369377348e-16
+special_point type=small_gap v=0.3 t=0.4 lm=0.7 gap=-7.494005416219807e-16
+special_point type=small_gap v=0.3 t=0.5 lm=0.0 gap=-2.220446049250313e-16
+special_point type=small_gap v=0.3 t=0.5 lm=0.1 gap=-1.1102230246251565e-15
+special_point type=small_gap v=0.3 t=0.5 lm=0.2 gap=-9.43689570931383e-16
+special_point type=chern_jump v=0.3 t=0.5 lm=0.7 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.3 t=0.5 lm=0.8 gap=-7.771561172376096e-16
+special_point type=small_gap v=0.3 t=0.5 lm=0.9 gap=3.885780586188048e-16
+special_point type=small_gap v=0.3 t=0.5 lm=1.0 gap=-9.43689570931383e-16
+special_point type=small_gap v=0.3 t=0.6 lm=0.3 gap=-1.249000902703301e-16
+special_point type=chern_jump v=0.3 t=0.6 lm=0.6 max_delta=1.0 axes=1
+special_point type=small_gap v=0.3 t=0.6 lm=0.7 gap=-1.8041124150158794e-16
+special_point type=chern_jump v=0.3 t=0.6 lm=0.7 max_delta=1.0000000000000004 axes=3
+special_point type=corner_candidate v=0.3 t=0.6 lm=0.7
+special_point type=chern_jump v=0.3 t=0.6 lm=0.8 max_delta=0.9999999999999997 axes=1
+special_point type=small_gap v=0.3 t=0.7 lm=0.4 gap=-9.020562075079397e-16
+special_point type=small_gap v=0.3 t=0.7 lm=0.6 gap=2.636779683484747e-16
+special_point type=chern_jump v=0.3 t=0.7 lm=0.7 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.3 t=0.8 lm=0.5 gap=-1.27675647831893e-15
+special_point type=chern_jump v=0.3 t=0.9 lm=0.3 max_delta=0.9999999999999994 axes=1
+special_point type=small_gap v=0.3 t=0.9 lm=0.5 gap=-2.275957200481571e-15
+special_point type=chern_jump v=0.3 t=1.0 lm=0.2 max_delta=1.0 axes=2
+special_point type=corner_candidate v=0.3 t=1.0 lm=0.2
+special_point type=chern_jump v=0.3 t=1.0 lm=0.3 max_delta=1.0 axes=3
+special_point type=corner_candidate v=0.3 t=1.0 lm=0.3
+special_point type=chern_jump v=0.3 t=1.0 lm=0.4 max_delta=1.0 axes=2
+special_point type=corner_candidate v=0.3 t=1.0 lm=0.4
+special_point type=small_gap v=0.3 t=1.0 lm=0.5 gap=-9.43689570931383e-16
+special_point type=small_gap v=0.4 t=0.0 lm=0.5 gap=-1.1102230246251565e-15
+special_point type=small_gap v=0.4 t=0.1 lm=0.5 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.4 t=0.2 lm=0.4 gap=1.1102230246251565e-16
+special_point type=small_gap v=0.4 t=0.2 lm=0.6 gap=-6.38378239159465e-16
+special_point type=small_gap v=0.4 t=0.3 lm=0.3 gap=2.950490619412211e-16
+special_point type=small_gap v=0.4 t=0.3 lm=0.7 gap=-7.65016663117172e-16
+special_point type=small_gap v=0.4 t=0.4 lm=0.2 gap=1.1102230246251565e-16
+special_point type=small_gap v=0.4 t=0.4 lm=0.8 gap=-1.1657341758564144e-15
+special_point type=small_gap v=0.4 t=0.5 lm=0.0 gap=-3.885780586188048e-16
+special_point type=small_gap v=0.4 t=0.5 lm=0.1 gap=-7.771561172376096e-16
+special_point type=small_gap v=0.4 t=0.5 lm=0.9 gap=-2.220446049250313e-16
+special_point type=small_gap v=0.4 t=0.5 lm=1.0 gap=-7.771561172376096e-16
+special_point type=small_gap v=0.4 t=0.6 lm=0.2 gap=-8.049116928532385e-16
+special_point type=chern_jump v=0.4 t=0.6 lm=0.7 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.4 t=0.6 lm=0.8 gap=8.326672684688674e-17
+special_point type=small_gap v=0.4 t=0.7 lm=0.3 gap=-8.590740071537415e-16
+special_point type=small_gap v=0.4 t=0.7 lm=0.7 gap=-1.3442792967232145e-16
+special_point type=small_gap v=0.4 t=0.8 lm=0.4 gap=-1.1102230246251565e-15
+special_point type=small_gap v=0.4 t=0.8 lm=0.6 gap=-2.498001805406602e-16
+special_point type=chern_jump v=0.4 t=0.9 lm=0.4 max_delta=0.9999999999999998 axes=1
+special_point type=small_gap v=0.4 t=0.9 lm=0.5 gap=-1.6653345369377348e-16
+special_point type=chern_jump v=0.4 t=0.9 lm=0.6 max_delta=1.0000000000000002 axes=1
+special_point type=chern_jump v=0.4 t=1.0 lm=0.3 max_delta=1.0000000000000002 axes=2
+special_point type=corner_candidate v=0.4 t=1.0 lm=0.3
+special_point type=chern_jump v=0.4 t=1.0 lm=0.4 max_delta=1.0000000000000002 axes=3
+special_point type=corner_candidate v=0.4 t=1.0 lm=0.4
+special_point type=small_gap v=0.4 t=1.0 lm=0.5 gap=-1.0547118733938987e-15
+special_point type=chern_jump v=0.4 t=1.0 lm=0.5 max_delta=1.0 axes=1
 special_point type=small_gap v=0.5 t=0.0 lm=0.5 gap=-1.9984014443252818e-15
-special_point type=small_gap v=0.5 t=0.25 lm=0.25 gap=2.1202803251541244e-16
-special_point type=small_gap v=0.5 t=0.25 lm=0.75 gap=-7.887553095399628e-16
+special_point type=small_gap v=0.5 t=0.1 lm=0.4 gap=2.220446049250313e-16
+special_point type=small_gap v=0.5 t=0.1 lm=0.6 gap=-2.1094237467877974e-15
+special_point type=small_gap v=0.5 t=0.2 lm=0.3 gap=2.7755575615628914e-17
+special_point type=small_gap v=0.5 t=0.2 lm=0.7 gap=-1.5404344466674047e-15
+special_point type=small_gap v=0.5 t=0.3 lm=0.2 gap=2.914335439641036e-16
+special_point type=small_gap v=0.5 t=0.3 lm=0.8 gap=-1.6237011735142914e-15
+special_point type=small_gap v=0.5 t=0.4 lm=0.1 gap=1.1102230246251565e-16
+special_point type=small_gap v=0.5 t=0.4 lm=0.9 gap=-1.5543122344752192e-15
 special_point type=small_gap v=0.5 t=0.5 lm=0.0 gap=-1.4988010832439613e-15
-special_point type=chern_jump v=0.5 t=0.5 lm=0.75 max_delta=1.0000000000000007 axes=2
-special_point type=corner_candidate v=0.5 t=0.5 lm=0.75
 special_point type=small_gap v=0.5 t=0.5 lm=1.0 gap=5.551115123125783e-17
-special_point type=small_gap v=0.5 t=0.75 lm=0.25 gap=-2.8774621677469933e-16
-special_point type=chern_jump v=0.5 t=0.75 lm=0.5 max_delta=1.0 axes=1
-special_point type=small_gap v=0.5 t=0.75 lm=0.75 gap=-1.0673671194163772e-16
-special_point type=chern_jump v=0.5 t=0.75 lm=0.75 max_delta=1.0 axes=3
-special_point type=corner_candidate v=0.5 t=0.75 lm=0.75
-special_point type=chern_jump v=0.5 t=0.75 lm=1.0 max_delta=1.0 axes=2
-special_point type=corner_candidate v=0.5 t=0.75 lm=1.0
+special_point type=small_gap v=0.5 t=0.6 lm=0.1 gap=-1.6653345369377348e-16
+special_point type=small_gap v=0.5 t=0.6 lm=0.9 gap=0.0
+special_point type=small_gap v=0.5 t=0.7 lm=0.2 gap=-5.551115123125783e-16
+special_point type=small_gap v=0.5 t=0.7 lm=0.8 gap=6.938893903907228e-17
+special_point type=small_gap v=0.5 t=0.8 lm=0.3 gap=-1.3461454173580023e-15
+special_point type=chern_jump v=0.5 t=0.8 lm=0.6 max_delta=0.9999999999999999 axes=1
+special_point type=small_gap v=0.5 t=0.8 lm=0.7 gap=-9.71445146547012e-17
+special_point type=chern_jump v=0.5 t=0.8 lm=0.8 max_delta=1.0 axes=1
+special_point type=small_gap v=0.5 t=0.9 lm=0.4 gap=-1.2212453270876722e-15
+special_point type=chern_jump v=0.5 t=0.9 lm=0.5 max_delta=1.0 axes=1
+special_point type=small_gap v=0.5 t=0.9 lm=0.6 gap=-2.220446049250313e-16
+special_point type=chern_jump v=0.5 t=0.9 lm=0.6 max_delta=1.0000000000000002 axes=3
+special_point type=corner_candidate v=0.5 t=0.9 lm=0.6
+special_point type=chern_jump v=0.5 t=0.9 lm=0.7 max_delta=1.0000000000000002 axes=1
+special_point type=chern_jump v=0.5 t=1.0 lm=0.4 max_delta=1.0 axes=1
 special_point type=small_gap v=0.5 t=1.0 lm=0.5 gap=-5.551115123125783e-17
-special_point type=chern_jump v=0.5 t=1.0 lm=0.75 max_delta=0.9999999999999993 axes=1
-special_point type=small_gap v=0.75 t=0.0 lm=0.25 gap=-8.326672684688674e-16
-special_point type=small_gap v=0.75 t=0.0 lm=0.5 gap=-2.7755575615628914e-16
-special_point type=small_gap v=0.75 t=0.0 lm=0.75 gap=-2.1094237467877974e-15
-special_point type=small_gap v=0.75 t=0.25 lm=0.0 gap=-3.885780586188048e-16
-special_point type=small_gap v=0.75 t=0.25 lm=1.0 gap=-1.27675647831893e-15
-special_point type=small_gap v=0.75 t=0.5 lm=0.0 gap=-6.38378239159465e-16
-special_point type=chern_jump v=0.75 t=0.5 lm=1.0 max_delta=1.0000000000000002 axes=1
-special_point type=small_gap v=0.75 t=0.75 lm=0.0 gap=-2.1371793224034263e-15
-special_point type=chern_jump v=0.75 t=0.75 lm=0.75 max_delta=0.9999999999999999 axes=2
-special_point type=corner_candidate v=0.75 t=0.75 lm=0.75
-special_point type=small_gap v=0.75 t=0.75 lm=1.0 gap=-1.6653345369377348e-16
-special_point type=chern_jump v=0.75 t=0.75 lm=1.0 max_delta=1.0000000000000002 axes=3
-special_point type=corner_candidate v=0.75 t=0.75 lm=1.0
-special_point type=small_gap v=0.75 t=1.0 lm=0.25 gap=-1.6653345369377348e-16
-special_point type=small_gap v=0.75 t=1.0 lm=0.75 gap=-3.0531133177191805e-16
-special_point type=chern_jump v=0.75 t=1.0 lm=1.0 max_delta=0.9999999999999998 axes=1
+special_point type=chern_jump v=0.5 t=1.0 lm=0.6 max_delta=0.9999999999999999 axes=2
+special_point type=corner_candidate v=0.5 t=1.0 lm=0.6
+special_point type=small_gap v=0.6 t=0.0 lm=0.4 gap=-7.216449660063518e-16
+special_point type=small_gap v=0.6 t=0.0 lm=0.5 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.6 t=0.0 lm=0.6 gap=-1.942890293094024e-15
+special_point type=small_gap v=0.6 t=0.1 lm=0.3 gap=1.1102230246251565e-16
+special_point type=small_gap v=0.6 t=0.1 lm=0.7 gap=-1.1379786002407855e-15
+special_point type=small_gap v=0.6 t=0.2 lm=0.2 gap=1.1670718467565813e-16
+special_point type=small_gap v=0.6 t=0.2 lm=0.8 gap=-5.351373934042006e-16
+special_point type=small_gap v=0.6 t=0.3 lm=0.1 gap=1.3877787807814457e-16
+special_point type=small_gap v=0.6 t=0.3 lm=0.9 gap=-1.1934897514720433e-15
+special_point type=small_gap v=0.6 t=0.4 lm=0.0 gap=-4.440892098500626e-16
+special_point type=small_gap v=0.6 t=0.4 lm=1.0 gap=-1.3877787807814457e-15
+special_point type=small_gap v=0.6 t=0.5 lm=0.0 gap=-4.996003610813204e-16
+special_point type=small_gap v=0.6 t=0.6 lm=0.0 gap=-1.3877787807814457e-15
+special_point type=small_gap v=0.6 t=0.6 lm=1.0 gap=-9.43689570931383e-16
+special_point type=small_gap v=0.6 t=0.7 lm=0.1 gap=-9.159339953157541e-16
+special_point type=chern_jump v=0.6 t=0.7 lm=0.8 max_delta=0.9999999999999999 axes=1
+special_point type=small_gap v=0.6 t=0.7 lm=0.9 gap=-4.440892098500626e-16
+special_point type=small_gap v=0.6 t=0.8 lm=0.2 gap=-9.37134072845097e-16
+special_point type=chern_jump v=0.6 t=0.8 lm=0.7 max_delta=0.9999999999999997 axes=1
+special_point type=small_gap v=0.6 t=0.8 lm=0.8 gap=-6.220887844026741e-17
+special_point type=chern_jump v=0.6 t=0.8 lm=0.8 max_delta=1.0 axes=3
+special_point type=corner_candidate v=0.6 t=0.8 lm=0.8
+special_point type=chern_jump v=0.6 t=0.8 lm=0.9 max_delta=1.0 axes=1
+special_point type=small_gap v=0.6 t=0.9 lm=0.3 gap=-7.771561172376096e-16
+special_point type=chern_jump v=0.6 t=0.9 lm=0.6 max_delta=0.9999999999999999 axes=2
+special_point type=corner_candidate v=0.6 t=0.9 lm=0.6
+special_point type=small_gap v=0.6 t=0.9 lm=0.7 gap=-2.220446049250313e-16
+special_point type=chern_jump v=0.6 t=0.9 lm=0.8 max_delta=1.0 axes=1
+special_point type=small_gap v=0.6 t=1.0 lm=0.4 gap=-1.27675647831893e-15
+special_point type=chern_jump v=0.6 t=1.0 lm=0.5 max_delta=0.9999999999999997 axes=1
+special_point type=small_gap v=0.6 t=1.0 lm=0.6 gap=-1.6653345369377348e-16
+special_point type=chern_jump v=0.6 t=1.0 lm=0.6 max_delta=1.0000000000000002 axes=3
+special_point type=corner_candidate v=0.6 t=1.0 lm=0.6
+special_point type=chern_jump v=0.6 t=1.0 lm=0.7 max_delta=1.0 axes=1
+special_point type=small_gap v=0.7 t=0.0 lm=0.3 gap=-4.440892098500626e-16
+special_point type=small_gap v=0.7 t=0.0 lm=0.4 gap=-6.661338147750939e-16
+special_point type=small_gap v=0.7 t=0.0 lm=0.5 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.7 t=0.0 lm=0.6 gap=-7.216449660063518e-16
+special_point type=small_gap v=0.7 t=0.0 lm=0.7 gap=-1.942890293094024e-15
+special_point type=small_gap v=0.7 t=0.1 lm=0.2 gap=5.551115123125783e-17
+special_point type=small_gap v=0.7 t=0.1 lm=0.8 gap=-8.743006318923108e-16
+special_point type=small_gap v=0.7 t=0.2 lm=0.1 gap=1.942890293094024e-16
+special_point type=small_gap v=0.7 t=0.2 lm=0.9 gap=-1.27675647831893e-15
+special_point type=small_gap v=0.7 t=0.3 lm=0.0 gap=-7.216449660063518e-16
+special_point type=small_gap v=0.7 t=0.3 lm=1.0 gap=-8.881784197001252e-16
+special_point type=small_gap v=0.7 t=0.4 lm=0.0 gap=-5.551115123125783e-16
+special_point type=small_gap v=0.7 t=0.5 lm=0.0 gap=-8.881784197001252e-16
+special_point type=small_gap v=0.7 t=0.6 lm=0.0 gap=-7.771561172376096e-16
+special_point type=small_gap v=0.7 t=0.7 lm=0.0 gap=-1.7763568394002505e-15
+special_point type=small_gap v=0.7 t=0.7 lm=1.0 gap=0.0
+special_point type=small_gap v=0.7 t=0.8 lm=0.1 gap=-1.2628786905111156e-15
+special_point type=chern_jump v=0.7 t=0.8 lm=0.8 max_delta=1.0 axes=1
+special_point type=small_gap v=0.7 t=0.8 lm=0.9 gap=-3.7470027081099033e-16
+special_point type=small_gap v=0.7 t=0.9 lm=0.2 gap=-1.817990202823694e-15
+special_point type=small_gap v=0.7 t=0.9 lm=0.8 gap=-1.3877787807814457e-16
+special_point type=chern_jump v=0.7 t=0.9 lm=0.9 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.7 t=1.0 lm=0.3 gap=-1.2212453270876722e-15
+special_point type=chern_jump v=0.7 t=1.0 lm=0.6 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.7 t=1.0 lm=0.7 gap=-5.551115123125783e-17
+special_point type=small_gap v=0.8 t=0.0 lm=0.2 gap=-8.049116928532385e-16
+special_point type=small_gap v=0.8 t=0.0 lm=0.3 gap=-4.996003610813204e-16
+special_point type=small_gap v=0.8 t=0.0 lm=0.4 gap=-6.38378239159465e-16
+special_point type=small_gap v=0.8 t=0.0 lm=0.5 gap=-4.996003610813204e-16
+special_point type=small_gap v=0.8 t=0.0 lm=0.6 gap=-1.6375789613221059e-15
+special_point type=small_gap v=0.8 t=0.0 lm=0.7 gap=-1.1379786002407855e-15
+special_point type=small_gap v=0.8 t=0.0 lm=0.8 gap=-2.7755575615628914e-15
+special_point type=small_gap v=0.8 t=0.1 lm=0.1 gap=1.3603833764214585e-16
+special_point type=small_gap v=0.8 t=0.1 lm=0.9 gap=-7.544304331421308e-16
+special_point type=small_gap v=0.8 t=0.2 lm=0.0 gap=-3.3306690738754696e-16
+special_point type=small_gap v=0.8 t=0.2 lm=1.0 gap=-6.38378239159465e-16
+special_point type=small_gap v=0.8 t=0.3 lm=0.0 gap=-3.0531133177191805e-16
+special_point type=small_gap v=0.8 t=0.4 lm=0.0 gap=-6.38378239159465e-16
+special_point type=small_gap v=0.8 t=0.5 lm=0.0 gap=-7.216449660063518e-16
+special_point type=small_gap v=0.8 t=0.6 lm=0.0 gap=-9.159339953157541e-16
+special_point type=small_gap v=0.8 t=0.7 lm=0.0 gap=-1.1379786002407855e-15
+special_point type=small_gap v=0.8 t=0.8 lm=0.0 gap=-1.5543122344752192e-15
+special_point type=chern_jump v=0.8 t=0.8 lm=0.9 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.8 t=0.8 lm=1.0 gap=-1.942890293094024e-16
+special_point type=small_gap v=0.8 t=0.9 lm=0.1 gap=-1.5176776157363357e-15
+special_point type=chern_jump v=0.8 t=0.9 lm=0.8 max_delta=1.0 axes=1
+special_point type=small_gap v=0.8 t=0.9 lm=0.9 gap=-4.2774418918664897e-16
+special_point type=chern_jump v=0.8 t=0.9 lm=0.9 max_delta=1.0000000000000004 axes=3
+special_point type=corner_candidate v=0.8 t=0.9 lm=0.9
+special_point type=chern_jump v=0.8 t=0.9 lm=1.0 max_delta=1.0000000000000004 axes=2
+special_point type=corner_candidate v=0.8 t=0.9 lm=1.0
+special_point type=small_gap v=0.8 t=1.0 lm=0.2 gap=-5.551115123125783e-16
+special_point type=small_gap v=0.8 t=1.0 lm=0.8 gap=-4.163336342344337e-16
+special_point type=chern_jump v=0.8 t=1.0 lm=0.9 max_delta=1.0000000000000002 axes=1
+special_point type=small_gap v=0.9 t=0.0 lm=0.1 gap=-3.191891195797325e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.2 gap=-7.632783294297951e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.3 gap=-7.355227538141662e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.4 gap=-3.7470027081099033e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.5 gap=-8.326672684688674e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.6 gap=-8.187894806610529e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.7 gap=-8.604228440844963e-16
+special_point type=small_gap v=0.9 t=0.0 lm=0.8 gap=-1.4988010832439613e-15
+special_point type=small_gap v=0.9 t=0.0 lm=0.9 gap=-2.400857290751901e-15
+special_point type=small_gap v=0.9 t=0.1 lm=0.0 gap=-7.216449660063518e-16
+special_point type=small_gap v=0.9 t=0.1 lm=1.0 gap=-1.0130785099704553e-15
+special_point type=small_gap v=0.9 t=0.2 lm=0.0 gap=-6.661338147750939e-16
+special_point type=small_gap v=0.9 t=0.3 lm=0.0 gap=-8.743006318923108e-16
+special_point type=small_gap v=0.9 t=0.4 lm=0.0 gap=-1.2351231148954867e-15
+special_point type=small_gap v=0.9 t=0.5 lm=0.0 gap=-5.273559366969494e-16
+special_point type=small_gap v=0.9 t=0.6 lm=0.0 gap=-8.881784197001252e-16
+special_point type=small_gap v=0.9 t=0.7 lm=0.0 gap=-6.661338147750939e-16
+special_point type=small_gap v=0.9 t=0.8 lm=0.0 gap=-9.298117831235686e-16
+special_point type=chern_jump v=0.9 t=0.8 lm=1.0 max_delta=1.0000000000000004 axes=1
+special_point type=small_gap v=0.9 t=0.9 lm=0.0 gap=-1.887379141862766e-15
+special_point type=chern_jump v=0.9 t=0.9 lm=0.9 max_delta=1.0000000000000004 axes=2
+special_point type=corner_candidate v=0.9 t=0.9 lm=0.9
+special_point type=small_gap v=0.9 t=0.9 lm=1.0 gap=-3.191891195797325e-16
+special_point type=chern_jump v=0.9 t=0.9 lm=1.0 max_delta=1.0000000000000004 axes=3
+special_point type=corner_candidate v=0.9 t=0.9 lm=1.0
+special_point type=small_gap v=0.9 t=1.0 lm=0.1 gap=-9.43689570931383e-16
+special_point type=small_gap v=0.9 t=1.0 lm=0.9 gap=-6.938893903907228e-17
+special_point type=chern_jump v=0.9 t=1.0 lm=1.0 max_delta=1.0 axes=1
 special_point type=small_gap v=1.0 t=0.0 lm=0.0 gap=2.4492935982947064e-16
-special_point type=small_gap v=1.0 t=0.0 lm=0.25 gap=-1.3680046309698162e-15
+special_point type=small_gap v=1.0 t=0.0 lm=0.1 gap=-7.429307571348453e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.2 gap=-6.865422774492489e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.3 gap=-9.09692284145483e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.4 gap=-9.7269394824695e-16
 special_point type=small_gap v=1.0 t=0.0 lm=0.5 gap=-4.1614915653858935e-16
-special_point type=small_gap v=1.0 t=0.0 lm=0.75 gap=-8.799719204282028e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.6 gap=-4.640391712057785e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.7 gap=-7.038226125893085e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.8 gap=-7.104171596280987e-16
+special_point type=small_gap v=1.0 t=0.0 lm=0.9 gap=-9.120177270343084e-16
 special_point type=small_gap v=1.0 t=0.0 lm=1.0 gap=-1.6134352437965543e-15
-special_point type=small_gap v=1.0 t=0.25 lm=0.0 gap=-9.861420351316257e-16
+special_point type=small_gap v=1.0 t=0.1 lm=0.0 gap=-5.54295646180894e-16
+special_point type=small_gap v=1.0 t=0.1 lm=0.1 gap=0.039607805437112675
+special_point type=small_gap v=1.0 t=0.1 lm=0.2 gap=0.09683686414545647
+special_point type=small_gap v=1.0 t=0.2 lm=0.0 gap=-6.891672339936243e-16
+special_point type=small_gap v=1.0 t=0.2 lm=0.1 gap=0.09683686414545645
+special_point type=small_gap v=1.0 t=0.3 lm=0.0 gap=-1.1171472287445201e-15
+special_point type=small_gap v=1.0 t=0.4 lm=0.0 gap=-8.601939595808942e-16
 special_point type=small_gap v=1.0 t=0.5 lm=0.0 gap=-6.021041009493909e-16
-special_point type=small_gap v=1.0 t=0.75 lm=0.0 gap=-6.072133247030263e-16
-special_point type=chern_jump v=1.0 t=0.75 lm=1.0 max_delta=0.9999999999999997 axes=1
+special_point type=small_gap v=1.0 t=0.6 lm=0.0 gap=-8.87510917483128e-16
+special_point type=small_gap v=1.0 t=0.7 lm=0.0 gap=-4.975965660219753e-16
+special_point type=small_gap v=1.0 t=0.8 lm=0.0 gap=-8.740307258812979e-16
+special_point type=small_gap v=1.0 t=0.9 lm=0.0 gap=-8.914367605520554e-16
+special_point type=chern_jump v=1.0 t=0.9 lm=1.0 max_delta=1.0000000000000002 axes=1
 special_point type=small_gap v=1.0 t=1.0 lm=0.0 gap=-1.872445951057756e-15
 special_point type=small_gap v=1.0 t=1.0 lm=1.0 gap=1.2367404674373022e-16

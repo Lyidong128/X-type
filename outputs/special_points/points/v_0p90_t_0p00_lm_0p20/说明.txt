@@ -1,0 +1,16 @@
+特殊点说明（自动生成）
+====================
+参数：v=0.90, t=0.00, lm=0.20
+物理量：gap=-7.632783e-16, chern=-1.781988e-16, Wilson_loop=-1.465876, Z2=1
+状态：edge_state=1, corner_state=0
+
+该点被选为“特殊点”的原因：
+1) small_gap 判据：abs(gap) < 0.1，当前 is_small_gap=1
+2) chern_jump 判据：参数最近邻上的最大 Chern 跳变 >= 0.5，当前 is_chern_jump=0，max_chern_delta=4.331499e-16，chern_jump_axes=0
+3) selection_reason：small_gap
+
+本目录文件含义：
+- band.png：周期边界下体能带
+- ribbon.png：ribbon 几何下 E-k_y 色散
+- obc_spectrum.png：OBC 近零能谱（E vs 模态索引）
+- obc_wavefunction.png：近零模在实空间的概率分布

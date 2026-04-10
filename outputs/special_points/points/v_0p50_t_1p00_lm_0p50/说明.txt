@@ -6,7 +6,7 @@
 
 该点被选为“特殊点”的原因：
 1) small_gap 判据：abs(gap) < 0.1，当前 is_small_gap=1
-2) chern_jump 判据：参数最近邻上的最大 Chern 跳变 >= 0.5，当前 is_chern_jump=0，max_chern_delta=7.895463e-16，chern_jump_axes=0
+2) chern_jump 判据：参数最近邻上的最大 Chern 跳变 >= 0.5，当前 is_chern_jump=0，max_chern_delta=6.835658e-16，chern_jump_axes=0
 3) selection_reason：small_gap
 
 本目录文件含义：
