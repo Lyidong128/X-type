@@ -1,0 +1,9 @@
+category=robust_topological
+v=0.50
+t=0.90
+lm=0.50
+gap=2.00000000e-01
+chern=1.04814375e-16
+z2=1
+wilson=0.57949192
+missing_assets=none

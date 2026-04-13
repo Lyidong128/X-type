@@ -1,0 +1,9 @@
+category=near_transition
+v=0.90
+t=1.00
+lm=0.90
+gap=-6.93889390e-17
+chern=-2.82715972e-16
+z2=0
+wilson=-0.24985597
+missing_assets=none
