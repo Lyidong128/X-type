@@ -14,3 +14,7 @@ each point folder includes:
 - obc_spectrum.png
 - obc_wavefunction.png
 - special_point_info.txt
+
+newly added (auto special-state analysis):
+- obc_wavefunction_subspace.png: weighted overlay of automatically selected special OBC modes
+- special_modes.txt: selected mode indices/energies/localization metrics/weights

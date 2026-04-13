@@ -1,0 +1,11 @@
+Automatically selected special modes for subspace overlay
+params: v=0.50, t=1.00, lm=0.50
+energy_window=8.000000e-02, candidate_count=40
+selection score = (1/(|E|+1e-4))*(0.4+0.4*boundary+0.2*corner)*(0.5+0.5*IPR_norm)
+picked modes (index, energy, boundary, corner, IPR, weight):
+idx=21, E=-6.364367e-03, boundary=0.1926, corner=0.0209, IPR=3.442724e-03, score=3.725510e+01, weight=0.220463
+idx=20, E=-6.364367e-03, boundary=0.1926, corner=0.0209, IPR=3.442724e-03, score=3.725510e+01, weight=0.220463
+idx=23, E=1.086621e-02, boundary=0.3323, corner=0.0286, IPR=3.870197e-03, score=2.459245e+01, weight=0.145530
+idx=22, E=1.086621e-02, boundary=0.3323, corner=0.0286, IPR=3.870197e-03, score=2.459245e+01, weight=0.145530
+idx=19, E=-1.036476e-02, boundary=0.1834, corner=0.0008, IPR=3.455658e-03, score=2.264516e+01, weight=0.134007
+idx=18, E=-1.036476e-02, boundary=0.1834, corner=0.0008, IPR=3.455658e-03, score=2.264516e+01, weight=0.134007
