@@ -82,6 +82,14 @@ def env_int(name: str, default: int) -> int:
         return default
 
 
+def env_str(name: str, default: str) -> str:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    value = raw.strip()
+    return value if value else default
+
+
 def load_xtype_model(model_path: Path):
     if not model_path.exists():
         raise FileNotFoundError(f"Model file not found: {model_path}")
@@ -746,7 +754,9 @@ def generate_special_point_artifacts(
 
 
 def compute_band_data(model_module) -> np.ndarray:
-    segments = [model_module.gx, model_module.xy, model_module.yg, model_module.gm, model_module.mg]
+    segments = getattr(model_module, "PATH_SEGMENTS", None)
+    if segments is None:
+        segments = [model_module.gx, model_module.xy, model_module.yg, model_module.gm, model_module.mg]
     eigvals = [np.array([np.linalg.eigvalsh(model_module.Hxtype(k)) for k in seg]) for seg in segments]
     return np.vstack(eigvals)
 
@@ -1133,7 +1143,8 @@ def run_parameter_scan() -> dict[str, int | str]:
     results_path = output_dir / "results.csv"
     logs_path = output_dir / "logs.txt"
     report_path = output_dir / "report.pdf"
-    model_path = project_root / "models" / "xtype_model.py"
+    model_filename = env_str("MODEL_FILE", "xtype_model.py")
+    model_path = project_root / "models" / model_filename
 
     os.environ.setdefault("MPLBACKEND", "Agg")
     model = load_xtype_model(model_path)
@@ -1295,6 +1306,7 @@ def run_parameter_scan() -> dict[str, int | str]:
         "logs_path": str(logs_path),
         "figures_path": str(figures_dir),
         "report_path": str(report_path),
+        "model_path": str(model_path),
     }
     generate_report_pdf(rows, figures_dir, report_path, summary)
 
