@@ -27,3 +27,6 @@ observation guidance files:
 - best_observation_positions.csv: global table of best viewing positions for all selected points
 - best_observation_positions_README.txt: interpretation guide
 - each point folder adds best_observation_position.txt
+
+best-view wavefunction figures:
+- obc_wavefunction_best_view.png: global + local zoom visualization centered on best observation position
