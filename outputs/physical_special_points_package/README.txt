@@ -18,3 +18,7 @@ each point folder includes:
 newly added (auto special-state analysis):
 - obc_wavefunction_subspace.png: weighted overlay of automatically selected special OBC modes
 - special_modes.txt: selected mode indices/energies/localization metrics/weights
+
+subspace energy-window setting (updated):
+- window_rule=max(0.20, 8.0*min|E|)
+- max picked modes per point: 8

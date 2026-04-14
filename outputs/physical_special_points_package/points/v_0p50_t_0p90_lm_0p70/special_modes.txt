@@ -1,11 +1,14 @@
 Automatically selected special modes for subspace overlay
 params: v=0.50, t=0.90, lm=0.70
-energy_window=8.000000e-02, candidate_count=14
+energy_window=2.000000e-01, candidate_count=30
+window_rule=max(0.20, 8.0*min|E|)
 selection score = (1/(|E|+1e-4))*(0.4+0.4*boundary+0.2*corner)*(0.5+0.5*IPR_norm)
 picked modes (index, energy, boundary, corner, IPR, weight):
-idx=5, E=-1.085654e-02, boundary=0.0744, corner=0.0009, IPR=2.929898e-03, score=1.962817e+01, weight=0.229940
-idx=4, E=-1.085654e-02, boundary=0.0744, corner=0.0009, IPR=2.929898e-03, score=1.962817e+01, weight=0.229940
-idx=3, E=-1.771742e-02, boundary=0.1176, corner=0.0012, IPR=2.845383e-03, score=1.255575e+01, weight=0.147088
-idx=2, E=-1.771742e-02, boundary=0.1176, corner=0.0012, IPR=2.845383e-03, score=1.255575e+01, weight=0.147088
-idx=6, E=2.190667e-02, boundary=0.1524, corner=0.0030, IPR=3.479552e-03, score=1.049717e+01, weight=0.122972
-idx=7, E=2.190667e-02, boundary=0.1524, corner=0.0030, IPR=3.479552e-03, score=1.049717e+01, weight=0.122972
+idx=5, E=-1.085654e-02, boundary=0.0744, corner=0.0009, IPR=2.929898e-03, score=1.962817e+01, weight=0.208432
+idx=4, E=-1.085654e-02, boundary=0.0744, corner=0.0009, IPR=2.929898e-03, score=1.962817e+01, weight=0.208432
+idx=3, E=-1.771742e-02, boundary=0.1176, corner=0.0012, IPR=2.845383e-03, score=1.255575e+01, weight=0.133330
+idx=2, E=-1.771742e-02, boundary=0.1176, corner=0.0012, IPR=2.845383e-03, score=1.255575e+01, weight=0.133330
+idx=6, E=2.190667e-02, boundary=0.1524, corner=0.0030, IPR=3.479552e-03, score=1.049717e+01, weight=0.111470
+idx=7, E=2.190667e-02, boundary=0.1524, corner=0.0030, IPR=3.479552e-03, score=1.049717e+01, weight=0.111470
+idx=8, E=5.065661e-02, boundary=0.1144, corner=0.0029, IPR=4.178495e-03, score=4.404123e+00, weight=0.046768
+idx=9, E=5.065661e-02, boundary=0.1144, corner=0.0029, IPR=4.178495e-03, score=4.404123e+00, weight=0.046768
