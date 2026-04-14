@@ -22,3 +22,8 @@ newly added (auto special-state analysis):
 subspace energy-window setting (updated):
 - window_rule=max(0.20, 8.0*min|E|)
 - max picked modes per point: 8
+
+observation guidance files:
+- best_observation_positions.csv: global table of best viewing positions for all selected points
+- best_observation_positions_README.txt: interpretation guide
+- each point folder adds best_observation_position.txt

@@ -1,0 +1,8 @@
+Best observation position for weighted special-state subspace
+params: v=0.30, t=0.60, lm=0.80
+category=robust_topological
+energy_window=2.000000e-01 (rule=max(0.20, 8.0*min|E|))
+peak_cell_x=15, peak_cell_y=4, peak_probability=3.957738e-03
+center_of_mass_x=9.500, center_of_mass_y=9.500
+boundary_weight=0.107848, corner_weight=0.001618, bulk_weight=0.892152
+recommended_observation_region=bulk_or_mixed

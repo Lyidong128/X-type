@@ -1,0 +1,8 @@
+Best observation position for weighted special-state subspace
+params: v=0.40, t=0.40, lm=0.20
+category=near_transition
+energy_window=2.000000e-01 (rule=max(0.20, 8.0*min|E|))
+peak_cell_x=0, peak_cell_y=19, peak_probability=9.574955e-03
+center_of_mass_x=9.500, center_of_mass_y=9.500
+boundary_weight=0.652473, corner_weight=0.038300, bulk_weight=0.347527
+recommended_observation_region=edge
