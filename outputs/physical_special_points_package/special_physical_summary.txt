@@ -1,0 +1,55 @@
+Special physically meaningful points summary
+==========================================
+Selection rules (same as previous package standard):
+- robust_topological: gap > 0.1 and Z2=1
+- near_transition: globally smallest |gap| points
+
+total_selected_points=34
+category_counts={'robust_topological': 14, 'near_transition': 20}
+z2_nontrivial_count=23
+chern_nontrivial_count=1
+observation_region_counts={'bulk_or_mixed': 25, 'edge': 9}
+point_dir_count=34
+required_file_missing_count=0
+
+Deliverables per point:
+- band.png
+- ribbon.png
+- obc_spectrum.png
+- obc_wavefunction.png
+- obc_wavefunction_subspace.png
+- special_modes.txt
+- best_observation_position.txt
+- obc_wavefunction_best_view.png
+- obc_wavefunction_gap_bands.png
+- gap_window_selection.txt
+- obc_wavefunction_gap_edges.png
+- gap_edge_selection.txt
+
+Representative robust_topological points (high gap first):
+v_0p60_t_0p90_lm_0p80: v=0.60, t=0.90, lm=0.80, gap=2.000000e-01, chern=0.000, z2=1, W=2.6259
+v_0p60_t_0p80_lm_0p70: v=0.60, t=0.80, lm=0.70, gap=2.000000e-01, chern=-0.000, z2=1, W=0.6610
+v_1p00_t_0p90_lm_1p00: v=1.00, t=0.90, lm=1.00, gap=2.000000e-01, chern=-0.000, z2=1, W=0.8228
+v_0p50_t_0p80_lm_0p60: v=0.50, t=0.80, lm=0.60, gap=2.000000e-01, chern=-0.000, z2=1, W=-0.5377
+v_0p30_t_0p60_lm_0p80: v=0.30, t=0.60, lm=0.80, gap=2.000000e-01, chern=0.000, z2=1, W=0.5745
+v_0p90_t_1p00_lm_1p00: v=0.90, t=1.00, lm=1.00, gap=2.000000e-01, chern=0.000, z2=1, W=-0.6050
+v_0p70_t_1p00_lm_0p60: v=0.70, t=1.00, lm=0.60, gap=2.000000e-01, chern=0.000, z2=1, W=0.9587
+v_0p60_t_0p70_lm_0p80: v=0.60, t=0.70, lm=0.80, gap=2.000000e-01, chern=-0.000, z2=1, W=-2.5934
+v_0p60_t_1p00_lm_0p50: v=0.60, t=1.00, lm=0.50, gap=2.000000e-01, chern=-0.000, z2=1, W=0.5112
+v_0p30_t_0p50_lm_0p70: v=0.30, t=0.50, lm=0.70, gap=2.000000e-01, chern=-0.000, z2=1, W=-1.0046
+v_0p50_t_0p90_lm_0p50: v=0.50, t=0.90, lm=0.50, gap=2.000000e-01, chern=0.000, z2=1, W=0.5795
+v_0p70_t_0p80_lm_0p80: v=0.70, t=0.80, lm=0.80, gap=2.000000e-01, chern=-0.000, z2=1, W=0.7848
+
+Representative near_transition points (small |gap| first):
+v_0p50_t_0p60_lm_0p90: v=0.50, t=0.60, lm=0.90, gap=0.000000e+00, chern=0.000, z2=1, W=-1.0932
+v_0p70_t_0p70_lm_1p00: v=0.70, t=0.70, lm=1.00, gap=0.000000e+00, chern=0.000, z2=0, W=-0.2543
+v_0p50_t_0p20_lm_0p30: v=0.50, t=0.20, lm=0.30, gap=2.775558e-17, chern=-0.000, z2=1, W=0.5520
+v_0p50_t_0p50_lm_1p00: v=0.50, t=0.50, lm=1.00, gap=5.551115e-17, chern=0.000, z2=1, W=-1.0583
+v_0p50_t_1p00_lm_0p50: v=0.50, t=1.00, lm=0.50, gap=-5.551115e-17, chern=0.000, z2=1, W=-0.6047
+v_0p70_t_0p10_lm_0p20: v=0.70, t=0.10, lm=0.20, gap=5.551115e-17, chern=-0.000, z2=0, W=-0.0489
+v_0p70_t_1p00_lm_0p70: v=0.70, t=1.00, lm=0.70, gap=-5.551115e-17, chern=0.000, z2=1, W=-0.5369
+v_0p60_t_0p80_lm_0p80: v=0.60, t=0.80, lm=0.80, gap=-6.220888e-17, chern=-1.000, z2=0, W=0.4580
+v_0p50_t_0p70_lm_0p80: v=0.50, t=0.70, lm=0.80, gap=6.938894e-17, chern=-0.000, z2=0, W=0.4823
+v_0p90_t_1p00_lm_0p90: v=0.90, t=1.00, lm=0.90, gap=-6.938894e-17, chern=-0.000, z2=0, W=-0.2499
+v_0p30_t_0p30_lm_0p40: v=0.30, t=0.30, lm=0.40, gap=8.326673e-17, chern=-0.000, z2=1, W=0.9845
+v_0p40_t_0p60_lm_0p80: v=0.40, t=0.60, lm=0.80, gap=8.326673e-17, chern=-0.000, z2=0, W=0.0081
