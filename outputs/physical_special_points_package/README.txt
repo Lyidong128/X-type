@@ -34,3 +34,7 @@ best-view wavefunction figures:
 in-gap band wavefunction files (new):
 - obc_wavefunction_gap_bands.png: per-band subspace wavefunction maps for states selected within gap window
 - gap_window_selection.txt: gap-window and clustering details for selected in-gap bands
+
+gap-edge wavefunction files (new):
+- obc_wavefunction_gap_edges.png: lower/upper gap-boundary wavefunctions (negative/positive side nearest to 0)
+- gap_edge_selection.txt: selected gap-edge energies, mode indices, and peaks

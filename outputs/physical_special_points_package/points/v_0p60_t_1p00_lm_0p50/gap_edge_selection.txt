@@ -1,0 +1,10 @@
+Gap-edge state selection (OBC spectrum)
+params: v=0.60, t=1.00, lm=0.50
+definition:
+- lower gap edge energy: max(E<0)
+- upper gap edge energy: min(E>0)
+degeneracy_tolerance=5.000e-03
+lower_idx=43, lower_E=-2.110940e-03, cluster=[42, 43, 44, 45, 46, 47]
+upper_idx=44, upper_E=6.922540e-05, cluster=[42, 43, 44, 45, 46, 47, 48, 49]
+lower_peak=(x=9, y=15), peak_prob=4.100324e-03
+upper_peak=(x=0, y=9), peak_prob=3.504595e-03
