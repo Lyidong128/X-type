@@ -30,3 +30,7 @@ observation guidance files:
 
 best-view wavefunction figures:
 - obc_wavefunction_best_view.png: global + local zoom visualization centered on best observation position
+
+in-gap band wavefunction files (new):
+- obc_wavefunction_gap_bands.png: per-band subspace wavefunction maps for states selected within gap window
+- gap_window_selection.txt: gap-window and clustering details for selected in-gap bands

@@ -1,0 +1,14 @@
+Gap-window based in-gap state selection
+params: v=0.20, t=0.60, lm=0.60
+bulk_gap_abs=1.050163e-16
+gap_window=±4.000000e-02 (rule=max(0.04, 0.45*|bulk_gap|))
+in_gap_candidate_count=12
+cluster_threshold=1.000000e-02
+cluster_count_used=6
+clusters (mode_indices, mean_energy):
+[48,49] mean_E=6.422937e-02
+[46,47] mean_E=-6.422937e-02
+[50,51] mean_E=1.154641e-01
+[44,45] mean_E=-1.154641e-01
+[52,53] mean_E=1.386702e-01
+[42,43] mean_E=-1.386702e-01
