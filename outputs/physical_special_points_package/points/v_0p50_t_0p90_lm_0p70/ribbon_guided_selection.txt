@@ -1,0 +1,14 @@
+Ribbon-guided OBC wavefunction selection
+params: v=0.50, t=0.90, lm=0.70
+ribbon inference:
+- bulk_valence_max=-5.379770e-04
+- bulk_conduction_min=6.904561e-03
+- edge_energy_min=-1.202898e+00
+- edge_energy_max=-1.186364e+00
+- selected_window=[-6.816708e-03, 1.318329e-02]
+- edge_states_in_gap=0
+- edge_states_all=352
+- edge_threshold_used=0.45
+obc_selected_count=8
+obc_selected_energy_min=-1.771742e-02
+obc_selected_energy_max=5.065661e-02

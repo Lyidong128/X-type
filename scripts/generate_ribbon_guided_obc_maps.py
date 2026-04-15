@@ -52,6 +52,17 @@ def _cell_probability_from_eigvecs(vec: np.ndarray, nx: int, ny: int) -> np.ndar
     return grid / total if total > 0 else grid
 
 
+def _boundary_localization_score(grid: np.ndarray, boundary_cells: int = 2) -> float:
+    ny, nx = grid.shape
+    bc = max(1, min(boundary_cells, ny // 2, nx // 2))
+    mask = np.zeros_like(grid, dtype=bool)
+    mask[:bc, :] = True
+    mask[-bc:, :] = True
+    mask[:, :bc] = True
+    mask[:, -bc:] = True
+    return float(np.sum(grid[mask]))
+
+
 def _infer_ribbon_edge_window(
     v: float,
     t: float,
@@ -176,7 +187,15 @@ def _infer_ribbon_edge_window(
     return ky_values, ribbon_eigs_arr, info
 
 
-def _write_selection_text(path: Path, row: dict[str, str], info: RibbonGuidedWindow, selected_energies: np.ndarray) -> None:
+def _write_selection_text(
+    path: Path,
+    row: dict[str, str],
+    info: RibbonGuidedWindow,
+    selected_energies: np.ndarray,
+    raw_count: int,
+    score_min: float,
+    score_max: float,
+) -> None:
     path.write_text(
         "Ribbon-guided OBC wavefunction selection\n"
         f"params: v={float(row['v']):.2f}, t={float(row['t']):.2f}, lm={float(row['lm']):.2f}\n"
@@ -189,9 +208,12 @@ def _write_selection_text(path: Path, row: dict[str, str], info: RibbonGuidedWin
         f"- edge_states_in_gap={info.edge_states_in_gap}\n"
         f"- edge_states_all={info.edge_states_all}\n"
         f"- edge_threshold_used={info.edge_threshold_used:.2f}\n"
+        f"obc_window_candidate_count={raw_count}\n"
         f"obc_selected_count={selected_energies.size}\n"
         f"obc_selected_energy_min={float(np.min(selected_energies)):.6e}\n"
-        f"obc_selected_energy_max={float(np.max(selected_energies)):.6e}\n",
+        f"obc_selected_energy_max={float(np.max(selected_energies)):.6e}\n"
+        f"obc_boundary_score_min={score_min:.6f}\n"
+        f"obc_boundary_score_max={score_max:.6f}\n",
         encoding="utf-8",
     )
 
@@ -267,13 +289,36 @@ def main() -> None:
             order = np.argsort(np.abs(evals - center))
             selected_idx = order[: min(8, evals.size)]
 
-        selected_energies = evals[selected_idx]
-        grids = np.stack([_cell_probability_from_eigvecs(evecs[:, i], nx=20, ny=20) for i in selected_idx], axis=0)
-        obc_grid = grids.mean(axis=0)
+        candidate_energies = evals[selected_idx]
+        candidate_grids = np.stack(
+            [_cell_probability_from_eigvecs(evecs[:, i], nx=20, ny=20) for i in selected_idx],
+            axis=0,
+        )
+        candidate_scores = np.array([_boundary_localization_score(g, boundary_cells=2) for g in candidate_grids])
+        raw_count = int(candidate_scores.size)
+        if candidate_scores.size > 2:
+            keep_count = min(8, max(2, candidate_scores.size // 2))
+            keep_order = np.argsort(-candidate_scores)[:keep_count]
+        else:
+            keep_order = np.arange(candidate_scores.size)
+        selected_energies = candidate_energies[keep_order]
+        selected_grids = candidate_grids[keep_order]
+        selected_scores = candidate_scores[keep_order]
+        weights = np.square(selected_scores) + 1e-12
+        weights = weights / np.sum(weights)
+        obc_grid = np.tensordot(weights, selected_grids, axes=(0, 0))
         obc_grid = obc_grid / max(float(np.sum(obc_grid)), 1e-16)
 
         _plot_ribbon_guided_map(out_png, ky_values, ribbon_eigs, info, obc_grid, row)
-        _write_selection_text(out_txt, row, info, selected_energies)
+        _write_selection_text(
+            out_txt,
+            row,
+            info,
+            selected_energies,
+            raw_count=raw_count,
+            score_min=float(np.min(candidate_scores)),
+            score_max=float(np.max(candidate_scores)),
+        )
 
         summary_rows.append(
             {
@@ -287,7 +332,7 @@ def main() -> None:
                 "window_high": f"{info.window_high:.6e}",
                 "edge_states_in_gap": str(info.edge_states_in_gap),
                 "edge_threshold_used": f"{info.edge_threshold_used:.2f}",
-                "obc_selected_count": str(selected_idx.size),
+                "obc_selected_count": str(selected_energies.size),
                 "obc_selected_e_min": f"{float(np.min(selected_energies)):.6e}",
                 "obc_selected_e_max": f"{float(np.max(selected_energies)):.6e}",
             }

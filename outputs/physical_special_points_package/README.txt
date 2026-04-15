@@ -38,3 +38,8 @@ in-gap band wavefunction files (new):
 gap-edge wavefunction files (new):
 - obc_wavefunction_gap_edges.png: lower/upper gap-boundary wavefunctions (negative/positive side nearest to 0)
 - gap_edge_selection.txt: selected gap-edge energies, mode indices, and peaks
+
+ribbon-guided OBC files (new):
+- obc_wavefunction_ribbon_guided.png: ribbon-based edge-window + OBC subspace wavefunction map
+- ribbon_guided_selection.txt: inferred bulk gap edges, selected window, and selected OBC energies
+- ribbon_guided_summary.csv: package-level summary of ribbon-guided windows
