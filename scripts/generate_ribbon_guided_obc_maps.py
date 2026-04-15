@@ -62,12 +62,8 @@ def _infer_ribbon_edge_window(
     edge_threshold: float = 0.45,
 ) -> tuple[np.ndarray, np.ndarray, RibbonGuidedWindow]:
     ky_values = np.linspace(-np.pi, np.pi, nk)
-    ribbon_eigs = []
-
-    valence_candidates: list[float] = []
-    conduction_candidates: list[float] = []
-    edge_energies_in_gap: list[float] = []
-    edge_energies_all: list[float] = []
+    ribbon_eigs: list[np.ndarray] = []
+    ky_data: list[tuple[np.ndarray, np.ndarray]] = []
     all_energies: list[float] = []
 
     for ky in ky_values:
@@ -82,75 +78,66 @@ def _infer_ribbon_edge_window(
         dim = probs.shape[0]
         cell_prob = probs.reshape(nx, 8, dim).sum(axis=1)  # (nx, dim)
         edge_weight = cell_prob[:edge_cells, :].sum(axis=0) + cell_prob[-edge_cells:, :].sum(axis=0)
-        edge_mask = edge_weight >= edge_threshold
-        bulk_mask = ~edge_mask
-
-        edge_energies_all.extend(evals[edge_mask].tolist())
-
-        bulk_evals = evals[bulk_mask]
-        bulk_neg = bulk_evals[bulk_evals < 0]
-        bulk_pos = bulk_evals[bulk_evals > 0]
-        if bulk_neg.size > 0:
-            valence = float(np.max(bulk_neg))
-            valence_candidates.append(valence)
-        else:
-            valence = None
-        if bulk_pos.size > 0:
-            conduction = float(np.min(bulk_pos))
-            conduction_candidates.append(conduction)
-        else:
-            conduction = None
-
-        if valence is not None and conduction is not None and conduction > valence:
-            edge_inside = evals[(evals >= valence) & (evals <= conduction) & edge_mask]
-            edge_energies_in_gap.extend(edge_inside.tolist())
+        ky_data.append((evals, edge_weight))
 
     ribbon_eigs_arr = np.array(ribbon_eigs)
 
-    if valence_candidates and conduction_candidates:
-        bulk_valence_max = float(np.max(valence_candidates))
-        bulk_conduction_min = float(np.min(conduction_candidates))
-    else:
-        # Fallback to a narrow central window if bulk-only bands cannot be robustly separated.
-        bulk_valence_max = float(np.percentile(all_energies, 49))
-        bulk_conduction_min = float(np.percentile(all_energies, 51))
+    def collect_with_threshold(threshold: float) -> tuple[float, float, list[float], list[float]]:
+        valence_candidates: list[float] = []
+        conduction_candidates: list[float] = []
+        edge_energies_all: list[float] = []
+        for evals, edge_weight in ky_data:
+            edge_mask = edge_weight >= threshold
+            bulk_mask = ~edge_mask
+            edge_energies_all.extend(np.real(evals[edge_mask]).tolist())
+            bulk_evals = np.real(evals[bulk_mask])
+            bulk_neg = bulk_evals[bulk_evals < 0]
+            bulk_pos = bulk_evals[bulk_evals > 0]
+            if bulk_neg.size > 0:
+                valence_candidates.append(float(np.max(bulk_neg)))
+            if bulk_pos.size > 0:
+                conduction_candidates.append(float(np.min(bulk_pos)))
 
-    if bulk_conduction_min <= bulk_valence_max:
-        # Keep a sane central interval around zero.
-        bulk_valence_max = min(bulk_valence_max, -0.02)
-        bulk_conduction_min = max(bulk_conduction_min, 0.02)
+        if valence_candidates and conduction_candidates:
+            bulk_valence_max = float(np.max(valence_candidates))
+            bulk_conduction_min = float(np.min(conduction_candidates))
+        else:
+            # Fallback to a narrow central window if bulk-only bands cannot be robustly separated.
+            bulk_valence_max = float(np.percentile(all_energies, 49))
+            bulk_conduction_min = float(np.percentile(all_energies, 51))
 
-    # If edge states in the gap are missed at the strict threshold,
-    # lower the threshold progressively to recover core boundary branches.
+        if bulk_conduction_min <= bulk_valence_max:
+            # Keep a sane central interval around zero.
+            bulk_valence_max = min(bulk_valence_max, -0.02)
+            bulk_conduction_min = max(bulk_conduction_min, 0.02)
+
+        edge_energies_in_gap = [
+            float(e)
+            for e in edge_energies_all
+            if bulk_valence_max <= float(e) <= bulk_conduction_min
+        ]
+        return bulk_valence_max, bulk_conduction_min, edge_energies_all, edge_energies_in_gap
+
+    bulk_valence_max, bulk_conduction_min, edge_energies_all, edge_energies_in_gap = collect_with_threshold(
+        edge_threshold
+    )
+
+    # If no in-gap edge branch is detected at strict threshold, relax threshold progressively.
     if not edge_energies_in_gap:
         for relaxed_threshold in (0.40, 0.35, 0.30, 0.25):
             if relaxed_threshold >= edge_threshold:
                 continue
-            relaxed_in_gap: list[float] = []
-            relaxed_all: list[float] = []
-            for ky in ky_values:
-                ham = build_ribbon_hamiltonian(v=v, t=t, lm=lm, ky=ky, w=1.0, j=0.0, nx=nx)
-                evals, evecs = np.linalg.eigh(ham)
-                evals = np.real(evals)
-                probs = np.abs(evecs) ** 2
-                dim = probs.shape[0]
-                cell_prob = probs.reshape(nx, 8, dim).sum(axis=1)
-                edge_weight = cell_prob[:edge_cells, :].sum(axis=0) + cell_prob[-edge_cells:, :].sum(axis=0)
-                edge_mask = edge_weight >= relaxed_threshold
-                bulk_mask = ~edge_mask
-                relaxed_all.extend(evals[edge_mask].tolist())
-                bulk_evals = evals[bulk_mask]
-                bulk_neg = bulk_evals[bulk_evals < 0]
-                bulk_pos = bulk_evals[bulk_evals > 0]
-                if bulk_neg.size > 0 and bulk_pos.size > 0:
-                    valence = float(np.max(bulk_neg))
-                    conduction = float(np.min(bulk_pos))
-                    if conduction > valence:
-                        edge_inside = evals[(evals >= valence) & (evals <= conduction) & edge_mask]
-                        relaxed_in_gap.extend(edge_inside.tolist())
+            (
+                relaxed_bulk_valence_max,
+                relaxed_bulk_conduction_min,
+                relaxed_all,
+                relaxed_in_gap,
+            ) = collect_with_threshold(relaxed_threshold)
             if relaxed_in_gap:
-                edge_energies_in_gap = relaxed_in_gap
+                bulk_valence_max = relaxed_bulk_valence_max
+                bulk_conduction_min = relaxed_bulk_conduction_min
                 edge_energies_all = relaxed_all
+                edge_energies_in_gap = relaxed_in_gap
                 edge_threshold = relaxed_threshold
                 break
 
