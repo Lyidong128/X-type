@@ -10,8 +10,14 @@ ribbon inference:
 - edge_states_all=104
 - edge_threshold_used=0.45
 obc_window_candidate_count=8
-obc_selected_count=4
+obc_selected_count=2
 obc_selected_energy_min=-1.824894e-01
 obc_selected_energy_max=1.824894e-01
-obc_boundary_score_min=0.139057
-obc_boundary_score_max=0.271899
+obc_core_score_min=0.044412
+obc_core_score_max=0.112006
+obc_edge_strip_score_min=0.127574
+obc_edge_strip_score_max=0.241849
+obc_corner_score_min=0.014815
+obc_corner_score_max=0.038053
+obc_energy_proximity_score_min=0.986608
+obc_energy_proximity_score_max=0.992276

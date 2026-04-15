@@ -11,7 +11,13 @@ ribbon inference:
 - edge_threshold_used=0.45
 obc_window_candidate_count=4
 obc_selected_count=2
-obc_selected_energy_min=1.027676e-02
-obc_selected_energy_max=1.027676e-02
-obc_boundary_score_min=0.827223
-obc_boundary_score_max=0.953369
+obc_selected_energy_min=6.393148e-03
+obc_selected_energy_max=6.393148e-03
+obc_core_score_min=0.170669
+obc_core_score_max=0.229685
+obc_edge_strip_score_min=0.559038
+obc_edge_strip_score_max=0.669586
+obc_corner_score_min=0.282632
+obc_corner_score_max=0.288740
+obc_energy_proximity_score_min=0.468825
+obc_energy_proximity_score_max=0.818617
