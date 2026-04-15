@@ -26,6 +26,7 @@ class RibbonGuidedWindow:
     window_high: float
     edge_states_in_gap: int
     edge_states_all: int
+    edge_threshold_used: float
 
 
 def _robust_eigs_near_zero_sparse(ham_sparse, target_k: int = 128) -> tuple[np.ndarray, np.ndarray]:
@@ -57,7 +58,7 @@ def _infer_ribbon_edge_window(
     lm: float,
     nx: int = 20,
     nk: int = 101,
-    edge_cells: int = 3,
+    edge_cells: int = 2,
     edge_threshold: float = 0.45,
 ) -> tuple[np.ndarray, np.ndarray, RibbonGuidedWindow]:
     ky_values = np.linspace(-np.pi, np.pi, nk)
@@ -119,6 +120,40 @@ def _infer_ribbon_edge_window(
         bulk_valence_max = min(bulk_valence_max, -0.02)
         bulk_conduction_min = max(bulk_conduction_min, 0.02)
 
+    # If edge states in the gap are missed at the strict threshold,
+    # lower the threshold progressively to recover core boundary branches.
+    if not edge_energies_in_gap:
+        for relaxed_threshold in (0.40, 0.35, 0.30, 0.25):
+            if relaxed_threshold >= edge_threshold:
+                continue
+            relaxed_in_gap: list[float] = []
+            relaxed_all: list[float] = []
+            for ky in ky_values:
+                ham = build_ribbon_hamiltonian(v=v, t=t, lm=lm, ky=ky, w=1.0, j=0.0, nx=nx)
+                evals, evecs = np.linalg.eigh(ham)
+                evals = np.real(evals)
+                probs = np.abs(evecs) ** 2
+                dim = probs.shape[0]
+                cell_prob = probs.reshape(nx, 8, dim).sum(axis=1)
+                edge_weight = cell_prob[:edge_cells, :].sum(axis=0) + cell_prob[-edge_cells:, :].sum(axis=0)
+                edge_mask = edge_weight >= relaxed_threshold
+                bulk_mask = ~edge_mask
+                relaxed_all.extend(evals[edge_mask].tolist())
+                bulk_evals = evals[bulk_mask]
+                bulk_neg = bulk_evals[bulk_evals < 0]
+                bulk_pos = bulk_evals[bulk_evals > 0]
+                if bulk_neg.size > 0 and bulk_pos.size > 0:
+                    valence = float(np.max(bulk_neg))
+                    conduction = float(np.min(bulk_pos))
+                    if conduction > valence:
+                        edge_inside = evals[(evals >= valence) & (evals <= conduction) & edge_mask]
+                        relaxed_in_gap.extend(edge_inside.tolist())
+            if relaxed_in_gap:
+                edge_energies_in_gap = relaxed_in_gap
+                edge_energies_all = relaxed_all
+                edge_threshold = relaxed_threshold
+                break
+
     if edge_energies_in_gap:
         edge_energy_min = float(np.min(edge_energies_in_gap))
         edge_energy_max = float(np.max(edge_energies_in_gap))
@@ -149,6 +184,7 @@ def _infer_ribbon_edge_window(
         window_high=window_high,
         edge_states_in_gap=len(edge_energies_in_gap),
         edge_states_all=len(edge_energies_all),
+        edge_threshold_used=edge_threshold,
     )
     return ky_values, ribbon_eigs_arr, info
 
@@ -165,6 +201,7 @@ def _write_selection_text(path: Path, row: dict[str, str], info: RibbonGuidedWin
         f"- selected_window=[{info.window_low:.6e}, {info.window_high:.6e}]\n"
         f"- edge_states_in_gap={info.edge_states_in_gap}\n"
         f"- edge_states_all={info.edge_states_all}\n"
+        f"- edge_threshold_used={info.edge_threshold_used:.2f}\n"
         f"obc_selected_count={selected_energies.size}\n"
         f"obc_selected_energy_min={float(np.min(selected_energies)):.6e}\n"
         f"obc_selected_energy_max={float(np.max(selected_energies)):.6e}\n",
@@ -262,6 +299,7 @@ def main() -> None:
                 "window_low": f"{info.window_low:.6e}",
                 "window_high": f"{info.window_high:.6e}",
                 "edge_states_in_gap": str(info.edge_states_in_gap),
+                "edge_threshold_used": f"{info.edge_threshold_used:.2f}",
                 "obc_selected_count": str(selected_idx.size),
                 "obc_selected_e_min": f"{float(np.min(selected_energies)):.6e}",
                 "obc_selected_e_max": f"{float(np.max(selected_energies)):.6e}",
@@ -285,6 +323,7 @@ def main() -> None:
                 "window_low",
                 "window_high",
                 "edge_states_in_gap",
+                "edge_threshold_used",
                 "obc_selected_count",
                 "obc_selected_e_min",
                 "obc_selected_e_max",
