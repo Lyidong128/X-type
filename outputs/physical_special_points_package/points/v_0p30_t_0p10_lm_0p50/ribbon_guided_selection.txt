@@ -9,6 +9,9 @@ ribbon inference:
 - edge_states_in_gap=4
 - edge_states_all=676
 - edge_threshold_used=0.45
-obc_selected_count=8
+obc_window_candidate_count=8
+obc_selected_count=4
 obc_selected_energy_min=9.945251e-03
 obc_selected_energy_max=1.920891e-02
+obc_boundary_score_min=0.205540
+obc_boundary_score_max=0.979094
