@@ -1,0 +1,33 @@
+{
+  "obc": {
+    "nx": 20,
+    "ny": 20,
+    "base_k": 192,
+    "min_candidate_states": 16
+  },
+  "energy_windows": {
+    "zero_center": 0.0,
+    "zero_half_width": 0.25,
+    "ldos_half_width": 0.05,
+    "fallback_half_width": 0.08
+  },
+  "geometry": {
+    "edge_width": 2,
+    "corner_size": 3
+  },
+  "degeneracy": {
+    "abs_delta_e": 0.001,
+    "relative_delta_e": 0.01
+  },
+  "ribbon": {
+    "nx": 20,
+    "nk": 101,
+    "edge_cells": 2,
+    "edge_threshold": 0.45
+  },
+  "selection": {
+    "keep_fraction": 0.2,
+    "min_keep": 2,
+    "max_keep": 8
+  }
+}
