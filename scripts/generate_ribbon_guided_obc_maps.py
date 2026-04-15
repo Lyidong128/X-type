@@ -52,15 +52,36 @@ def _cell_probability_from_eigvecs(vec: np.ndarray, nx: int, ny: int) -> np.ndar
     return grid / total if total > 0 else grid
 
 
-def _boundary_localization_score(grid: np.ndarray, boundary_cells: int = 2) -> float:
+def _edge_strip_and_corner_scores(
+    grid: np.ndarray,
+    edge_cells: int = 2,
+    corner_cells: int = 3,
+) -> tuple[float, float]:
     ny, nx = grid.shape
-    bc = max(1, min(boundary_cells, ny // 2, nx // 2))
-    mask = np.zeros_like(grid, dtype=bool)
-    mask[:bc, :] = True
-    mask[-bc:, :] = True
-    mask[:, :bc] = True
-    mask[:, -bc:] = True
-    return float(np.sum(grid[mask]))
+    ec = max(1, min(edge_cells, ny // 2, nx // 2))
+    cc = max(1, min(corner_cells, ny // 2, nx // 2))
+
+    edge_mask = np.zeros_like(grid, dtype=bool)
+    edge_mask[:ec, :] = True
+    edge_mask[-ec:, :] = True
+    edge_mask[:, :ec] = True
+    edge_mask[:, -ec:] = True
+
+    # Remove corner blocks from edge strip score to emphasize true edge channels.
+    edge_mask[:cc, :cc] = False
+    edge_mask[:cc, -cc:] = False
+    edge_mask[-cc:, :cc] = False
+    edge_mask[-cc:, -cc:] = False
+
+    corner_mask = np.zeros_like(grid, dtype=bool)
+    corner_mask[:cc, :cc] = True
+    corner_mask[:cc, -cc:] = True
+    corner_mask[-cc:, :cc] = True
+    corner_mask[-cc:, -cc:] = True
+
+    edge_strip_score = float(np.sum(grid[edge_mask]))
+    corner_score = float(np.sum(grid[corner_mask]))
+    return edge_strip_score, corner_score
 
 
 def _infer_ribbon_edge_window(
@@ -195,6 +216,12 @@ def _write_selection_text(
     raw_count: int,
     score_min: float,
     score_max: float,
+    edge_score_min: float,
+    edge_score_max: float,
+    corner_score_min: float,
+    corner_score_max: float,
+    energy_score_min: float,
+    energy_score_max: float,
 ) -> None:
     path.write_text(
         "Ribbon-guided OBC wavefunction selection\n"
@@ -212,8 +239,14 @@ def _write_selection_text(
         f"obc_selected_count={selected_energies.size}\n"
         f"obc_selected_energy_min={float(np.min(selected_energies)):.6e}\n"
         f"obc_selected_energy_max={float(np.max(selected_energies)):.6e}\n"
-        f"obc_boundary_score_min={score_min:.6f}\n"
-        f"obc_boundary_score_max={score_max:.6f}\n",
+        f"obc_core_score_min={score_min:.6f}\n"
+        f"obc_core_score_max={score_max:.6f}\n"
+        f"obc_edge_strip_score_min={edge_score_min:.6f}\n"
+        f"obc_edge_strip_score_max={edge_score_max:.6f}\n"
+        f"obc_corner_score_min={corner_score_min:.6f}\n"
+        f"obc_corner_score_max={corner_score_max:.6f}\n"
+        f"obc_energy_proximity_score_min={energy_score_min:.6f}\n"
+        f"obc_energy_proximity_score_max={energy_score_max:.6f}\n",
         encoding="utf-8",
     )
 
@@ -294,10 +327,38 @@ def main() -> None:
             [_cell_probability_from_eigvecs(evecs[:, i], nx=20, ny=20) for i in selected_idx],
             axis=0,
         )
-        candidate_scores = np.array([_boundary_localization_score(g, boundary_cells=2) for g in candidate_grids])
+        ribbon_center = 0.5 * (info.edge_energy_min + info.edge_energy_max)
+        ribbon_span = max(
+            1e-4,
+            abs(info.edge_energy_max - info.edge_energy_min),
+            abs(info.window_high - info.window_low),
+        )
+        energy_sigma = max(1e-4, 0.30 * ribbon_span)
+
+        edge_scores = []
+        corner_scores = []
+        energy_scores = []
+        candidate_scores = []
+        for energy, grid in zip(candidate_energies, candidate_grids):
+            edge_strip_score, corner_score = _edge_strip_and_corner_scores(grid, edge_cells=2, corner_cells=3)
+            energy_score = float(np.exp(-((float(energy) - ribbon_center) ** 2) / (2.0 * energy_sigma**2)))
+            # Core-edge priority:
+            # - strong edge strip localization
+            # - weak corner localization
+            # - energy close to ribbon-identified edge branch center
+            core_score = (edge_strip_score**1.5) * ((max(0.0, 1.0 - corner_score)) ** 1.2) * energy_score
+            edge_scores.append(edge_strip_score)
+            corner_scores.append(corner_score)
+            energy_scores.append(energy_score)
+            candidate_scores.append(core_score)
+
+        edge_scores = np.array(edge_scores, dtype=float)
+        corner_scores = np.array(corner_scores, dtype=float)
+        energy_scores = np.array(energy_scores, dtype=float)
+        candidate_scores = np.array(candidate_scores, dtype=float)
         raw_count = int(candidate_scores.size)
         if candidate_scores.size > 2:
-            keep_count = min(8, max(2, candidate_scores.size // 2))
+            keep_count = min(8, max(2, int(np.ceil(0.20 * candidate_scores.size))))
             keep_order = np.argsort(-candidate_scores)[:keep_count]
         else:
             keep_order = np.arange(candidate_scores.size)
@@ -318,6 +379,12 @@ def main() -> None:
             raw_count=raw_count,
             score_min=float(np.min(candidate_scores)),
             score_max=float(np.max(candidate_scores)),
+            edge_score_min=float(np.min(edge_scores)),
+            edge_score_max=float(np.max(edge_scores)),
+            corner_score_min=float(np.min(corner_scores)),
+            corner_score_max=float(np.max(corner_scores)),
+            energy_score_min=float(np.min(energy_scores)),
+            energy_score_max=float(np.max(energy_scores)),
         )
 
         summary_rows.append(
