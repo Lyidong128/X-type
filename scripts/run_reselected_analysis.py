@@ -517,13 +517,23 @@ def build_key_points(summary_rows: list[dict]) -> list[dict]:
             return None
         return min(cand, key=lambda r: float(r[key]))
 
+    robust_bulk_mixed = pick_max(
+        "gap",
+        lambda r: r["category"] == "robust_topological" and r["recommended_physical_role"] == "bulk_mixed",
+    )
+    if robust_bulk_mixed is None:
+        # Fallback: if no strict bulk_mixed robust point exists, take the robust point
+        # with the weakest best-edge localization as a "quasi bulk-mixed" representative.
+        robust_only = [r for r in rows if r["category"] == "robust_topological"]
+        robust_bulk_mixed = min(robust_only, key=lambda r: float(r["best_edge_weight"])) if robust_only else None
+
     key_defs = [
         ("strongest edge precursor", pick_max("best_edge_weight", lambda r: r["category"] == "near_transition")),
         ("strongest corner precursor", pick_max("best_corner_weight", lambda r: r["category"] == "near_transition")),
         ("most critical transition core", pick_min("gap", lambda r: r["category"] == "near_transition")),
         ("strongest Chern-anomalous point", pick_max("best_edge_weight", lambda r: abs(float(r["Chern"])) >= 0.5)),
         ("reopened robust edge-dominated point", pick_max("rotated_edge_weight", lambda r: r["category"] == "robust_topological")),
-        ("reopened robust but bulk-mixed point", pick_max("gap", lambda r: r["category"] == "robust_topological" and r["recommended_physical_role"] == "bulk_mixed")),
+        ("reopened robust but bulk-mixed point", robust_bulk_mixed),
     ]
 
     out = []
