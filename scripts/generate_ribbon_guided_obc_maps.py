@@ -4,6 +4,7 @@ import csv
 from dataclasses import dataclass
 from pathlib import Path
 import sys
+import shutil
 
 import matplotlib.pyplot as plt
 import numpy as np
