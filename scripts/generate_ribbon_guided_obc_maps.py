@@ -3,10 +3,14 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse.linalg import eigsh
+
+if str(Path("/workspace")) not in sys.path:
+    sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.run_scan import build_obc_hamiltonian_sparse, build_ribbon_hamiltonian
 
