@@ -1,0 +1,4 @@
+Topological special-point selection criteria
+1) robust_nontrivial: gap>0.1 and (Z2=1 or |Chern|>=0.5 or corner_state=1)
+2) near_transition: |gap|<=0.1 and ((Z2=1 or |Chern|>=0.5 or corner_state=1) or edge_state=1)
+Artifacts are copied from outputs/all_points_full_package/points for each selected point.
