@@ -66,6 +66,8 @@
 - `outputs/all_points_full_package/points/<point_id>/...`
 - `outputs/all_points_full_package/all_points_summary.csv`
 
+> 注意：阶段C筛选与打包依赖 `outputs/all_points_full_package/points` 存在。
+
 ### 2.4 验收
 
 - 点目录数 = 1331：
@@ -92,14 +94,22 @@
   - `selection_criteria.txt`
   - `missing_points.txt`
 
-### 3.3 压缩交付
+### 3.3 一键命令（已脚本化）
+
+- `python3 scripts/package_topology_special_points.py`
+- 可选参数：
+  - `--split-size-mb 45`
+  - `--output-dir outputs/topology_special_points_package`
+  - `--zip-base outputs/topology_special_points_package`
+
+### 3.4 压缩交付
 
 - 单包（本地）：
   - `outputs/topology_special_points_package.zip`
 - GitHub 网页下载友好分卷（45MB）：
   - `outputs/topology_special_points_package.zip.part.000` ~ `.004`
 
-### 3.4 合并命令（用户侧）
+### 3.5 合并命令（用户侧）
 
 - `cat topology_special_points_package.zip.part.* > topology_special_points_package.zip`
 - `unzip topology_special_points_package.zip`
@@ -147,4 +157,46 @@
 - [ ] `special_points_summary.csv` 分类列存在  
 - [ ] 分卷可重组并通过 `zip` 完整性校验  
 - [ ] 交付说明包含“筛选依据 + 下载方式 + 合并命令”
+
+---
+
+## 7. 一键流水线入口（新增）
+
+- `scripts/run_pipeline.sh`（阶段化执行）
+- 示例：
+  - `scripts/run_pipeline.sh all`
+  - `scripts/run_pipeline.sh scan`
+  - `scripts/run_pipeline.sh full-points`
+  - `scripts/run_pipeline.sh special-package`
+
+---
+
+## 7. 一键执行入口（新增）
+
+### 7.1 总入口脚本
+
+- `scripts/run_pipeline.sh`
+
+### 7.2 用法
+
+- 全流程（A+B+C）：
+  - `bash scripts/run_pipeline.sh all`
+- 仅扫描（A）：
+  - `bash scripts/run_pipeline.sh scan`
+- 仅全点生成（B）：
+  - `bash scripts/run_pipeline.sh package-all-points`
+- 仅特殊点筛选压缩（C）：
+  - `bash scripts/run_pipeline.sh package-special-points`
+
+### 7.3 特殊点打包独立脚本
+
+- `python3 scripts/package_topology_special_points.py`
+
+可选参数：
+
+- `--results-csv outputs/results.csv`
+- `--all-points-dir outputs/all_points_full_package`
+- `--output-dir outputs/topology_special_points_package`
+- `--zip-base outputs/topology_special_points_package`
+- `--split-size 45m`
 
