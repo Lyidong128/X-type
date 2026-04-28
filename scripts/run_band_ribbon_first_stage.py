@@ -12,6 +12,7 @@ from scripts.run_scan import (  # noqa: E402
     build_scan_values,
     compute_band_data,
     compute_ribbon_spectrum,
+    format_param_token,
     load_xtype_model,
     plot_band_structure,
     plot_ribbon_spectrum,
@@ -23,13 +24,21 @@ def dynamic_w(v: float) -> float:
     return float(2.0 - v)
 
 
+def point_id(v: float, t: float, lm: float) -> str:
+    return (
+        f"v_{format_param_token(v)}_"
+        f"t_{format_param_token(t)}_"
+        f"lm_{format_param_token(lm)}"
+    )
+
+
 def run(args: argparse.Namespace) -> None:
     root = Path("/workspace")
     model = load_xtype_model(root / "models" / args.model_file)
 
     out_dir = root / args.output_dir
-    fig_dir = out_dir / "figures"
-    fig_dir.mkdir(parents=True, exist_ok=True)
+    points_dir = out_dir / "points"
+    points_dir.mkdir(parents=True, exist_ok=True)
     summary_csv = out_dir / "band_ribbon_summary.csv"
     logs_txt = out_dir / "logs.txt"
     if logs_txt.exists():
@@ -46,8 +55,11 @@ def run(args: argparse.Namespace) -> None:
         for lm in lm_values:
             done += 1
             w = dynamic_w(v)
-            band_path = fig_dir / f"band_v{v:.2f}_t{t:.2f}_lm{lm:.2f}.png"
-            ribbon_path = fig_dir / f"ribbon_v{v:.2f}_t{t:.2f}_lm{lm:.2f}.png"
+            pid = point_id(v=v, t=t, lm=lm)
+            point_dir = points_dir / pid
+            point_dir.mkdir(parents=True, exist_ok=True)
+            band_path = point_dir / "band.png"
+            ribbon_path = point_dir / "ribbon.png"
             status = "ok"
             try:
                 set_model_params(model, v=v, t=t, lm=lm, w=w, j=0.0)
@@ -82,6 +94,7 @@ def run(args: argparse.Namespace) -> None:
                     "t": t,
                     "lm": lm,
                     "w": w,
+                    "point_id": pid,
                     "band_path": str(band_path.relative_to(root)),
                     "ribbon_path": str(ribbon_path.relative_to(root)),
                     "status": status,
@@ -91,14 +104,14 @@ def run(args: argparse.Namespace) -> None:
                 print(f"processed {done}/{total}")
 
     with summary_csv.open("w", encoding="utf-8", newline="") as f:
-        fields = ["v", "t", "lm", "w", "band_path", "ribbon_path", "status"]
+        fields = ["point_id", "v", "t", "lm", "w", "band_path", "ribbon_path", "status"]
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
 
     print(f"total={total}")
     print(f"summary={summary_csv}")
-    print(f"figures={fig_dir}")
+    print(f"points={points_dir}")
     if logs_txt.exists():
         print(f"logs={logs_txt}")
 
