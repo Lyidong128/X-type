@@ -45,11 +45,17 @@ SPECIAL_POINT_FIELDS = [
 SCAN_MIN = 0.0
 SCAN_MAX = 1.0
 DEFAULT_SCAN_STEP = 0.1
+DEFAULT_FIXED_T = 0.5
 DEFAULT_OBC_NX = 20
 DEFAULT_OBC_NY = 20
 DEFAULT_OBC_MODE_COUNT = 48
 DEFAULT_RIBBON_NX = 20
 DEFAULT_RIBBON_NK = 61
+
+
+def compute_dynamic_w(v: float) -> float:
+    """Model rule for this study: w = 2 - v."""
+    return float(2.0 - float(v))
 
 
 def build_scan_values(start: float, stop: float, step: float) -> list[float]:
@@ -687,7 +693,8 @@ def generate_special_point_artifacts(
         note_path = point_dir / "说明.txt"
 
         try:
-            set_model_params(model, v=v, t=t, lm=lm, w=1.0, j=0.0)
+            w = compute_dynamic_w(v)
+            set_model_params(model, v=v, t=t, lm=lm, w=w, j=0.0)
             if not band_path.exists():
                 band_data = compute_band_data(model)
                 plot_band_structure(
@@ -701,7 +708,7 @@ def generate_special_point_artifacts(
                     v=v,
                     t=t,
                     lm=lm,
-                    w=1.0,
+                    w=w,
                     j=0.0,
                     nx=ribbon_nx,
                     nk=ribbon_nk,
@@ -718,7 +725,7 @@ def generate_special_point_artifacts(
                     v=v,
                     t=t,
                     lm=lm,
-                    w=1.0,
+                    w=w,
                     j=0.0,
                     nx=obc_nx,
                     ny=obc_ny,
@@ -989,11 +996,12 @@ def generate_obc_diagnostics(
             continue
 
         try:
+            w = compute_dynamic_w(v)
             eigvals, _, target_energy, prob_grid = compute_obc_spectrum_and_probability(
                 v=v,
                 t=t,
                 lm=lm,
-                w=1.0,
+                w=w,
                 j=0.0,
                 nx=nx,
                 ny=ny,
@@ -1110,7 +1118,8 @@ def recalculate_invalid_rows(model, rows: list[dict[str, float]], invalid_indice
         t = float(row["t"])
         lm = float(row["lm"])
         try:
-            set_model_params(model, v=v, t=t, lm=lm, w=1.0, j=0.0)
+            w = compute_dynamic_w(v)
+            set_model_params(model, v=v, t=t, lm=lm, w=w, j=0.0)
             row["gap"] = compute_bulk_gap(model, nk=11, n_occ=4)
             row["chern"] = compute_chern_number(model, nk=21, n_occ=4)
             wilson, z2 = compute_wilson_loop_and_z2(model, nk=15, n_occ=4)
@@ -1161,7 +1170,8 @@ def run_parameter_scan() -> dict[str, int | str]:
     if chern_jump_threshold <= 0:
         chern_jump_threshold = 0.5
     values = build_scan_values(SCAN_MIN, SCAN_MAX, scan_step)
-    scan_points = list(product(values, values, values))
+    fixed_t = env_float("FIXED_T", DEFAULT_FIXED_T)
+    scan_points = list(product(values, [fixed_t], values))
 
     cache = load_cached_rows(results_path, logs_path)
     rows: list[dict[str, float]] = []
@@ -1183,7 +1193,8 @@ def run_parameter_scan() -> dict[str, int | str]:
             continue
 
         try:
-            set_model_params(model, v=float(v), t=float(t), lm=float(lm), w=1.0, j=0.0)
+            w = compute_dynamic_w(float(v))
+            set_model_params(model, v=float(v), t=float(t), lm=float(lm), w=w, j=0.0)
             gap = compute_bulk_gap(model, nk=11, n_occ=4)
             chern = compute_chern_number(model, nk=21, n_occ=4)
             wilson, z2 = compute_wilson_loop_and_z2(model, nk=15, n_occ=4)
