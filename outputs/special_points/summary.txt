@@ -1,4 +1,0 @@
-total_special_points=310
-small_gap_count=234
-chern_jump_count=84
-corner_candidate_count=29
