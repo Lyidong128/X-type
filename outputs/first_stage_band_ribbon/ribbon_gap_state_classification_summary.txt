@@ -1,0 +1,10 @@
+Ribbon gap-state classification summary
+total_points=126
+connecting_edge_branch=25
+isolated_midgap_state=47
+empty_gap=54
+
+edge_threshold=0.55
+ribbon_nx=20
+ribbon_nk=121
+edge_cells=2
