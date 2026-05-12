@@ -29,6 +29,12 @@ CLASS_CN = {
     CLASS_EMPTY: "能隙中间无态",
 }
 
+CLASS_EN = {
+    CLASS_CONNECTING: "Connecting edge branch",
+    CLASS_ISOLATED: "Isolated mid-gap state",
+    CLASS_EMPTY: "Empty gap",
+}
+
 
 def load_points(summary_csv: Path) -> list[dict[str, float | str]]:
     rows: list[dict[str, float | str]] = []
@@ -209,11 +215,12 @@ def plot_class_map(rows: list[dict[str, float | int | str]], save_path: Path) ->
     ax.set_title("Ribbon gap-state classification map (t=0.5, w=2-v)")
     cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
     cbar.set_ticks([0, 1, 2])
+    # Use English labels on figure colorbar to avoid missing CJK glyph issues.
     cbar.set_ticklabels(
         [
-            CLASS_CN[CLASS_EMPTY],
-            CLASS_CN[CLASS_ISOLATED],
-            CLASS_CN[CLASS_CONNECTING],
+            CLASS_EN[CLASS_EMPTY],
+            CLASS_EN[CLASS_ISOLATED],
+            CLASS_EN[CLASS_CONNECTING],
         ]
     )
     fig.tight_layout()
