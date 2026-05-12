@@ -1,0 +1,18 @@
+Band-2/3 window ribbon-state classification summary
+total_points=126
+connecting_edge_branch=27
+isolated_midgap_state=16
+empty_gap=83
+
+points_with_edge_state=43
+points_with_isolated_state=16
+points_with_connecting_edge_branch=27
+
+lower_band=2
+upper_band=3
+edge_threshold=0.55
+ribbon_nx=20
+ribbon_nk=121
+edge_cells=2
+min_window_width=1e-10
+model_file=xtype_model.py
