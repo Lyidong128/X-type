@@ -9,6 +9,7 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
+from matplotlib.patches import Patch
 import numpy as np
 
 if str(Path("/workspace")) not in sys.path:
@@ -208,23 +209,25 @@ def plot_class_map(rows: list[dict[str, float | int | str]], save_path: Path) ->
     norm = mcolors.BoundaryNorm([-0.5, 0.5, 1.5, 2.5], cmap.N)
 
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(9.6, 5.2))
     ax.scatter(v, lm, c=c, cmap=cmap, norm=norm, s=120, marker="s", edgecolors="black", linewidths=0.3)
     ax.set_xlabel("v")
     ax.set_ylabel("lm")
     ax.set_title("Ribbon gap-state classification map (t=0.5, w=2-v)")
-    cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax)
-    cbar.set_ticks([0, 1, 2])
-    # Use English labels on figure colorbar to avoid missing CJK glyph issues.
-    cbar.set_ticklabels(
-        [
-            CLASS_EN[CLASS_EMPTY],
-            CLASS_EN[CLASS_ISOLATED],
-            CLASS_EN[CLASS_CONNECTING],
-        ]
+    legend_handles = [
+        Patch(facecolor="#8c8c8c", edgecolor="black", label=f"0: {CLASS_EN[CLASS_EMPTY]}"),
+        Patch(facecolor="#ff7f0e", edgecolor="black", label=f"1: {CLASS_EN[CLASS_ISOLATED]}"),
+        Patch(facecolor="#1f77b4", edgecolor="black", label=f"2: {CLASS_EN[CLASS_CONNECTING]}"),
+    ]
+    ax.legend(
+        handles=legend_handles,
+        title="Classes",
+        loc="center left",
+        bbox_to_anchor=(1.01, 0.5),
+        frameon=True,
     )
-    fig.tight_layout()
-    fig.savefig(save_path, dpi=180)
+    fig.tight_layout(rect=[0, 0, 0.83, 1])
+    fig.savefig(save_path, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
 
