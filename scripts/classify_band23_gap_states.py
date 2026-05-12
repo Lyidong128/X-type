@@ -117,6 +117,8 @@ def classify_point_in_band_window(
     edge_cells: int,
     edge_threshold: float,
     min_window_width: float,
+    lower_band_1based: int,
+    upper_band_1based: int,
 ) -> dict[str, float | int | str]:
     if window_width <= min_window_width:
         return {
@@ -189,7 +191,10 @@ def classify_point_in_band_window(
         cls = CLASS_ISOLATED
         has_isolated = 1
         has_connecting = 0
-        reason = "edge_states_exist_but_not_connecting_band2_and_band3"
+        reason = (
+            "edge_states_exist_but_not_connecting_"
+            f"band{lower_band_1based}_and_band{upper_band_1based}"
+        )
 
     return {
         "classification": cls,
@@ -205,7 +210,12 @@ def classify_point_in_band_window(
     }
 
 
-def plot_class_map(rows: list[dict[str, float | int | str]], save_path: Path) -> None:
+def plot_class_map(
+    rows: list[dict[str, float | int | str]],
+    save_path: Path,
+    lower_band_1based: int,
+    upper_band_1based: int,
+) -> None:
     class_to_int = {
         CLASS_EMPTY: 0,
         CLASS_ISOLATED: 1,
@@ -223,7 +233,11 @@ def plot_class_map(rows: list[dict[str, float | int | str]], save_path: Path) ->
     ax.scatter(v, lm, c=c, cmap=cmap, norm=norm, s=120, marker="s", edgecolors="black", linewidths=0.3)
     ax.set_xlabel("v")
     ax.set_ylabel("lm")
-    ax.set_title("Band-2/3 window ribbon state classification (t=0.5, w=2-v)")
+    ax.set_title(
+        "Band-"
+        f"{lower_band_1based}/{upper_band_1based} window ribbon state classification "
+        "(t=0.5, w=2-v)"
+    )
     legend_handles = [
         Patch(facecolor="#8c8c8c", edgecolor="black", label="0: Empty gap"),
         Patch(facecolor="#ff7f0e", edgecolor="black", label="1: Isolated mid-gap state"),
@@ -289,6 +303,8 @@ def run(args: argparse.Namespace) -> None:
                 edge_cells=args.edge_cells,
                 edge_threshold=args.edge_threshold,
                 min_window_width=args.min_window_width,
+                lower_band_1based=args.lower_band,
+                upper_band_1based=args.upper_band,
             )
         )
         rows.append(rec)
@@ -326,7 +342,10 @@ def run(args: argparse.Namespace) -> None:
     n_has_isolated = int(sum(int(r["has_isolated_state"]) for r in rows))
     n_has_connecting = int(sum(int(r["has_connecting_edge_branch"]) for r in rows))
     lines = [
-        "Band-2/3 window ribbon-state classification summary",
+        (
+            "Band-"
+            f"{args.lower_band}/{args.upper_band} window ribbon-state classification summary"
+        ),
         f"total_points={len(rows)}",
         f"connecting_edge_branch={cnt.get(CLASS_CONNECTING, 0)}",
         f"isolated_midgap_state={cnt.get(CLASS_ISOLATED, 0)}",
@@ -346,7 +365,12 @@ def run(args: argparse.Namespace) -> None:
         f"model_file={args.model_file}",
     ]
     output_txt.write_text("\n".join(lines), encoding="utf-8")
-    plot_class_map(rows=rows, save_path=output_map_png)
+    plot_class_map(
+        rows=rows,
+        save_path=output_map_png,
+        lower_band_1based=args.lower_band,
+        upper_band_1based=args.upper_band,
+    )
 
     print(f"total={len(rows)}")
     print(f"csv={output_csv}")
