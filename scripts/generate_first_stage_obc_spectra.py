@@ -15,6 +15,13 @@ if str(Path("/workspace")) not in sys.path:
 from scripts.run_scan import build_obc_hamiltonian_sparse, plot_obc_spectrum
 
 
+def full_dense_eigvals(ham_sparse) -> np.ndarray:
+    """Compute full eigenvalue spectrum by dense Hermitian diagonalization."""
+    dense = ham_sparse.toarray()
+    vals = np.linalg.eigvalsh(dense)
+    return np.real(vals)
+
+
 def robust_sparse_eigs(
     ham_sparse,
     base_k: int,
@@ -123,12 +130,16 @@ def run(args: argparse.Namespace) -> None:
                     nx=args.obc_nx,
                     ny=args.obc_ny,
                 )
-                eigvals = robust_sparse_eigs(
-                    ham_sparse=ham_sparse,
-                    base_k=args.obc_k,
-                    min_candidate_states=args.obc_min_k,
-                    per_try_timeout=args.per_try_timeout,
-                )
+                dim = int(ham_sparse.shape[0])
+                if args.full_spectrum and dim <= args.full_max_dim:
+                    eigvals = full_dense_eigvals(ham_sparse)
+                else:
+                    eigvals = robust_sparse_eigs(
+                        ham_sparse=ham_sparse,
+                        base_k=args.obc_k,
+                        min_candidate_states=args.obc_min_k,
+                        per_try_timeout=args.per_try_timeout,
+                    )
                 eig_count = int(eigvals.size)
                 plot_obc_spectrum(
                     eigvals=eigvals,
@@ -204,6 +215,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--obc-k", type=int, default=96)
     parser.add_argument("--obc-min-k", type=int, default=16)
     parser.add_argument("--per-try-timeout", type=int, default=20)
+    parser.add_argument("--full-spectrum", action="store_true", dest="full_spectrum")
+    parser.add_argument("--no-full-spectrum", action="store_false", dest="full_spectrum")
+    parser.set_defaults(full_spectrum=True)
+    parser.add_argument("--full-max-dim", type=int, default=4000)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
