@@ -6,13 +6,17 @@ from pathlib import Path
 import signal
 import sys
 
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse.linalg import ArpackNoConvergence, eigsh
 
 if str(Path("/workspace")) not in sys.path:
     sys.path.insert(0, str(Path("/workspace")))
 
-from scripts.run_scan import build_obc_hamiltonian_sparse, plot_obc_spectrum
+from scripts.run_scan import build_obc_hamiltonian_sparse
+
+matplotlib.use("Agg")
 
 
 def full_dense_eigvals(ham_sparse) -> np.ndarray:
@@ -63,6 +67,56 @@ def robust_sparse_eigs(
                 signal.signal(signal.SIGALRM, old_handler)
 
     raise RuntimeError("Failed to compute sparse eigenvalues near zero.")
+
+
+def plot_obc_spectrum_marked(
+    eigvals: np.ndarray,
+    save_path: Path,
+    title: str,
+    abs_floor: float,
+    scale: float,
+) -> tuple[float, int]:
+    """
+    Plot E-vs-index and mark near-zero special states in red.
+
+    A state is marked red when:
+      |E| <= max(abs_floor, scale * min|E|)
+    """
+    eigvals = np.sort(np.real(eigvals))
+    min_abs = float(np.min(np.abs(eigvals)))
+    highlight_window = float(max(abs_floor, scale * min_abs))
+    red_mask = np.abs(eigvals) <= highlight_window
+    red_count = int(np.sum(red_mask))
+
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    idx = np.arange(eigvals.size)
+    ax.scatter(
+        idx[~red_mask],
+        eigvals[~red_mask],
+        s=3,
+        c="#5f5f5f",
+        alpha=0.75,
+        label="other states",
+    )
+    ax.scatter(
+        idx[red_mask],
+        eigvals[red_mask],
+        s=8,
+        c="red",
+        alpha=0.95,
+        label="special states (red)",
+    )
+    ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
+    ax.set_xlabel("Mode index")
+    ax.set_ylabel("Energy")
+    ax.set_title(title)
+    ax.grid(alpha=0.22)
+    ax.legend(loc="upper right", fontsize=8)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=170)
+    plt.close(fig)
+    return highlight_window, red_count
 
 
 def load_points(summary_csv: Path) -> list[dict[str, float | str]]:
@@ -116,6 +170,8 @@ def run(args: argparse.Namespace) -> None:
         status = "ok"
         detail = ""
         eig_count = 0
+        highlight_window: float | str = ""
+        red_count: int | str = ""
 
         if obc_path.exists() and not args.force:
             status = "skipped_existing"
@@ -141,10 +197,12 @@ def run(args: argparse.Namespace) -> None:
                         per_try_timeout=args.per_try_timeout,
                     )
                 eig_count = int(eigvals.size)
-                plot_obc_spectrum(
+                highlight_window, red_count = plot_obc_spectrum_marked(
                     eigvals=eigvals,
                     save_path=obc_path,
-                    title=f"OBC E vs index (v={v:.2f}, t={t:.2f}, lm={lm:.2f}, {args.obc_nx}x{args.obc_ny})",
+                    title=f"OBC E vs index (special marked, v={v:.2f}, t={t:.2f}, lm={lm:.2f}, {args.obc_nx}x{args.obc_ny})",
+                    abs_floor=args.highlight_abs_floor,
+                    scale=args.highlight_scale,
                 )
             except Exception as exc:
                 status = "failed"
@@ -165,6 +223,8 @@ def run(args: argparse.Namespace) -> None:
                 "obc_nx": int(args.obc_nx),
                 "obc_ny": int(args.obc_ny),
                 "eigvals_count": eig_count,
+                "highlight_window": (highlight_window if status != "failed" else ""),
+                "highlight_count": (red_count if status != "failed" else ""),
                 "status": status,
                 "detail": detail,
                 "obc_spectrum_path": str(obc_path.relative_to(project_root)),
@@ -183,6 +243,8 @@ def run(args: argparse.Namespace) -> None:
         "obc_nx",
         "obc_ny",
         "eigvals_count",
+        "highlight_window",
+        "highlight_count",
         "status",
         "detail",
         "obc_spectrum_path",
@@ -219,6 +281,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-full-spectrum", action="store_false", dest="full_spectrum")
     parser.set_defaults(full_spectrum=True)
     parser.add_argument("--full-max-dim", type=int, default=4000)
+    parser.add_argument("--highlight-abs-floor", type=float, default=0.02)
+    parser.add_argument("--highlight-scale", type=float, default=6.0)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
