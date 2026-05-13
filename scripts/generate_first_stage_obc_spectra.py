@@ -75,6 +75,7 @@ def plot_obc_spectrum_marked(
     title: str,
     abs_floor: float,
     scale: float,
+    abs_cap: float,
 ) -> tuple[float, int]:
     """
     Plot E-vs-index and mark near-zero special states in red.
@@ -84,7 +85,7 @@ def plot_obc_spectrum_marked(
     """
     eigvals = np.sort(np.real(eigvals))
     min_abs = float(np.min(np.abs(eigvals)))
-    highlight_window = float(max(abs_floor, scale * min_abs))
+    highlight_window = float(min(max(abs_floor, scale * min_abs), abs_cap))
     red_mask = np.abs(eigvals) <= highlight_window
     red_count = int(np.sum(red_mask))
 
@@ -203,6 +204,7 @@ def run(args: argparse.Namespace) -> None:
                     title=f"OBC E vs index (special marked, v={v:.2f}, t={t:.2f}, lm={lm:.2f}, {args.obc_nx}x{args.obc_ny})",
                     abs_floor=args.highlight_abs_floor,
                     scale=args.highlight_scale,
+                    abs_cap=args.highlight_abs_cap,
                 )
             except Exception as exc:
                 status = "failed"
@@ -283,6 +285,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--full-max-dim", type=int, default=4000)
     parser.add_argument("--highlight-abs-floor", type=float, default=0.02)
     parser.add_argument("--highlight-scale", type=float, default=6.0)
+    parser.add_argument("--highlight-abs-cap", type=float, default=0.2)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
