@@ -1,0 +1,31 @@
+Special-point analysis from OBC E-vs-index spectra
+total_points=126
+special_top_n=20
+obc_size=20x20
+highlight_window=max(0.02, 6.0*min_abs_energy)
+
+Selection rule:
+- Compute special_score = 2.5*N(|E|<=0.02) + 1.0*N(|E|<=0.05) + 0.08/(min|E|+1e-7) + 0.06/(|gap|+1e-7)
+- Select top-N by score as special points.
+
+Special points (rank, point_id, score):
+rank=01 point_id=v_0p90_t_0p50_lm_0p20 score=3639.881 min|E|=2.2082e-05 N0.02=6
+rank=02 point_id=v_1p10_t_0p50_lm_0p20 score=1601.774 min|E|=6.0796e-05 N0.02=42
+rank=03 point_id=v_1p30_t_0p50_lm_0p00 score=698.673 min|E|=1.3532e-04 N0.02=20
+rank=04 point_id=v_1p20_t_0p50_lm_0p20 score=536.153 min|E|=3.8685e-04 N0.02=56
+rank=05 point_id=v_0p40_t_0p50_lm_0p30 score=503.025 min|E|=1.6813e-04 N0.02=4
+rank=06 point_id=v_0p10_t_0p50_lm_0p20 score=398.770 min|E|=2.2020e-04 N0.02=6
+rank=07 point_id=v_1p20_t_0p50_lm_0p10 score=254.523 min|E|=1.9279e-03 N0.02=50
+rank=08 point_id=v_1p20_t_0p50_lm_0p00 score=240.065 min|E|=2.0906e-03 N0.02=46
+rank=09 point_id=v_1p10_t_0p50_lm_0p10 score=184.932 min|E|=2.7854e-03 N0.02=20
+rank=10 point_id=v_0p40_t_0p50_lm_0p10 score=161.112 min|E|=7.1309e-04 N0.02=8
+rank=11 point_id=v_1p10_t_0p50_lm_0p00 score=149.541 min|E|=1.2974e-03 N0.02=12
+rank=12 point_id=v_1p20_t_0p50_lm_0p30 score=147.248 min|E|=2.8066e-03 N0.02=18
+rank=13 point_id=v_1p10_t_0p50_lm_0p40 score=135.734 min|E|=8.1911e-04 N0.02=6
+rank=14 point_id=v_0p60_t_0p50_lm_0p20 score=126.166 min|E|=9.2557e-04 N0.02=6
+rank=15 point_id=v_0p30_t_0p50_lm_0p30 score=123.087 min|E|=9.3912e-04 N0.02=6
+rank=16 point_id=v_1p30_t_0p50_lm_0p10 score=121.767 min|E|=5.6998e-03 N0.02=18
+rank=17 point_id=v_1p30_t_0p50_lm_0p20 score=117.654 min|E|=5.8632e-03 N0.02=18
+rank=18 point_id=v_0p60_t_0p50_lm_0p30 score=113.590 min|E|=1.1574e-03 N0.02=10
+rank=19 point_id=v_1p30_t_0p50_lm_0p30 score=111.009 min|E|=3.1572e-03 N0.02=14
+rank=20 point_id=v_1p00_t_0p50_lm_0p00 score=110.599 min|E|=8.9689e-03 N0.02=6
