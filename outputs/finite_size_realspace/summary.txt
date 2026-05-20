@@ -1,0 +1,10 @@
+Finite-size scaling + real-space Bott validation
+points_selected=20
+sizes=[12, 16, 20]
+bott_size=12
+fermi=0.0
+sparse_k=96
+
+scaling_csv=/workspace/outputs/finite_size_realspace/finite_size_metrics.csv
+bott_csv=/workspace/outputs/finite_size_realspace/bott_index_summary.csv
+figures_dir=/workspace/outputs/finite_size_realspace/figures
