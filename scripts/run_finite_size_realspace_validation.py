@@ -208,6 +208,30 @@ def plot_bott_vs_score(bott_rows: list[dict[str, float | int | str]], save_path:
     plt.close(fig)
 
 
+def plot_bott_size_scaling(bott_rows: list[dict[str, float | int | str]], save_path: Path) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(8.8, 5.2))
+    grouped: dict[str, list[dict[str, float | int | str]]] = {}
+    for row in bott_rows:
+        if str(row.get("bott_status", "")) != "ok":
+            continue
+        grouped.setdefault(str(row["point_id"]), []).append(row)
+    for pid, rows in grouped.items():
+        rows = sorted(rows, key=lambda r: int(r["bott_size"]))
+        x = [int(r["bott_size"]) for r in rows]
+        y = [float(r["bott_index"]) for r in rows]
+        ax.plot(x, y, marker="o", linewidth=1.1, markersize=3.5, alpha=0.85, label=pid)
+    ax.set_xlabel("System size L for Bott")
+    ax.set_ylabel("Bott index")
+    ax.set_title("Bott index finite-size scaling")
+    ax.grid(alpha=0.25)
+    if len(grouped) <= 12:
+        ax.legend(loc="best", fontsize=7)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=180)
+    plt.close(fig)
+
+
 def run(args: argparse.Namespace) -> None:
     root = Path("/workspace")
     analysis_csv = root / args.analysis_csv
@@ -217,11 +241,12 @@ def run(args: argparse.Namespace) -> None:
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     sizes = parse_sizes(args.sizes)
+    bott_sizes = parse_sizes(args.bott_sizes)
     points = load_top_points(analysis_csv=analysis_csv, top_n=args.top_n)
     if not points:
         raise RuntimeError(f"No ranked points found in {analysis_csv}")
 
-    print(f"selected_points={len(points)} sizes={sizes}")
+    print(f"selected_points={len(points)} sizes={sizes} bott_sizes={bott_sizes}")
 
     scaling_rows: list[dict[str, float | int | str]] = []
     bott_rows: list[dict[str, float | int | str]] = []
@@ -256,21 +281,43 @@ def run(args: argparse.Namespace) -> None:
                 }
             )
 
-            if L == args.bott_size:
-                bott = compute_bott_index_dense(ham_sparse=ham_sparse, nx=L, ny=L, fermi=args.fermi)
-                bott_rows.append(
-                    {
-                        "point_id": p.point_id,
-                        "special_rank": p.special_rank,
-                        "special_score": p.special_score,
-                        "v": p.v,
-                        "t": p.t,
-                        "lm": p.lm,
-                        "w": p.w,
-                        "bott_size": L,
-                        "bott_index": bott,
-                    }
-                )
+            if L in bott_sizes:
+                dim = int(ham_sparse.shape[0])
+                if dim <= args.bott_max_dim:
+                    bott = compute_bott_index_dense(ham_sparse=ham_sparse, nx=L, ny=L, fermi=args.fermi)
+                    bott_rows.append(
+                        {
+                            "point_id": p.point_id,
+                            "special_rank": p.special_rank,
+                            "special_score": p.special_score,
+                            "v": p.v,
+                            "t": p.t,
+                            "lm": p.lm,
+                            "w": p.w,
+                            "bott_size": L,
+                            "bott_dim": dim,
+                            "bott_index": bott,
+                            "bott_status": "ok",
+                            "bott_detail": "",
+                        }
+                    )
+                else:
+                    bott_rows.append(
+                        {
+                            "point_id": p.point_id,
+                            "special_rank": p.special_rank,
+                            "special_score": p.special_score,
+                            "v": p.v,
+                            "t": p.t,
+                            "lm": p.lm,
+                            "w": p.w,
+                            "bott_size": L,
+                            "bott_dim": dim,
+                            "bott_index": "",
+                            "bott_status": "skipped_dim_cap",
+                            "bott_detail": f"dim={dim}>bott_max_dim={args.bott_max_dim}",
+                        }
+                    )
 
             if done % 10 == 0 or done == total_jobs:
                 print(f"processed {done}/{total_jobs}")
@@ -295,7 +342,7 @@ def run(args: argparse.Namespace) -> None:
         w.writeheader()
         w.writerows(scaling_rows)
 
-    bott_csv = output_dir / "bott_index_summary.csv"
+    bott_csv = output_dir / "bott_size_scaling.csv"
     bott_fields = [
         "point_id",
         "special_rank",
@@ -305,12 +352,15 @@ def run(args: argparse.Namespace) -> None:
         "lm",
         "w",
         "bott_size",
+        "bott_dim",
         "bott_index",
+        "bott_status",
+        "bott_detail",
     ]
     with bott_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=bott_fields)
         w.writeheader()
-        w.writerows(sorted(bott_rows, key=lambda r: int(r["special_rank"])))
+        w.writerows(sorted(bott_rows, key=lambda r: (int(r["special_rank"]), int(r["bott_size"]))))
 
     plot_scaling(
         metric_rows=scaling_rows,
@@ -325,14 +375,22 @@ def run(args: argparse.Namespace) -> None:
         save_path=figures_dir / "size_scaling_count_absE_0p02.png",
     )
     if bott_rows:
-        plot_bott_vs_score(bott_rows=bott_rows, save_path=figures_dir / "bott_vs_special_score.png")
+        plot_bott_size_scaling(bott_rows=bott_rows, save_path=figures_dir / "bott_size_scaling.png")
+        # use largest bott size with valid values for score-vs-bott comparison
+        ok_rows = [r for r in bott_rows if str(r.get("bott_status", "")) == "ok"]
+        if ok_rows:
+            max_size = max(int(r["bott_size"]) for r in ok_rows)
+            rows_max = [r for r in ok_rows if int(r["bott_size"]) == max_size]
+            if rows_max:
+                plot_bott_vs_score(bott_rows=rows_max, save_path=figures_dir / "bott_vs_special_score.png")
 
     summary_txt = output_dir / "summary.txt"
     lines = [
         "Finite-size scaling + real-space Bott validation",
         f"points_selected={len(points)}",
         f"sizes={sizes}",
-        f"bott_size={args.bott_size}",
+        f"bott_sizes={bott_sizes}",
+        f"bott_max_dim={args.bott_max_dim}",
         f"fermi={args.fermi}",
         f"sparse_k={args.sparse_k}",
         "",
@@ -362,7 +420,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--top-n", type=int, default=20)
     parser.add_argument("--sizes", default="12,16,20")
-    parser.add_argument("--bott-size", type=int, default=12)
+    parser.add_argument("--bott-sizes", default="12,16")
+    parser.add_argument("--bott-max-dim", type=int, default=2200)
     parser.add_argument("--fermi", type=float, default=0.0)
     parser.add_argument("--sparse-k", type=int, default=96)
     parser.add_argument("--per-try-timeout", type=int, default=20)
