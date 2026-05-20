@@ -1,0 +1,9 @@
+Transition corridor local dense scan
+corridor_ranks=[1, 2]
+model_file=xtype_model.py
+v_width=0.2, v_step=0.04
+lm_width=0.2, lm_step=0.04
+gap_nk=11, chern_nk=15
+obc_size=16, obc_sparse_k=96
+
+summary_csv=/workspace/outputs/transition_corridors/corridor_summary.csv
