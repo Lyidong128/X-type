@@ -105,7 +105,7 @@ def write_csv(path: Path, rows: list[dict[str, object]], fieldnames: list[str]) 
         writer = csv.DictWriter(fh, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
-            writer.writerow(row)
+            writer.writerow({k: row.get(k, "") for k in fieldnames})
 
 
 def plot_category_map(rows: list[dict[str, object]], out_png: Path) -> None:
