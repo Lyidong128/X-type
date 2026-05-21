@@ -5,9 +5,13 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+if str(Path("/workspace")) not in sys.path:
+    sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.next_stage.common import (
     auto_select_points,
@@ -44,7 +48,7 @@ def subspace_chern(frames: list[list[np.ndarray]]) -> tuple[float, np.ndarray]:
         for j in range(nk):
             jp = (j + 1) % nk
             F[i, j] = np.log(Ux[i, j] * Uy[ip, j] / (Ux[i, jp] * Uy[i, j] + 1e-14))
-    chern = float(np.sum(F) / (2j * np.pi))
+    chern = float((np.sum(F) / (2j * np.pi)).real)
     return chern, np.real(F / (2j * np.pi))
 
 
@@ -53,9 +57,9 @@ def unitary_part(mat: np.ndarray) -> np.ndarray:
     return u @ vh
 
 
-def spin_bott_from_occ(occ: np.ndarray, spin_occ: np.ndarray, nx: int, ny: int) -> float:
+def spin_bott_from_occ(spin_occ: np.ndarray, nx: int, ny: int) -> float:
     """Compute Bott index for one occupied subspace."""
-    if occ.shape[1] == 0:
+    if spin_occ.shape[1] == 0:
         return 0.0
     dim = nx * ny * 8
     px = np.zeros(dim, dtype=complex)
@@ -159,14 +163,15 @@ def main() -> None:
             if np.sum(occ_mask) == 0:
                 occ_mask = np.arange(evals.size) < (evals.size // 2)
             occ = evecs[:, occ_mask]
-            s_occ = occ.conj().T @ spin_op @ occ
+            spin_op_obc = np.kron(np.eye(args.obc_size * args.obc_size, dtype=complex), spin_op)
+            s_occ = occ.conj().T @ spin_op_obc @ occ
             se, sv = np.linalg.eigh(s_occ)
             plus_mask = se >= 0
             minus_mask = se < 0
             occ_plus = occ @ sv[:, plus_mask] if np.sum(plus_mask) > 0 else np.zeros((occ.shape[0], 0), dtype=complex)
             occ_minus = occ @ sv[:, minus_mask] if np.sum(minus_mask) > 0 else np.zeros((occ.shape[0], 0), dtype=complex)
-            b_plus = spin_bott_from_occ(occ, occ_plus, nx=args.obc_size, ny=args.obc_size)
-            b_minus = spin_bott_from_occ(occ, occ_minus, nx=args.obc_size, ny=args.obc_size)
+            b_plus = spin_bott_from_occ(occ_plus, nx=args.obc_size, ny=args.obc_size)
+            b_minus = spin_bott_from_occ(occ_minus, nx=args.obc_size, ny=args.obc_size)
             spin_bott = 0.5 * (b_plus - b_minus)
 
         berry = f_plus - f_minus

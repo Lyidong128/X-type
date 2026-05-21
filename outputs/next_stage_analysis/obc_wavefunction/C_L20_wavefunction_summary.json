@@ -1,0 +1,93 @@
+{
+  "point_label": "C",
+  "params": {
+    "label": "C",
+    "v": 1.9,
+    "lm": 0.0,
+    "t": 0.5,
+    "w": 0.10000000000000009,
+    "source": "auto_from_topology_summary",
+    "note": "z2=0, chern≈0, ribbon no connecting branch"
+  },
+  "L": 20,
+  "near_state_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "thresholds": {
+    "edge_width": 2,
+    "corner_size": 3,
+    "edge_like_thr": 0.45,
+    "corner_like_thr": 0.28
+  },
+  "states": [
+    {
+      "point_label": "C",
+      "v": 1.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 20,
+      "state_index": 0,
+      "energy": 0.8011935785495399,
+      "abs_energy": 0.8011935785495399,
+      "edge_weight": 0.042540481976955286,
+      "corner_weight": 0.0033453587300088443,
+      "ipr": 0.0006404533644863195,
+      "classification": "bulk-like"
+    },
+    {
+      "point_label": "C",
+      "v": 1.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 20,
+      "state_index": 1,
+      "energy": 0.8011935785495465,
+      "abs_energy": 0.8011935785495465,
+      "edge_weight": 0.04254048197693466,
+      "corner_weight": 0.0033453587300066134,
+      "ipr": 0.000690160011733534,
+      "classification": "bulk-like"
+    },
+    {
+      "point_label": "C",
+      "v": 1.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 20,
+      "state_index": 2,
+      "energy": 0.8029662135339367,
+      "abs_energy": 0.8029662135339367,
+      "edge_weight": 0.09925535225451967,
+      "corner_weight": 0.011392634661389092,
+      "ipr": 0.0006200726568917462,
+      "classification": "bulk-like"
+    },
+    {
+      "point_label": "C",
+      "v": 1.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 20,
+      "state_index": 3,
+      "energy": 0.8029662135339368,
+      "abs_energy": 0.8029662135339368,
+      "edge_weight": 0.09925535225451368,
+      "corner_weight": 0.011392634661387195,
+      "ipr": 0.001093178549158388,
+      "classification": "bulk-like"
+    }
+  ],
+  "subspace": {
+    "classification": "bulk-like",
+    "edge_weight": 0.07089791711573082,
+    "corner_weight": 0.0073689966956979385,
+    "bulk_weight": 0.9263068491751674
+  }
+}

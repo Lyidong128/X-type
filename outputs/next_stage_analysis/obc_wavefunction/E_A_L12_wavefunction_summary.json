@@ -1,0 +1,93 @@
+{
+  "point_label": "E_A",
+  "params": {
+    "label": "E_A",
+    "v": 0.9,
+    "lm": 0.0,
+    "t": 0.5,
+    "w": 1.1,
+    "source": "existing_transition_corridors",
+    "note": "gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+  },
+  "L": 12,
+  "near_state_indices": [
+    608,
+    609,
+    610,
+    611
+  ],
+  "thresholds": {
+    "edge_width": 2,
+    "corner_size": 3,
+    "edge_like_thr": 0.45,
+    "corner_like_thr": 0.28
+  },
+  "states": [
+    {
+      "point_label": "E_A",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 608,
+      "energy": 0.02789116938369482,
+      "abs_energy": 0.02789116938369482,
+      "edge_weight": 0.7203738495157952,
+      "corner_weight": 0.38283617469087516,
+      "ipr": 0.004008227861436321,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "E_A",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 609,
+      "energy": 0.027891169383695145,
+      "abs_energy": 0.027891169383695145,
+      "edge_weight": 0.7203738495157949,
+      "corner_weight": 0.3828361746908754,
+      "ipr": 0.00345398357923268,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "E_A",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 610,
+      "energy": 0.027891169383695694,
+      "abs_energy": 0.027891169383695694,
+      "edge_weight": 0.7203738495157946,
+      "corner_weight": 0.38283617469087566,
+      "ipr": 0.004732001318285532,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "E_A",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 611,
+      "energy": 0.02789116938369585,
+      "abs_energy": 0.02789116938369585,
+      "edge_weight": 0.7203738495157951,
+      "corner_weight": 0.38283617469087594,
+      "ipr": 0.003244515319323583,
+      "classification": "corner-like"
+    }
+  ],
+  "subspace": {
+    "classification": "corner-like",
+    "edge_weight": 0.720373849515795,
+    "corner_weight": 0.3828361746908755,
+    "bulk_weight": 0.2529337178038438
+  }
+}

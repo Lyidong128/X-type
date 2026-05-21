@@ -1,0 +1,93 @@
+{
+  "point_label": "B",
+  "params": {
+    "label": "B",
+    "v": 1.1,
+    "lm": 0.2,
+    "t": 0.5,
+    "w": 0.8999999999999999,
+    "source": "fixed_user",
+    "note": ""
+  },
+  "L": 20,
+  "near_state_indices": [
+    42,
+    43,
+    41,
+    40
+  ],
+  "thresholds": {
+    "edge_width": 2,
+    "corner_size": 3,
+    "edge_like_thr": 0.45,
+    "corner_like_thr": 0.28
+  },
+  "states": [
+    {
+      "point_label": "B",
+      "v": 1.1,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.8999999999999999,
+      "L": 20,
+      "state_index": 42,
+      "energy": 6.0796025384962346e-05,
+      "abs_energy": 6.0796025384962346e-05,
+      "edge_weight": 0.425448033066206,
+      "corner_weight": 0.09257191738862594,
+      "ipr": 0.0013258131353316171,
+      "classification": "mixed"
+    },
+    {
+      "point_label": "B",
+      "v": 1.1,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.8999999999999999,
+      "L": 20,
+      "state_index": 43,
+      "energy": 6.079602538496244e-05,
+      "abs_energy": 6.079602538496244e-05,
+      "edge_weight": 0.4254480330662058,
+      "corner_weight": 0.09257191738862582,
+      "ipr": 0.0013258312851717902,
+      "classification": "mixed"
+    },
+    {
+      "point_label": "B",
+      "v": 1.1,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.8999999999999999,
+      "L": 20,
+      "state_index": 41,
+      "energy": -0.00047935544840144796,
+      "abs_energy": 0.00047935544840144796,
+      "edge_weight": 0.392719852648909,
+      "corner_weight": 0.1466900419923985,
+      "ipr": 0.001275732912824558,
+      "classification": "mixed"
+    },
+    {
+      "point_label": "B",
+      "v": 1.1,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.8999999999999999,
+      "L": 20,
+      "state_index": 40,
+      "energy": -0.00047935544840145,
+      "abs_energy": 0.00047935544840145,
+      "edge_weight": 0.3927198526489081,
+      "corner_weight": 0.14669004199239782,
+      "ipr": 0.001298046072259477,
+      "classification": "mixed"
+    }
+  ],
+  "subspace": {
+    "classification": "mixed",
+    "edge_weight": 0.4090839428575573,
+    "corner_weight": 0.11963097969051203,
+    "bulk_weight": 0.5861243341387573
+  }
+}

@@ -1,0 +1,5 @@
+spin_operator=from model.sz with kron(I4, sz)
+A: C+=1.000, C-=-1.000, spin_chern=1.000, spin_bott=-1.000
+B: C+=1.000, C-=-1.000, spin_chern=1.000, spin_bott=-0.000
+C: C+=-0.000, C-=0.000, spin_chern=-0.000, spin_bott=0.000
+D: C+=0.000, C-=0.000, spin_chern=-0.000, spin_bott=-0.000

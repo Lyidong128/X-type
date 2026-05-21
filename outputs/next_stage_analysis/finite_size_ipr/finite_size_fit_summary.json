@@ -1,0 +1,146 @@
+{
+  "A": {
+    "point": {
+      "label": "A",
+      "v": 0.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 1.1,
+      "source": "fixed_user",
+      "note": ""
+    },
+    "fit_exponential": {
+      "a": 5.04342024295248,
+      "b": -0.7455446766404554,
+      "xi": 1.3413012410016276,
+      "r2": 0.8028235273160056
+    },
+    "fit_powerlaw": {
+      "c": 23.91100671031679,
+      "alpha": 11.19427548206473,
+      "r2": 0.7418818354347358
+    },
+    "best_model": "exponential",
+    "n_sizes": 3
+  },
+  "B": {
+    "point": {
+      "label": "B",
+      "v": 1.1,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.8999999999999999,
+      "source": "fixed_user",
+      "note": ""
+    },
+    "fit_exponential": {
+      "a": 3.3743872803431847,
+      "b": -0.6272999297539912,
+      "xi": 1.5941337669082332,
+      "r2": 0.8794423077564684
+    },
+    "fit_powerlaw": {
+      "c": 19.49532191098314,
+      "alpha": 9.508183209040743,
+      "r2": 0.828174725590096
+    },
+    "best_model": "exponential",
+    "n_sizes": 3
+  },
+  "C": {
+    "point": {
+      "label": "C",
+      "v": 1.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "source": "auto_from_topology_summary",
+      "note": "z2=0, chern≈0, ribbon no connecting branch"
+    },
+    "fit_exponential": {
+      "a": -0.21587858636660814,
+      "b": -0.00029545803748314914,
+      "xi": 3384.575381730927,
+      "r2": 0.962298859876717
+    },
+    "fit_powerlaw": {
+      "c": -0.2077608420266142,
+      "alpha": 0.004669108920048,
+      "r2": 0.9850456942178782
+    },
+    "best_model": "powerlaw",
+    "n_sizes": 3
+  },
+  "D": {
+    "point": {
+      "label": "D",
+      "v": 1.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "source": "auto_from_topology+obc",
+      "note": "z2=1 but weak near-zero: min|E|=0.8012, N0.02=0"
+    },
+    "fit_exponential": {
+      "a": -0.2158685643167217,
+      "b": -0.0002958524017988597,
+      "xi": 3380.063822094191,
+      "r2": 0.9623081630532894
+    },
+    "fit_powerlaw": {
+      "c": -0.2077400082432262,
+      "alpha": 0.004675332507941726,
+      "r2": 0.9850516220201208
+    },
+    "best_model": "powerlaw",
+    "n_sizes": 3
+  },
+  "E_A": {
+    "point": {
+      "label": "E_A",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "source": "existing_transition_corridors",
+      "note": "gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+    },
+    "fit_exponential": {
+      "a": -0.8008066362532869,
+      "b": -0.32737103054524286,
+      "xi": 3.054638030538256,
+      "r2": 0.3018411239407387
+    },
+    "fit_powerlaw": {
+      "c": 9.547614708494548,
+      "alpha": 5.665549953107965,
+      "r2": 0.3705544877728407
+    },
+    "best_model": "powerlaw",
+    "n_sizes": 3
+  },
+  "E_B": {
+    "point": {
+      "label": "E_B",
+      "v": 0.9,
+      "lm": 0.0,
+      "t": 0.5,
+      "w": 1.1,
+      "source": "existing_transition_corridors",
+      "note": "gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+    },
+    "fit_exponential": {
+      "a": -0.800806636253292,
+      "b": -0.3273710305452425,
+      "xi": 3.054638030538259,
+      "r2": 0.30184112394073814
+    },
+    "fit_powerlaw": {
+      "c": 9.547614708494534,
+      "alpha": 5.665549953107961,
+      "r2": 0.3705544877728405
+    },
+    "best_model": "powerlaw",
+    "n_sizes": 3
+  }
+}

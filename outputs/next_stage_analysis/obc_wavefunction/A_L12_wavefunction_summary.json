@@ -1,0 +1,93 @@
+{
+  "point_label": "A",
+  "params": {
+    "label": "A",
+    "v": 0.9,
+    "lm": 0.2,
+    "t": 0.5,
+    "w": 1.1,
+    "source": "fixed_user",
+    "note": ""
+  },
+  "L": 12,
+  "near_state_indices": [
+    598,
+    599,
+    597,
+    596
+  ],
+  "thresholds": {
+    "edge_width": 2,
+    "corner_size": 3,
+    "edge_like_thr": 0.45,
+    "corner_like_thr": 0.28
+  },
+  "states": [
+    {
+      "point_label": "A",
+      "v": 0.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 598,
+      "energy": 0.008596553969064367,
+      "abs_energy": 0.008596553969064367,
+      "edge_weight": 0.9184073210280008,
+      "corner_weight": 0.48201488734219095,
+      "ipr": 0.007322826308851449,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "A",
+      "v": 0.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 599,
+      "energy": 0.008596553969064434,
+      "abs_energy": 0.008596553969064434,
+      "edge_weight": 0.9184073210280008,
+      "corner_weight": 0.48201488734219256,
+      "ipr": 0.0073228263088514515,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "A",
+      "v": 0.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 597,
+      "energy": -0.014807598911918584,
+      "abs_energy": 0.014807598911918584,
+      "edge_weight": 0.9203818697320167,
+      "corner_weight": 0.4802533515364399,
+      "ipr": 0.007559002585941803,
+      "classification": "corner-like"
+    },
+    {
+      "point_label": "A",
+      "v": 0.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 1.1,
+      "L": 12,
+      "state_index": 596,
+      "energy": -0.014807598911918827,
+      "abs_energy": 0.014807598911918827,
+      "edge_weight": 0.9203818697320165,
+      "corner_weight": 0.48025335153643894,
+      "ipr": 0.0075590025859417955,
+      "classification": "corner-like"
+    }
+  ],
+  "subspace": {
+    "classification": "corner-like",
+    "edge_weight": 0.9193945953800087,
+    "corner_weight": 0.4811341194393156,
+    "bulk_weight": 0.060962175316270566
+  }
+}

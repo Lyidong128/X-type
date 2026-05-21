@@ -1,0 +1,56 @@
+run_all_next_stage start 2026-05-21T08:06:48Z
+quick_mode=--quick
+
+[RUN] python3 "/workspace/scripts/next_stage/check_symmetry.py" --quick
+[ok] symmetry summary: /workspace/outputs/next_stage_analysis/symmetry/symmetry_summary.csv
+[OK] python3 "/workspace/scripts/next_stage/check_symmetry.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_wilson_loop.py" --quick
+[ok] wilson outputs at /workspace/outputs/next_stage_analysis/wilson_loop
+[OK] python3 "/workspace/scripts/next_stage/run_wilson_loop.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_ribbon_xy.py" --quick
+[ok] ribbon xy outputs at /workspace/outputs/next_stage_analysis/ribbon_xy
+[OK] python3 "/workspace/scripts/next_stage/run_ribbon_xy.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_obc_wavefunction.py" --quick
+[ok] obc wavefunction outputs at /workspace/outputs/next_stage_analysis/obc_wavefunction
+[OK] python3 "/workspace/scripts/next_stage/run_obc_wavefunction.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_finite_size_ipr.py" --quick
+[ok] finite-size ipr outputs at /workspace/outputs/next_stage_analysis/finite_size_ipr
+[OK] python3 "/workspace/scripts/next_stage/run_finite_size_ipr.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_transition_refinement.py" --quick
+[A] processed 200/441
+[A] processed 400/441
+[A] processed 441/441
+[B] processed 200/441
+[B] processed 400/441
+[B] processed 441/441
+[ok] transition refinement outputs at /workspace/outputs/next_stage_analysis/transition_refinement
+[OK] python3 "/workspace/scripts/next_stage/run_transition_refinement.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_robustness.py" --quick
+[ok] robustness outputs at /workspace/outputs/next_stage_analysis/robustness
+[OK] python3 "/workspace/scripts/next_stage/run_robustness.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/run_spin_topology_optional.py" --quick
+[ok] spin topology outputs at /workspace/outputs/next_stage_analysis/spin_topology_optional
+[OK] python3 "/workspace/scripts/next_stage/run_spin_topology_optional.py" --quick
+
+[RUN] python3 "/workspace/scripts/next_stage/generate_next_stage_report.py"
+[ok] report generated: /workspace/outputs/next_stage_analysis/NEXT_STAGE_REPORT.md
+[OK] python3 "/workspace/scripts/next_stage/generate_next_stage_report.py"
+
+=== module status summary ===
+[OK] python3 "/workspace/scripts/next_stage/check_symmetry.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_wilson_loop.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_ribbon_xy.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_obc_wavefunction.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_finite_size_ipr.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_transition_refinement.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_robustness.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/run_spin_topology_optional.py" --quick
+[OK] python3 "/workspace/scripts/next_stage/generate_next_stage_report.py"
+run_all_next_stage end 2026-05-21T08:09:19Z

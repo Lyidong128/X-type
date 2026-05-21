@@ -1,0 +1,8 @@
+Selected analysis points:
+- A: v=0.900, lm=0.200, t=0.500, w=1.100 (source=fixed_user; note=)
+- B: v=1.100, lm=0.200, t=0.500, w=0.900 (source=fixed_user; note=)
+- C: v=1.900, lm=0.000, t=0.500, w=0.100 (source=auto_from_topology_summary; note=z2=0, chern≈0, ribbon no connecting branch)
+- D: v=1.900, lm=0.200, t=0.500, w=0.100 (source=auto_from_topology+obc; note=z2=1 but weak near-zero: min|E|=0.8012, N0.02=0)
+- E_A: v=0.900, lm=0.000, t=0.500, w=1.100 (source=existing_transition_corridors; note=gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv)
+- E_B: v=0.900, lm=0.000, t=0.500, w=1.100 (source=existing_transition_corridors; note=gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv)
+ribbon_width=60, nk=81

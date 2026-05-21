@@ -5,10 +5,14 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import sparse
+
+if str(Path("/workspace")) not in sys.path:
+    sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.next_stage.common import (
     auto_select_points,

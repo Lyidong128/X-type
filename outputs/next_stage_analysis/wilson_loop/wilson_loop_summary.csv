@@ -1,0 +1,13 @@
+point_label,v,lm,t,w,direction,estimated_z2,comment
+A,0.9,0.2,0.5,1.1,kx,1,fixed_user
+A,0.9,0.2,0.5,1.1,ky,0,fixed_user
+B,1.1,0.2,0.5,0.8999999999999999,kx,0,fixed_user
+B,1.1,0.2,0.5,0.8999999999999999,ky,0,fixed_user
+C,1.9,0.0,0.5,0.10000000000000009,kx,0,"z2=0, chern≈0, ribbon no connecting branch"
+C,1.9,0.0,0.5,0.10000000000000009,ky,1,"z2=0, chern≈0, ribbon no connecting branch"
+D,1.9,0.2,0.5,0.10000000000000009,kx,0,"z2=1 but weak near-zero: min|E|=0.8012, N0.02=0"
+D,1.9,0.2,0.5,0.10000000000000009,ky,1,"z2=1 but weak near-zero: min|E|=0.8012, N0.02=0"
+E_A,0.9,0.0,0.5,1.1,kx,0,"gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+E_A,0.9,0.0,0.5,1.1,ky,0,"gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+E_B,0.9,0.0,0.5,1.1,kx,0,"gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"
+E_B,0.9,0.0,0.5,1.1,ky,0,"gap=-3.608e-16, from=/workspace/outputs/transition_corridors/rank_02_v_1p10_t_0p50_lm_0p20/corridor_scan.csv"

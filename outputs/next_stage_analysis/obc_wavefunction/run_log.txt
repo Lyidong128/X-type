@@ -1,0 +1,12 @@
+[ok] A L=12: solved 1152 modes, near=4
+[ok] A L=20: solved 96 modes, near=4
+[ok] B L=12: solved 1152 modes, near=4
+[ok] B L=20: solved 96 modes, near=4
+[ok] C L=12: solved 1152 modes, near=4
+[ok] C L=20: solved 96 modes, near=4
+[ok] D L=12: solved 1152 modes, near=4
+[ok] D L=20: solved 96 modes, near=4
+[ok] E_A L=12: solved 1152 modes, near=4
+[ok] E_A L=20: solved 96 modes, near=4
+[ok] E_B L=12: solved 1152 modes, near=4
+[ok] E_B L=20: solved 96 modes, near=4

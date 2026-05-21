@@ -1,0 +1,20 @@
+Symmetry check report
+model_file=/workspace/models/xtype_model.py
+nk=11
+
+[A] v=0.900, lm=0.200, t=0.500, w=1.100
+  - TRS: best=candidate_iSy max_err=0.000e+00 mean_err=0.000e+00 status=reliably_satisfied
+  - INV: best=candidate_orbital_swap max_err=0.000e+00 mean_err=0.000e+00 status=reliably_satisfied
+  - PHS: best=candidate_sigma_x max_err=2.000e+00 mean_err=2.000e+00 status=not_satisfied
+  - CHIRAL: best=candidate_orbital_chiral max_err=1.287e+00 mean_err=7.177e-01 status=not_satisfied
+
+[B] v=1.100, lm=0.200, t=0.500, w=0.900
+  - TRS: best=candidate_iSy max_err=0.000e+00 mean_err=0.000e+00 status=reliably_satisfied
+  - INV: best=candidate_orbital_swap max_err=0.000e+00 mean_err=0.000e+00 status=reliably_satisfied
+  - PHS: best=candidate_sigma_x max_err=2.000e+00 mean_err=2.000e+00 status=not_satisfied
+  - CHIRAL: best=candidate_orbital_chiral max_err=1.287e+00 mean_err=7.177e-01 status=not_satisfied
+
+Conclusion:
+- reliable status only means low numerical residual under selected operator.
+- candidate_symmetry entries are heuristic and require physical confirmation.
+- If no explicit operator is found, protection symmetry remains undetermined from current code.

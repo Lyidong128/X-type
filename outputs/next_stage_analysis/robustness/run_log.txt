@@ -1,0 +1,2 @@
+seed=12345
+TRS-mass operator: from model.sz with kron(I4, sz)

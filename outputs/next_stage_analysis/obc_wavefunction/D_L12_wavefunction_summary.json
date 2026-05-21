@@ -1,0 +1,93 @@
+{
+  "point_label": "D",
+  "params": {
+    "label": "D",
+    "v": 1.9,
+    "lm": 0.2,
+    "t": 0.5,
+    "w": 0.10000000000000009,
+    "source": "auto_from_topology+obc",
+    "note": "z2=1 but weak near-zero: min|E|=0.8012, N0.02=0"
+  },
+  "L": 12,
+  "near_state_indices": [
+    576,
+    577,
+    578,
+    579
+  ],
+  "thresholds": {
+    "edge_width": 2,
+    "corner_size": 3,
+    "edge_like_thr": 0.45,
+    "corner_like_thr": 0.28
+  },
+  "states": [
+    {
+      "point_label": "D",
+      "v": 1.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 12,
+      "state_index": 576,
+      "energy": 0.8030939500135954,
+      "abs_energy": 0.8030939500135954,
+      "edge_weight": 0.16530343453575497,
+      "corner_weight": 0.04947463838478521,
+      "ipr": 0.0032906896357718955,
+      "classification": "bulk-like"
+    },
+    {
+      "point_label": "D",
+      "v": 1.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 12,
+      "state_index": 577,
+      "energy": 0.803093950013596,
+      "abs_energy": 0.803093950013596,
+      "edge_weight": 0.1653034345357554,
+      "corner_weight": 0.04947463838478474,
+      "ipr": 0.0032906896357718716,
+      "classification": "bulk-like"
+    },
+    {
+      "point_label": "D",
+      "v": 1.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 12,
+      "state_index": 578,
+      "energy": 0.8076169992619563,
+      "abs_energy": 0.8076169992619563,
+      "edge_weight": 0.34298374594870185,
+      "corner_weight": 0.12970349742962314,
+      "ipr": 0.002379278845398341,
+      "classification": "mixed"
+    },
+    {
+      "point_label": "D",
+      "v": 1.9,
+      "lm": 0.2,
+      "t": 0.5,
+      "w": 0.10000000000000009,
+      "L": 12,
+      "state_index": 579,
+      "energy": 0.8076169992619564,
+      "abs_energy": 0.8076169992619564,
+      "edge_weight": 0.3429837459487076,
+      "corner_weight": 0.1297034974296302,
+      "ipr": 0.0023792788453983185,
+      "classification": "mixed"
+    }
+  ],
+  "subspace": {
+    "classification": "bulk-like",
+    "edge_weight": 0.25414359024223,
+    "corner_weight": 0.08958906790720582,
+    "bulk_weight": 0.7160411898654901
+  }
+}

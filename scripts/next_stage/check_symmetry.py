@@ -6,8 +6,12 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 
 import numpy as np
+
+if str(Path("/workspace")) not in sys.path:
+    sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.next_stage.common import (
     PROJECT_ROOT,

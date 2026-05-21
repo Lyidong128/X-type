@@ -1,0 +1,68 @@
+{
+  "point": {
+    "label": "A",
+    "v": 0.9,
+    "lm": 0.2,
+    "t": 0.5,
+    "w": 1.1,
+    "source": "fixed_user",
+    "note": ""
+  },
+  "nk": 11,
+  "results": {
+    "TRS": [
+      {
+        "candidate": "candidate_iSy",
+        "source": "candidate: spinful TR U=i*sigma_y",
+        "antiunitary": true,
+        "target": "H(-k)",
+        "mean_error": 0.0,
+        "max_error": 0.0,
+        "median_error": 0.0
+      }
+    ],
+    "INV": [
+      {
+        "candidate": "candidate_orbital_swap",
+        "source": "candidate: orbital inversion swap (1<->4,2<->3)",
+        "antiunitary": false,
+        "target": "H(-k)",
+        "mean_error": 0.0,
+        "max_error": 0.0,
+        "median_error": 0.0
+      },
+      {
+        "candidate": "candidate_identity",
+        "source": "candidate: identity inversion baseline",
+        "antiunitary": false,
+        "target": "H(-k)",
+        "mean_error": 0.9799919346554251,
+        "max_error": 1.4563500477441675,
+        "median_error": 0.9670107978399827
+      }
+    ],
+    "PHS": [
+      {
+        "candidate": "candidate_sigma_x",
+        "source": "candidate: particle-hole trial U=sigma_x",
+        "antiunitary": true,
+        "target": "-H(-k)",
+        "mean_error": 2.0,
+        "max_error": 2.0,
+        "median_error": 2.0
+      }
+    ],
+    "CHIRAL": [
+      {
+        "candidate": "candidate_orbital_chiral",
+        "source": "candidate: orbital chiral diag(+,-,+,-)",
+        "antiunitary": false,
+        "target": "-H(k)",
+        "mean_error": 0.7177447526274298,
+        "max_error": 1.2871131522512143,
+        "median_error": 0.6628551657551044
+      }
+    ]
+  },
+  "note": "Operators from model.* are treated as explicit; others are candidate symmetries."
+}

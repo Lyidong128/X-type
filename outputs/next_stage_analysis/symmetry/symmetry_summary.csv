@@ -1,0 +1,9 @@
+point_label,v,lm,t,w,symmetry,best_candidate,best_source,max_error,mean_error,status,comment
+A,0.9,0.2,0.5,1.1,TRS,candidate_iSy,candidate: spinful TR U=i*sigma_y,0.0,0.0,reliably_satisfied,candidate_symmetry
+A,0.9,0.2,0.5,1.1,INV,candidate_orbital_swap,"candidate: orbital inversion swap (1<->4,2<->3)",0.0,0.0,reliably_satisfied,candidate_symmetry
+A,0.9,0.2,0.5,1.1,PHS,candidate_sigma_x,candidate: particle-hole trial U=sigma_x,2.0,2.0,not_satisfied,candidate_symmetry
+A,0.9,0.2,0.5,1.1,CHIRAL,candidate_orbital_chiral,"candidate: orbital chiral diag(+,-,+,-)",1.2871131522512143,0.7177447526274298,not_satisfied,candidate_symmetry
+B,1.1,0.2,0.5,0.8999999999999999,TRS,candidate_iSy,candidate: spinful TR U=i*sigma_y,0.0,0.0,reliably_satisfied,candidate_symmetry
+B,1.1,0.2,0.5,0.8999999999999999,INV,candidate_orbital_swap,"candidate: orbital inversion swap (1<->4,2<->3)",0.0,0.0,reliably_satisfied,candidate_symmetry
+B,1.1,0.2,0.5,0.8999999999999999,PHS,candidate_sigma_x,candidate: particle-hole trial U=sigma_x,2.0,2.0,not_satisfied,candidate_symmetry
+B,1.1,0.2,0.5,0.8999999999999999,CHIRAL,candidate_orbital_chiral,"candidate: orbital chiral diag(+,-,+,-)",1.287113152251214,0.7177447526274298,not_satisfied,candidate_symmetry

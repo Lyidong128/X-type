@@ -6,6 +6,7 @@ import csv
 import importlib
 import json
 import math
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,9 @@ from typing import Any
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import ArpackNoConvergence, eigsh
+
+if str(Path("/workspace")) not in sys.path:
+    sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.run_scan import (
     build_obc_hamiltonian,
