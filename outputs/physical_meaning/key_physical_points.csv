@@ -1,0 +1,5 @@
+key_role,point_id,v,t,lm,w,category,physical_score,z2,chern,wilson,band_window_width,count_absE_le_0p02,ribbon_classification,rationale
+strongest_robust_edge_candidate,v_0p80_t_0p50_lm_0p40,0.8,0.5,0.4,1.2,robust_edge_topology,0.907265,1,-9.255766151337647e-17,-0.9598075069860618,0.9999999999999998,6,connecting_edge_branch,Z2=1 且 ribbon(4/5) 连接边界分支清晰，且能隙足够打开
+strongest_transition_core,v_0p90_t_0p50_lm_0p20,0.9,0.5,0.2,1.1,transition_core_or_precursor,0.530542,0,-4.441649548505126e-17,2.1093883938796214,0.47046999107196186,6,connecting_edge_branch,小隙/近零能聚集/高 special_rank，属于相变核心或前驱
+strongest_bulk_mixed_nontrivial,v_0p20_t_0p50_lm_0p50,0.2,0.5,0.5,1.8,bulk_mixed_nontrivial,0.550522,1,-6.482764226736991e-17,1.2065433345747885,1.1999999999999977,4,isolated_midgap_state,Z2 非平庸但 ribbon 未形成连接边界分支，边界性被弱化
+representative_trivial_gapped,v_1p90_t_0p50_lm_0p00,1.9,0.5,0.0,0.10000000000000009,trivial_gapped,0.12,0,2.5881336988175605e-16,-1.5422322900346006,2.5999999999999988,0,empty_gap,边界分支缺失且近零态缺失，平庸绝缘体特征明显

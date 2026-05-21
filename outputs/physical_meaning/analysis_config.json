@@ -1,0 +1,5 @@
+{
+  "robust_gap_min": 0.2,
+  "transition_gap_max": 0.08,
+  "transition_min_abs_max": 0.002
+}
