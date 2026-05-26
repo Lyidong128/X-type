@@ -1,0 +1,18 @@
+{
+  "point_id": "v_1.00_soc_on",
+  "v": 1.0,
+  "t": 0.5,
+  "w": 1.0,
+  "lm": 0.2,
+  "soc_state": "soc_on",
+  "gap": 0.4770329614269003,
+  "chern": -1.7713081590498925e-17,
+  "wilson": 1.4049821426937201,
+  "z2": 1,
+  "obc_target_index": 24,
+  "obc_target_energy": 0.004204101202075716,
+  "obc_nx": 20,
+  "obc_ny": 20,
+  "ribbon_nx": 40,
+  "ribbon_nk": 121
+}
