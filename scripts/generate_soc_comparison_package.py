@@ -16,7 +16,6 @@ from scripts.run_scan import (
     compute_band_data,
     compute_bulk_gap,
     compute_chern_number,
-    compute_dynamic_w,
     compute_obc_spectrum_and_probability,
     compute_ribbon_spectrum,
     compute_wilson_loop_and_z2,
@@ -58,6 +57,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         "",
         f"- model_file: `{args.model_file}`",
         f"- fixed_t: `{args.t}`",
+        f"- fixed_w: `{args.w}`",
         f"- v_values: `{v_values}`",
         f"- soc_on_lm: `{args.lm_on}`",
         f"- soc_off_lm: `{args.lm_off}`",
@@ -68,7 +68,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
 
     for v in v_values:
         for soc_state, lm in (("soc_on", args.lm_on), ("soc_off", args.lm_off)):
-            w = compute_dynamic_w(v)
+            w = float(args.w)
             set_model_params(model, v=v, t=args.t, lm=lm, w=w, j=0.0)
 
             point_id = f"v_{v:.2f}_{soc_state}"
@@ -189,6 +189,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-file", default="xtype_model.py")
     parser.add_argument("--v-values", default="0.5,0.8,1.0")
     parser.add_argument("--t", type=float, default=0.5)
+    parser.add_argument("--w", type=float, default=1.0)
     parser.add_argument("--lm-on", type=float, default=0.2)
     parser.add_argument("--lm-off", type=float, default=0.0)
     parser.add_argument("--nk-gap", type=int, default=11)
