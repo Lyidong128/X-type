@@ -9,10 +9,13 @@ import shutil
 from pathlib import Path
 import sys
 
+import numpy as np
+
 if str(Path("/workspace")) not in sys.path:
     sys.path.insert(0, str(Path("/workspace")))
 
 from scripts.run_scan import (
+    build_obc_hamiltonian,
     compute_band_data,
     compute_bulk_gap,
     compute_chern_number,
@@ -44,6 +47,8 @@ def parse_v_values(raw: str) -> list[float]:
 def run(args: argparse.Namespace) -> tuple[Path, Path]:
     project_root = Path("/workspace")
     output_root = project_root / args.output_dir
+    if output_root.exists() and args.clean_output:
+        shutil.rmtree(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
     points_root = output_root / "points"
     points_root.mkdir(parents=True, exist_ok=True)
@@ -61,13 +66,37 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         f"- v_values: `{v_values}`",
         f"- soc_on_lm: `{args.lm_on}`",
         f"- soc_off_lm: `{args.lm_off}`",
+        f"- soc_only: `{args.soc_only}`",
+        f"- obc_full_spectrum: `{args.full_obc_spectrum}`",
         "",
         "|point_id|v|t|w|lm|soc_state|gap|chern|wilson|z2|target_obc_energy|",
         "|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|",
     ]
 
+    soc_configs = [("soc_on", args.lm_on)] if args.soc_only else [("soc_on", args.lm_on), ("soc_off", args.lm_off)]
+
+    def compute_obc_full_spectrum_and_probability(
+        v: float,
+        t: float,
+        lm: float,
+        w: float,
+        nx: int,
+        ny: int,
+    ) -> tuple[np.ndarray, int, float, np.ndarray]:
+        ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=0.0, nx=nx, ny=ny)
+        eigvals, eigvecs = np.linalg.eigh(ham)
+        target_idx = int(np.argmin(np.abs(eigvals)))
+        target_energy = float(np.real(eigvals[target_idx]))
+        vec = eigvecs[:, target_idx]
+        cell_prob = np.zeros(nx * ny, dtype=float)
+        for cell_id in range(nx * ny):
+            start = cell_id * 8
+            cell_prob[cell_id] = float(np.sum(np.abs(vec[start : start + 8]) ** 2))
+        prob_grid = cell_prob.reshape((ny, nx))
+        return np.real(eigvals), target_idx, target_energy, prob_grid
+
     for v in v_values:
-        for soc_state, lm in (("soc_on", args.lm_on), ("soc_off", args.lm_off)):
+        for soc_state, lm in soc_configs:
             w = float(args.w)
             set_model_params(model, v=v, t=args.t, lm=lm, w=w, j=0.0)
 
@@ -102,16 +131,26 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 title=f"Ribbon: v={v:.2f}, lm={lm:.2f}, t={args.t:.2f}, w={w:.2f}",
             )
 
-            eigvals, target_idx, target_energy, prob_grid = compute_obc_spectrum_and_probability(
-                v=v,
-                t=args.t,
-                lm=lm,
-                w=w,
-                j=0.0,
-                nx=args.obc_nx,
-                ny=args.obc_ny,
-                mode_count=args.obc_mode_count,
-            )
+            if args.full_obc_spectrum:
+                eigvals, target_idx, target_energy, prob_grid = compute_obc_full_spectrum_and_probability(
+                    v=v,
+                    t=args.t,
+                    lm=lm,
+                    w=w,
+                    nx=args.obc_nx,
+                    ny=args.obc_ny,
+                )
+            else:
+                eigvals, target_idx, target_energy, prob_grid = compute_obc_spectrum_and_probability(
+                    v=v,
+                    t=args.t,
+                    lm=lm,
+                    w=w,
+                    j=0.0,
+                    nx=args.obc_nx,
+                    ny=args.obc_ny,
+                    mode_count=args.obc_mode_count,
+                )
             plot_obc_spectrum(
                 eigvals=eigvals,
                 save_path=point_dir / "obc_spectrum_e_vs_index.png",
@@ -139,6 +178,8 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 "obc_target_energy": float(target_energy),
                 "obc_nx": args.obc_nx,
                 "obc_ny": args.obc_ny,
+                "obc_full_spectrum": bool(args.full_obc_spectrum),
+                "obc_total_modes": int(len(eigvals)),
                 "ribbon_nx": args.ribbon_nx,
                 "ribbon_nk": args.ribbon_nk,
             }
@@ -190,7 +231,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--v-values", default="0.5,0.8,1.0")
     parser.add_argument("--t", type=float, default=0.5)
     parser.add_argument("--w", type=float, default=1.0)
-    parser.add_argument("--lm-on", type=float, default=0.2)
+    parser.add_argument("--lm-on", type=float, default=0.1)
     parser.add_argument("--lm-off", type=float, default=0.0)
     parser.add_argument("--nk-gap", type=int, default=11)
     parser.add_argument("--nk-chern", type=int, default=21)
@@ -200,6 +241,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--obc-nx", type=int, default=20)
     parser.add_argument("--obc-ny", type=int, default=20)
     parser.add_argument("--obc-mode-count", type=int, default=64)
+    parser.add_argument("--soc-only", action="store_true")
+    parser.add_argument("--full-obc-spectrum", action="store_true")
+    parser.add_argument("--clean-output", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output-dir", default="outputs/soc_comparison_v_points")
     parser.add_argument("--archive-name", default="outputs/soc_comparison_v_points_package")
     return parser.parse_args()
