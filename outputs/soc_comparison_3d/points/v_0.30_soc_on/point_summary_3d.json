@@ -1,0 +1,23 @@
+{
+  "point_id": "v_0.30_soc_on",
+  "v": 0.3,
+  "t": 0.3,
+  "w": 1.0,
+  "lm": 0.1,
+  "J": 0.0,
+  "soc_state": "soc_on",
+  "kz_slices": 21,
+  "kz_grid_start_end": [
+    0.0,
+    0.9523809523809523
+  ],
+  "gap_kz0": -0.2,
+  "chern_kz0": 7.82386317462967e-17,
+  "wilson_kz0": 1.0978517836195456,
+  "z2_kz0": 1,
+  "chern_kz_mean": -7.023860778333343e-17,
+  "chern_kz_std": 1.3122784462072449e-16,
+  "gap_kz_min": -0.2,
+  "gap_kz_max": 1.2804318502617216,
+  "z2_kz_ones_count": 12
+}
