@@ -1,0 +1,7 @@
+3D post analysis generated
+input_summary=/workspace/outputs/soc_comparison_3d/summary_3d.csv
+phase_label=/workspace/outputs/soc_comparison_3d/phase_label_3d.csv
+soc_delta=/workspace/outputs/soc_comparison_3d/soc_delta_table.csv
+transition_plot=/workspace/outputs/soc_comparison_3d/transition_corridor_3d.png
+key_points=/workspace/outputs/soc_comparison_3d/key_points_3d.md
+small_gap_threshold=0.01
