@@ -1,0 +1,16 @@
+{
+  "point_id": "v_0.50_soc_off",
+  "v": 0.5,
+  "t": 0.3,
+  "w": 1.0,
+  "lm": 0.0,
+  "soc_state": "soc_off",
+  "kz_frac": 0.0,
+  "ribbon_nx": 40,
+  "ribbon_nk": 121,
+  "edge_width": 3,
+  "obc_nx": 12,
+  "obc_ny": 12,
+  "obc_total_modes": 1152,
+  "obc_min_abs_energy": 0.03777559580646942
+}
