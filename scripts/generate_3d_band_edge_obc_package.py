@@ -220,21 +220,31 @@ def plot_ribbon_edge_spectrum(
     edge_weights: np.ndarray,
     save_path: Path,
     title: str,
+    edge_mark_threshold: float,
 ) -> None:
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    k_grid = np.repeat((ky_values / np.pi)[:, None], eigvals.shape[1], axis=1).ravel()
-    e_grid = eigvals.ravel()
-    w_grid = edge_weights.ravel()
-
-    fig, ax = plt.subplots(figsize=(6.6, 4.5))
-    scatter = ax.scatter(k_grid, e_grid, c=w_grid, s=5, cmap="viridis", linewidths=0)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    xvals = ky_values / np.pi
+    for band_idx in range(eigvals.shape[1]):
+        ax.plot(xvals, eigvals[:, band_idx], linewidth=0.6, color="tab:blue", alpha=0.85)
+    mask = edge_weights >= edge_mark_threshold
+    if np.any(mask):
+        ax.scatter(
+            np.repeat(xvals[:, None], eigvals.shape[1], axis=1)[mask],
+            eigvals[mask],
+            s=6,
+            c="tab:red",
+            linewidths=0,
+            alpha=0.85,
+            label=f"edge weight ≥ {edge_mark_threshold:.2f}",
+        )
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
     ax.set_xlabel(r"$k_y / \pi$")
     ax.set_ylabel("Energy")
     ax.set_title(title)
     ax.grid(alpha=0.25)
-    cbar = fig.colorbar(scatter, ax=ax)
-    cbar.set_label("Edge weight")
+    if np.any(mask):
+        ax.legend(loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(save_path, dpi=180)
     plt.close(fig)
@@ -279,7 +289,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         band = compute_band_data(model)
         plot_band_structure(
             eigvals=band,
-            save_path=out_dir / "band_3d_path.png",
+            save_path=out_dir / "band.png",
             title=f"3D Band: {point_id}",
             path_ticks=path_ticks,
             path_labels=path_labels,
@@ -301,8 +311,9 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             ky_values=ky,
             eigvals=ribbon_eigs,
             edge_weights=edge_weights,
-            save_path=out_dir / "ribbon_edge_kz0.png",
+            save_path=out_dir / "ribbon.png",
             title=f"Edge ribbon @ kz={args.kz_frac:.2f}: {point_id}",
+            edge_mark_threshold=args.edge_mark_threshold,
         )
 
         z_minus, z_plus = _z_phase(args.kz_frac, model)
@@ -320,7 +331,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         obc_eigs = np.real(np.linalg.eigvalsh(obc_h))
         plot_obc_spectrum(
             eigvals=obc_eigs,
-            save_path=out_dir / "obc_e_vs_index_kz0.png",
+            save_path=out_dir / "obc_spectrum_e_vs_index.png",
             title=f"OBC E vs index @ kz={args.kz_frac:.2f}: {point_id}",
         )
 
@@ -382,12 +393,13 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 f"- ribbon_nx: `{args.ribbon_nx}`",
                 f"- ribbon_nk: `{args.ribbon_nk}`",
                 f"- edge_width: `{args.edge_width}`",
+                f"- edge_mark_threshold: `{args.edge_mark_threshold}`",
                 f"- obc_size: `{args.obc_nx}x{args.obc_ny}`",
                 "",
                 "Each point folder includes:",
-                "- `band_3d_path.png`",
-                "- `ribbon_edge_kz0.png`",
-                "- `obc_e_vs_index_kz0.png`",
+                "- `band.png`",
+                "- `ribbon.png`",
+                "- `obc_spectrum_e_vs_index.png`",
                 "- `point_summary_edge_obc.json`",
                 "",
                 f"Summary CSV: `{summary_csv.name}`",
@@ -412,6 +424,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ribbon-nx", type=int, default=40)
     parser.add_argument("--ribbon-nk", type=int, default=121)
     parser.add_argument("--edge-width", type=int, default=3)
+    parser.add_argument("--edge-mark-threshold", type=float, default=0.35)
     parser.add_argument("--obc-nx", type=int, default=12)
     parser.add_argument("--obc-ny", type=int, default=12)
     parser.add_argument("--clean-output", action=argparse.BooleanOptionalAction, default=True)
