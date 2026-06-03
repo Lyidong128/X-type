@@ -8,7 +8,6 @@
   "kz_frac": 0.0,
   "ribbon_nx": 40,
   "ribbon_nk": 121,
-  "edge_width": 3,
   "obc_nx": 12,
   "obc_ny": 12,
   "obc_total_modes": 1152,

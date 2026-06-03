@@ -5,8 +5,6 @@
 - kz_frac_for_edge_and_obc: `0.0`
 - ribbon_nx: `40`
 - ribbon_nk: `121`
-- edge_width: `3`
-- edge_mark_threshold: `0.35`
 - obc_size: `12x12`
 
 Each point folder includes:
