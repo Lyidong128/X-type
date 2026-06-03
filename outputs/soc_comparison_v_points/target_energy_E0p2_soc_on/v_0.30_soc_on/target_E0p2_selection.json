@@ -1,0 +1,15 @@
+{
+  "point_id": "v_0.30_soc_on",
+  "v": 0.3,
+  "t": 0.3,
+  "w": 1.0,
+  "lm": 0.1,
+  "target_energy": 0.2,
+  "selected_index": 1664,
+  "selected_energy": 0.201429684751872,
+  "abs_delta": 0.0014296847518719957,
+  "nx": 20,
+  "ny": 20,
+  "wavefunction_path": "target_energy_E0p2_soc_on/v_0.30_soc_on/obc_wavefunction_target_E0p2.png",
+  "spectrum_path": "target_energy_E0p2_soc_on/v_0.30_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png"
+}

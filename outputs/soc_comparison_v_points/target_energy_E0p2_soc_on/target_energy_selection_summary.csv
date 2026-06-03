@@ -1,0 +1,6 @@
+point_id,v,t,w,lm,target_energy,selected_index,selected_energy,abs_delta,nx,ny,wavefunction_path,spectrum_path
+v_0.10_soc_on,0.1,0.3,1.0,0.1,0.2,1671,0.1789290773712324,0.021070922628767613,20,20,target_energy_E0p2_soc_on/v_0.10_soc_on/obc_wavefunction_target_E0p2.png,target_energy_E0p2_soc_on/v_0.10_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png
+v_0.30_soc_on,0.3,0.3,1.0,0.1,0.2,1664,0.201429684751872,0.0014296847518719957,20,20,target_energy_E0p2_soc_on/v_0.30_soc_on/obc_wavefunction_target_E0p2.png,target_energy_E0p2_soc_on/v_0.30_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png
+v_0.50_soc_on,0.5,0.3,1.0,0.1,0.2,1662,0.20093781667287822,0.0009378166728782056,20,20,target_energy_E0p2_soc_on/v_0.50_soc_on/obc_wavefunction_target_E0p2.png,target_energy_E0p2_soc_on/v_0.50_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png
+v_0.80_soc_on,0.8,0.3,1.0,0.1,0.2,1669,0.19217218873372366,0.007827811266276352,20,20,target_energy_E0p2_soc_on/v_0.80_soc_on/obc_wavefunction_target_E0p2.png,target_energy_E0p2_soc_on/v_0.80_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png
+v_1.00_soc_on,1.0,0.3,1.0,0.1,0.2,1756,0.20245518883040778,0.0024551888304077674,20,20,target_energy_E0p2_soc_on/v_1.00_soc_on/obc_wavefunction_target_E0p2.png,target_energy_E0p2_soc_on/v_1.00_soc_on/obc_spectrum_e_vs_index_marked_E0p2.png
