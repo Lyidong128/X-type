@@ -6,12 +6,13 @@
 - ribbon_nx: `40`
 - ribbon_nk: `121`
 - edge_width: `3`
+- edge_mark_threshold: `0.35`
 - obc_size: `12x12`
 
 Each point folder includes:
-- `band_3d_path.png`
-- `ribbon_edge_kz0.png`
-- `obc_e_vs_index_kz0.png`
+- `band.png`
+- `ribbon.png`
+- `obc_spectrum_e_vs_index.png`
 - `point_summary_edge_obc.json`
 
 Summary CSV: `summary_3d_band_edge_obc.csv`
