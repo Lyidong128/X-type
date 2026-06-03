@@ -180,7 +180,7 @@ def build_ribbon_hamiltonian_3d_kz(
     return ham
 
 
-def compute_ribbon_edge_spectrum_3d_kz(
+def compute_ribbon_spectrum_3d_kz(
     v: float,
     t: float,
     lm: float,
@@ -190,61 +190,38 @@ def compute_ribbon_edge_spectrum_3d_kz(
     model_module,
     nx: int,
     nk: int,
-    edge_width: int,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     z_minus, z_plus = _z_phase(kz_frac, model_module)
     ky_values = np.linspace(-np.pi, np.pi, nk)
     eigvals_all = []
-    edge_weights_all = []
 
     for ky in ky_values:
         ham = build_ribbon_hamiltonian_3d_kz(
             v=v, t=t, lm=lm, w=w, j=j, ky=ky, nx=nx, z_minus=z_minus, z_plus=z_plus
         )
-        evals, evecs = np.linalg.eigh(ham)
+        evals = np.linalg.eigvalsh(ham)
         evals = np.real(evals)
-        probs = np.abs(evecs) ** 2
-        probs_x = probs.reshape(nx, 8, -1).sum(axis=1)
-        left_weight = probs_x[:edge_width, :].sum(axis=0)
-        right_weight = probs_x[-edge_width:, :].sum(axis=0)
-        edge_weight = left_weight + right_weight
         eigvals_all.append(evals)
-        edge_weights_all.append(edge_weight)
 
-    return ky_values, np.array(eigvals_all), np.array(edge_weights_all)
+    return ky_values, np.array(eigvals_all)
 
 
-def plot_ribbon_edge_spectrum(
+def plot_ribbon_spectrum_2d_style(
     ky_values: np.ndarray,
     eigvals: np.ndarray,
-    edge_weights: np.ndarray,
     save_path: Path,
     title: str,
-    edge_mark_threshold: float,
 ) -> None:
     save_path.parent.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(6, 4))
     xvals = ky_values / np.pi
     for band_idx in range(eigvals.shape[1]):
-        ax.plot(xvals, eigvals[:, band_idx], linewidth=0.6, color="tab:blue", alpha=0.85)
-    mask = edge_weights >= edge_mark_threshold
-    if np.any(mask):
-        ax.scatter(
-            np.repeat(xvals[:, None], eigvals.shape[1], axis=1)[mask],
-            eigvals[mask],
-            s=6,
-            c="tab:red",
-            linewidths=0,
-            alpha=0.85,
-            label=f"edge weight ≥ {edge_mark_threshold:.2f}",
-        )
+        ax.plot(xvals, eigvals[:, band_idx], linewidth=0.6, color="tab:blue")
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
     ax.set_xlabel(r"$k_y / \pi$")
     ax.set_ylabel("Energy")
     ax.set_title(title)
     ax.grid(alpha=0.25)
-    if np.any(mask):
-        ax.legend(loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(save_path, dpi=180)
     plt.close(fig)
@@ -295,7 +272,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             path_labels=path_labels,
         )
 
-        ky, ribbon_eigs, edge_weights = compute_ribbon_edge_spectrum_3d_kz(
+        ky, ribbon_eigs = compute_ribbon_spectrum_3d_kz(
             v=v,
             t=t,
             lm=lm,
@@ -305,15 +282,12 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             model_module=model,
             nx=args.ribbon_nx,
             nk=args.ribbon_nk,
-            edge_width=args.edge_width,
         )
-        plot_ribbon_edge_spectrum(
+        plot_ribbon_spectrum_2d_style(
             ky_values=ky,
             eigvals=ribbon_eigs,
-            edge_weights=edge_weights,
             save_path=out_dir / "ribbon.png",
-            title=f"Edge ribbon @ kz={args.kz_frac:.2f}: {point_id}",
-            edge_mark_threshold=args.edge_mark_threshold,
+            title=f"Ribbon @ kz={args.kz_frac:.2f}: {point_id}",
         )
 
         z_minus, z_plus = _z_phase(args.kz_frac, model)
@@ -346,7 +320,6 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             "kz_frac": float(args.kz_frac),
             "ribbon_nx": int(args.ribbon_nx),
             "ribbon_nk": int(args.ribbon_nk),
-            "edge_width": int(args.edge_width),
             "obc_nx": int(args.obc_nx),
             "obc_ny": int(args.obc_ny),
             "obc_total_modes": int(obc_eigs.size),
@@ -370,7 +343,6 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             "kz_frac",
             "ribbon_nx",
             "ribbon_nk",
-            "edge_width",
             "obc_nx",
             "obc_ny",
             "obc_total_modes",
@@ -392,8 +364,6 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 f"- kz_frac_for_edge_and_obc: `{args.kz_frac}`",
                 f"- ribbon_nx: `{args.ribbon_nx}`",
                 f"- ribbon_nk: `{args.ribbon_nk}`",
-                f"- edge_width: `{args.edge_width}`",
-                f"- edge_mark_threshold: `{args.edge_mark_threshold}`",
                 f"- obc_size: `{args.obc_nx}x{args.obc_ny}`",
                 "",
                 "Each point folder includes:",
@@ -423,8 +393,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--kz-frac", type=float, default=0.0)
     parser.add_argument("--ribbon-nx", type=int, default=40)
     parser.add_argument("--ribbon-nk", type=int, default=121)
-    parser.add_argument("--edge-width", type=int, default=3)
-    parser.add_argument("--edge-mark-threshold", type=float, default=0.35)
     parser.add_argument("--obc-nx", type=int, default=12)
     parser.add_argument("--obc-ny", type=int, default=12)
     parser.add_argument("--clean-output", action=argparse.BooleanOptionalAction, default=True)
