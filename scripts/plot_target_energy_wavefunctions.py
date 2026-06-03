@@ -29,6 +29,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--nx", type=int, default=20)
     parser.add_argument("--ny", type=int, default=20)
     parser.add_argument("--output-subdir", default="target_energy_E0p2_soc_on")
+    parser.add_argument(
+        "--point-target-overrides",
+        default="",
+        help="Comma-separated point-specific target energies, e.g. v_1.00_soc_on:-0.1,v_0.50_soc_on:0.15",
+    )
     return parser.parse_args()
 
 
@@ -51,6 +56,29 @@ def compute_prob_grid(vec: np.ndarray, nx: int, ny: int) -> np.ndarray:
         start = cell_id * 8
         probs[cell_id] = float(np.sum(np.abs(vec[start : start + 8]) ** 2))
     return probs.reshape((ny, nx))
+
+
+def energy_token(energy: float) -> str:
+    return f"{energy:.3f}".replace("-", "m").replace(".", "p")
+
+
+def parse_overrides(raw: str) -> dict[str, float]:
+    overrides: dict[str, float] = {}
+    text = raw.strip()
+    if not text:
+        return overrides
+    for item in text.split(","):
+        pair = item.strip()
+        if not pair:
+            continue
+        if ":" not in pair:
+            raise ValueError(f"Invalid override entry (missing ':'): {pair}")
+        point_id, energy_text = pair.split(":", 1)
+        point_id = point_id.strip()
+        if not point_id:
+            raise ValueError(f"Invalid override entry (empty point id): {pair}")
+        overrides[point_id] = float(energy_text.strip())
+    return overrides
 
 
 def plot_wavefunction(prob_grid: np.ndarray, save_path: Path, title: str) -> None:
@@ -105,6 +133,7 @@ def run(args: argparse.Namespace) -> Path:
 
     out_root = package_root / args.output_subdir
     out_root.mkdir(parents=True, exist_ok=True)
+    overrides = parse_overrides(args.point_target_overrides)
 
     summary_rows: list[dict[str, float | int | str]] = []
 
@@ -116,20 +145,22 @@ def run(args: argparse.Namespace) -> Path:
         point_id = str(row["point_id"])
         point_dir = out_root / point_id
         point_dir.mkdir(parents=True, exist_ok=True)
+        target_energy = float(overrides.get(point_id, args.target_energy))
+        token = energy_token(target_energy)
 
         ham = build_obc_hamiltonian(v=v, t=t, lm=lm, w=w, j=0.0, nx=args.nx, ny=args.ny)
         eigvals, eigvecs = np.linalg.eigh(ham)
         eigvals = np.real(eigvals)
 
-        idx = int(np.argmin(np.abs(eigvals - args.target_energy)))
+        idx = int(np.argmin(np.abs(eigvals - target_energy)))
         selected_energy = float(eigvals[idx])
-        delta = float(abs(selected_energy - args.target_energy))
+        delta = float(abs(selected_energy - target_energy))
         vec = eigvecs[:, idx]
         prob_grid = compute_prob_grid(vec, nx=args.nx, ny=args.ny)
 
-        wave_path = point_dir / "obc_wavefunction_target_E0p2.png"
-        spec_path = point_dir / "obc_spectrum_e_vs_index_marked_E0p2.png"
-        title_suffix = f"v={v:.2f}, lm={lm:.2f}, target E={args.target_energy:.2f}"
+        wave_path = point_dir / f"obc_wavefunction_target_E{token}.png"
+        spec_path = point_dir / f"obc_spectrum_e_vs_index_marked_E{token}.png"
+        title_suffix = f"v={v:.2f}, lm={lm:.2f}, target E={target_energy:.2f}"
         plot_wavefunction(
             prob_grid=prob_grid,
             save_path=wave_path,
@@ -137,7 +168,7 @@ def run(args: argparse.Namespace) -> Path:
         )
         plot_spectrum_marked(
             eigvals=eigvals,
-            target_energy=args.target_energy,
+            target_energy=target_energy,
             target_idx=idx,
             target_eval=selected_energy,
             save_path=spec_path,
@@ -150,7 +181,7 @@ def run(args: argparse.Namespace) -> Path:
             "t": t,
             "w": w,
             "lm": lm,
-            "target_energy": float(args.target_energy),
+            "target_energy": float(target_energy),
             "selected_index": idx,
             "selected_energy": selected_energy,
             "abs_delta": delta,
@@ -160,7 +191,7 @@ def run(args: argparse.Namespace) -> Path:
             "spectrum_path": str(spec_path.relative_to(package_root)),
         }
         summary_rows.append(point_info)
-        (point_dir / "target_E0p2_selection.json").write_text(
+        (point_dir / f"target_E{token}_selection.json").write_text(
             json.dumps(point_info, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
@@ -197,12 +228,13 @@ def run(args: argparse.Namespace) -> Path:
                 f"- soc_state: `{args.soc_state}`",
                 f"- lm: `{args.lm}`",
                 f"- target_energy: `{args.target_energy}`",
+                f"- point_target_overrides: `{args.point_target_overrides or '(none)'}`",
                 f"- lattice: `{args.nx} x {args.ny}`",
                 "",
                 "Per point outputs:",
-                "- `obc_wavefunction_target_E0p2.png`",
-                "- `obc_spectrum_e_vs_index_marked_E0p2.png`",
-                "- `target_E0p2_selection.json`",
+                "- `obc_wavefunction_target_E{token}.png`",
+                "- `obc_spectrum_e_vs_index_marked_E{token}.png`",
+                "- `target_E{token}_selection.json`",
             ]
         )
         + "\n",
