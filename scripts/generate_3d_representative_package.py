@@ -18,6 +18,7 @@ if str(Path("/workspace")) not in sys.path:
 from scripts.run_scan import (
     compute_band_data,
     compute_bulk_gap,
+    get_band_path_metadata,
     load_xtype_model,
     plot_band_structure,
     set_model_params,
@@ -145,6 +146,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
     points_root.mkdir(parents=True, exist_ok=True)
 
     model = load_xtype_model(project_root / "models" / args.model_file)
+    path_ticks, path_labels = get_band_path_metadata(model)
     v_values = parse_values(args.v_values)
     kz_values = np.linspace(0.0, 1.0, args.kz_slices, endpoint=False)
     soc_cfg = [("soc_on", args.lm_on), ("soc_off", args.lm_off)] if not args.soc_only else [("soc_on", args.lm_on)]
@@ -165,6 +167,8 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 eigvals=band_data,
                 save_path=point_dir / "band_3d_path.png",
                 title=f"3D Band Path: v={v:.2f}, lm={lm:.2f}, t={args.t:.2f}, w={args.w:.2f}",
+                path_ticks=path_ticks,
+                path_labels=path_labels,
             )
 
             # kz-slice diagnostics.

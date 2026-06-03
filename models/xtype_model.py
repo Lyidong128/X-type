@@ -67,6 +67,8 @@ xy = linspace(X,Y,500,endpoint=False)
 yg = linspace(Y,G,500,endpoint=False)
 gm = linspace(G,M,500,endpoint=False)
 mg = linspace(M,G,500,endpoint=False)
+PATH_SEGMENTS = [gx, xy, yg, gm, mg]
+PATH_LABELS = [r"$\Gamma$", "X", "Y", r"$\Gamma$", "M", r"$\Gamma$"]
 
 
 t= 0.3

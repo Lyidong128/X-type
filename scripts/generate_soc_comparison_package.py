@@ -22,6 +22,7 @@ from scripts.run_scan import (
     compute_obc_spectrum_and_probability,
     compute_ribbon_spectrum,
     compute_wilson_loop_and_z2,
+    get_band_path_metadata,
     load_xtype_model,
     plot_band_structure,
     plot_obc_spectrum,
@@ -54,6 +55,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
     points_root.mkdir(parents=True, exist_ok=True)
 
     model = load_xtype_model(project_root / "models" / args.model_file)
+    path_ticks, path_labels = get_band_path_metadata(model)
     v_values = parse_v_values(args.v_values)
 
     summary_rows: list[dict[str, float | str | int]] = []
@@ -113,6 +115,8 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
                 eigvals=band_data,
                 save_path=point_dir / "band.png",
                 title=f"Band: v={v:.2f}, lm={lm:.2f}, t={args.t:.2f}, w={w:.2f}",
+                path_ticks=path_ticks,
+                path_labels=path_labels,
             )
 
             ky_values, ribbon_eigs = compute_ribbon_spectrum(

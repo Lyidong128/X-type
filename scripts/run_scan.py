@@ -674,6 +674,7 @@ def generate_special_point_artifacts(
 ) -> int:
     points_dir = special_points_dir / "points"
     points_dir.mkdir(parents=True, exist_ok=True)
+    path_ticks, path_labels = get_band_path_metadata(model)
 
     generated_point_count = 0
     for record in special_records:
@@ -701,6 +702,8 @@ def generate_special_point_artifacts(
                     eigvals=band_data,
                     save_path=band_path,
                     title=f"Band (v={v:.2f}, t={t:.2f}, lm={lm:.2f})",
+                    path_ticks=path_ticks,
+                    path_labels=path_labels,
                 )
 
             if not ribbon_path.exists():
@@ -768,14 +771,47 @@ def compute_band_data(model_module) -> np.ndarray:
     return np.vstack(eigvals)
 
 
-def plot_band_structure(eigvals: np.ndarray, save_path: Path, title: str) -> None:
+def get_band_path_metadata(model_module) -> tuple[list[int] | None, list[str] | None]:
+    segments = getattr(model_module, "PATH_SEGMENTS", None)
+    if segments is None:
+        segments = [model_module.gx, model_module.xy, model_module.yg, model_module.gm, model_module.mg]
+    labels = getattr(model_module, "PATH_LABELS", None)
+    if labels is None:
+        return None, None
+    segment_lengths = [len(seg) for seg in segments]
+    if not segment_lengths:
+        return None, None
+    ticks = [0]
+    cumulative = 0
+    for length in segment_lengths:
+        cumulative += int(length)
+        ticks.append(max(cumulative - 1, 0))
+    if len(labels) != len(ticks):
+        return None, None
+    return ticks, [str(label) for label in labels]
+
+
+def plot_band_structure(
+    eigvals: np.ndarray,
+    save_path: Path,
+    title: str,
+    path_ticks: list[int] | None = None,
+    path_labels: list[str] | None = None,
+) -> None:
     save_path.parent.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(6, 4))
     x = np.arange(eigvals.shape[0])
     for band in range(eigvals.shape[1]):
         ax.plot(x, eigvals[:, band], linewidth=0.8)
     ax.set_title(title)
-    ax.set_xlabel("k-path index")
+    if path_ticks is not None and path_labels is not None and len(path_ticks) == len(path_labels):
+        ax.set_xticks(path_ticks)
+        ax.set_xticklabels(path_labels)
+        for tick in path_ticks:
+            ax.axvline(tick, color="0.85", linewidth=0.6, zorder=0)
+        ax.set_xlabel("High-symmetry path")
+    else:
+        ax.set_xlabel("k-path index")
     ax.set_ylabel("Energy")
     fig.tight_layout()
     fig.savefig(save_path, dpi=150)
@@ -1157,6 +1193,7 @@ def run_parameter_scan() -> dict[str, int | str]:
 
     os.environ.setdefault("MPLBACKEND", "Agg")
     model = load_xtype_model(model_path)
+    path_ticks, path_labels = get_band_path_metadata(model)
 
     if logs_path.exists():
         logs_path.unlink()
@@ -1212,7 +1249,13 @@ def run_parameter_scan() -> dict[str, int | str]:
                 }
             )
             band_data = compute_band_data(model)
-            plot_band_structure(band_data, save_path=band_path, title=f"Band structure (v={v:.1f}, t={t:.1f}, lm={lm:.1f})")
+            plot_band_structure(
+                band_data,
+                save_path=band_path,
+                title=f"Band structure (v={v:.1f}, t={t:.1f}, lm={lm:.1f})",
+                path_ticks=path_ticks,
+                path_labels=path_labels,
+            )
             success_count += 1
         except Exception as error:  # pragma: no cover
             failure_count += 1
