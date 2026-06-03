@@ -1,0 +1,15 @@
+{
+  "point_id": "v_1.00_soc_on",
+  "v": 1.0,
+  "t": 0.3,
+  "w": 1.0,
+  "lm": 0.1,
+  "target_energy": -0.1,
+  "selected_index": 1599,
+  "selected_energy": -0.10079920618650877,
+  "abs_delta": 0.0007992061865087635,
+  "nx": 20,
+  "ny": 20,
+  "wavefunction_path": "target_energy_mixed_v1_Em0p1_soc_on/v_1.00_soc_on/obc_wavefunction_target_Em0p100.png",
+  "spectrum_path": "target_energy_mixed_v1_Em0p1_soc_on/v_1.00_soc_on/obc_spectrum_e_vs_index_marked_Em0p100.png"
+}
