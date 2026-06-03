@@ -1,0 +1,22 @@
+[
+  {
+    "point_id": "v_0.50_soc_on",
+    "v": 0.5,
+    "t": 0.3,
+    "w": 1.0,
+    "lm": 0.1,
+    "soc_state": "soc_on",
+    "gap": 0.20000000000000015,
+    "chern": 1.2494934476721884e-16,
+    "wilson": -2.994177462078252,
+    "z2": 1,
+    "obc_target_index": 1621,
+    "obc_target_energy": -0.002051572877438984,
+    "obc_nx": 20,
+    "obc_ny": 20,
+    "obc_full_spectrum": true,
+    "obc_total_modes": 3200,
+    "ribbon_nx": 40,
+    "ribbon_nk": 121
+  }
+]
