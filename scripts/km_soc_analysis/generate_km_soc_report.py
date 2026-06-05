@@ -13,6 +13,7 @@ import numpy as np
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate KM SOC topology markdown report.")
     parser.add_argument("--output-root", default="/workspace/outputs/km_soc_topology_analysis")
+    parser.add_argument("--quick", action="store_true", help="Accepted for CLI consistency; report generation is lightweight.")
     return parser.parse_args()
 
 
