@@ -391,11 +391,98 @@ def main() -> None:
     ]
     (out_root / "NO_SOC_MASS_EXPRESSION_REPORT.md").write_text("\n".join(report_lines) + "\n", encoding="utf-8")
 
+    # ---------------- Appendix: detailed derivation ----------------
+    lam = sp.symbols("lambda", real=True)
+    m0 = sp.symbols("m0", real=True)
+    h_block_m0 = h_up.subs({v - w: m0})
+    char_poly = sp.factor((lam * sp.eye(4) - h_block_m0).det())
+    eigvals_manual = [
+        sp.simplify(m0 + 2 * t),
+        sp.simplify(m0 - 2 * t),
+        sp.simplify(-m0),
+        sp.simplify(-m0),
+    ]
+    vc_formula = sp.simplify(vc_general)
+
+    appendix_lines = [
+        "# NO_SOC_MASS_EXPRESSION_APPENDIX",
+        "",
+        "本附录记录 `lm=0` 时从真实模型 Hamiltonian 提取 M 点有效质量项的详细推导过程。",
+        "",
+        "## A. 起点：真实模型的 Bloch Hamiltonian",
+        "- 模型函数：`models/xtype_model.py::Hxtype(k)`。",
+        "- 先写 4x4 轨道块 `H0(k)`，再做 `H(k)=kron(H0,s0)`（无 SOC, 无 J）。",
+        "",
+        "轨道块非零元（与源码一致）：",
+        "- `H01=t, H02=t, H03=v+w*e^{-ikx}`",
+        "- `H10=t, H12=v+w*e^{-iky}, H13=t`",
+        "- `H20=t, H21=v+w*e^{+iky}, H23=t`",
+        "- `H30=v+w*e^{+ikx}, H31=t, H32=t`",
+        "",
+        "## B. 代入 M 点",
+        "- `M=(pi,pi)`，因此 `e^{±ikx}=e^{±iky}=-1`。",
+        "- 定义 `m0 = v-w`，则",
+        "",
+        "```text",
+        "H_M_block = [[0, t, t, m0],",
+        "             [t, 0, m0, t],",
+        "             [t, m0, 0, t],",
+        "             [m0, t, t, 0]]",
+        "```",
+        "",
+        "对应的 8x8 `H_M` 为两份相同 spin block（up/down 简并）。",
+        "",
+        "## C. 解析本征值",
+        f"- 特征多项式（将 `v-w` 替换为 `m0`）：`det(lambda I - H_M_block) = {char_poly}`。",
+        f"- 本征值集合可写为：`{eigvals_manual}`。",
+        "",
+        "等价地（还原 `m0=v-w`）：",
+        "- `E1 = v-w+2t`",
+        "- `E2 = v-w-2t`",
+        "- `E3 = w-v`",
+        "- `E4 = w-v`",
+        "",
+        "## D. 低能两带与 2x2 投影",
+        "选取如下两态作为控制闭隙的低能子空间基（列向量）：",
+        "- `|psi_a> = (1,1,1,1)^T / 2`（对应 `E1=v-w+2t`）",
+        "- `|psi_b> = (1,1,-1,-1)^T / 2`（对应 `E3=w-v`）",
+        "",
+        "投影后得到：",
+        f"- `H_eff = {sp.simplify(h_eff)}`",
+        "",
+        "写成 Pauli 形式 `H_eff = d0*I + dx*sigma_x + dy*sigma_y + dz*sigma_z`：",
+        f"- `d0={sp.simplify(d0)}`",
+        f"- `dx={sp.simplify(dx)}`",
+        f"- `dy={sp.simplify(dy)}`",
+        f"- `dz={sp.simplify(dz)}`",
+        "",
+        "因此定义 M 点质量项：",
+        f"- `m_M(v,t,w) = dz = {sp.simplify(dz)}`",
+        "",
+        "## E. 临界条件",
+        "- 质量变号条件 `m_M=0`：",
+        f"- `v_c = {vc_formula}`",
+        "",
+        "特别地当 `w=1`：",
+        "- `v_c = 1 - t`。",
+        "",
+        "## F. 与数值扫描一致性",
+        "- 数值 `signed_m_M` 扫描与线性拟合得到 `m_M(v,t,w=1)=v+t-1`，`R^2=1`。",
+        "- 对 `t=0.3,w=1`，解析与拟合都给 `v_c=0.7`。",
+        "- 在 `v=0.68` 与 `v=0.72` 两侧，`signed_m_M` 符号相反，支持 M 点 band inversion。",
+        "",
+        "## G. 物理表述边界",
+        "- 本附录仅证明无 SOC 情况下的 M 点质量项变号与 band inversion。",
+        "- 不将该结论直接等同为拓扑相变结论，拓扑性质仍需独立不变量计算支持。",
+    ]
+    (out_root / "NO_SOC_MASS_EXPRESSION_APPENDIX.md").write_text("\n".join(appendix_lines) + "\n", encoding="utf-8")
+
     print(f"[ok] symbolic_HM={out_root / 'H_M_symbolic.txt'}")
     print(f"[ok] spin_block={out_root / 'H_M_spin_block_symbolic.txt'}")
     print(f"[ok] signed_mass_csv={csv_path}")
     print(f"[ok] fit={out_root / 'mass_fit_result.txt'}")
     print(f"[ok] report={out_root / 'NO_SOC_MASS_EXPRESSION_REPORT.md'}")
+    print(f"[ok] appendix={out_root / 'NO_SOC_MASS_EXPRESSION_APPENDIX.md'}")
 
 
 if __name__ == "__main__":
