@@ -1,0 +1,13 @@
+v,lm,C_up,C_down,C_spin,z2_from_spin_chern,z2_fu_kane,z2_wilson,consistency_label,comment
+0.55,0.1,0.0,0.0,0.0,0,-1,0,all_consistent,Spin-Chern-derived Z2 agrees with available references.
+0.58,0.1,0.0,0.0,0.0,0,1,0,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+0.595,0.1,0.0,0.0,0.0,0,1,-1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+0.6,0.1,0.0,0.0,0.0,0,1,-1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+0.605,0.1,1.0,-1.0,1.0,1,1,1,all_consistent,Spin-Chern-derived Z2 agrees with available references.
+0.62,0.1,1.0,-1.0,1.0,1,1,1,all_consistent,Spin-Chern-derived Z2 agrees with available references.
+0.65,0.1,1.0,-1.0,1.0,1,-1,-1,z2_unavailable,Fu-Kane/Wilson unavailable near this v.
+0.8,0.1,1.0,-1.0,1.0,1,0,0,spin_chern_vs_fu_kane_inconsistent,Both Fu-Kane and Wilson disagree with spin Chern; check inversion parity implementation and Wilson gauge tracking.
+1.0,0.1,1.0,-1.0,1.0,1,0,1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+1.09,0.1,1.0,-1.0,1.0,1,0,-1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+1.093,0.1,-1.0,1.0,-1.0,1,0,1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.
+1.096,0.1,-1.0,1.0,-1.0,1,0,-1,spin_chern_vs_fu_kane_inconsistent,Fu-Kane differs from spin Chern; check inversion operator / parity implementation.

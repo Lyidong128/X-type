@@ -166,21 +166,32 @@ def main() -> None:
     lines.append("")
 
     lines.append("8. **v≈1.09 附近 C_spin 翻转是否伴随真实 gap closing？**")
-    c1 = cspin_at(1.086)
-    c2 = cspin_at(1.098)
-    g1 = _nearest(g_rows, 1.086)
-    g2 = _nearest(g_rows, 1.098)
-    if np.isfinite(c1) and np.isfinite(c2) and g1 and g2:
+    g2_rows = [r for r in g_rows if 1.08 <= float(r["v"]) <= 1.10]
+    g2_min = min(g2_rows, key=lambda r: float(r["Delta_global"])) if g2_rows else None
+    if g2_min is not None:
+        v2c = float(g2_min["v"])
+        c_left = cspin_at(v2c - 0.003)
+        c_mid = cspin_at(v2c)
+        c_right = cspin_at(v2c + 0.003)
+        g_left = _nearest(g_rows, v2c - 0.003)
+        g_mid = _nearest(g_rows, v2c)
+        g_right = _nearest(g_rows, v2c + 0.003)
+        nk_rows_mid = [r for r in s_rows if abs(float(r["v"]) - v2c) < 1e-9]
+        nk_unique_mid = sorted({int(round(float(r["rounded_C_spin"]))) for r in nk_rows_mid})
         lines.append(
-            f"- `C_spin(1.086)={c1:.0f}`, `C_spin(1.098)={c2:.0f}`; "
-            f"`Delta_global` 约为 `{float(g1['Delta_global']):.3e}` 到 `{float(g2['Delta_global']):.3e}`。"
+            f"- 次级窗口最小全局 gap 在 `v≈{v2c:.6f}`，`Delta_global≈{float(g2_min['Delta_global']):.3e}`，"
+            f"`k_min≈({float(g2_min['kx_min']):.3f}, {float(g2_min['ky_min']):.3f})`。"
         )
-        if (c1 != c2) and (min(float(g1["Delta_global"]), float(g2["Delta_global"])) < 1e-3):
-            lines.append("- 结论：符号翻转伴随近闭隙，需高精度复核其拓扑稳定性。")
-        elif c1 != c2:
-            lines.append("- 结论：有符号翻转但未见强闭隙证据，需警惕数值/规范选择影响。")
+        lines.append(
+            f"- 近邻点 `C_spin(v_left, v_c, v_right)=({c_left:.0f}, {c_mid:.0f}, {c_right:.0f})`；"
+            f"`Nk` 横向取值集合（在 v_c）为 `{nk_unique_mid}`。"
+        )
+        if len(nk_unique_mid) > 1:
+            lines.append("- 结论：该窗口存在明显 Nk 依赖，不足以确认稳定符号翻转。")
+        elif (c_left != c_right) and (float(g2_min["Delta_global"]) < 1e-3):
+            lines.append("- 结论：若左右点符号不同且闭隙显著，可视为候选翻转；当前仍建议加密 Nk/步长复核。")
         else:
-            lines.append("- 结论：未见明确符号翻转。")
+            lines.append("- 结论：当前数据未确认从 +1 到 -1 的稳定翻转。")
     else:
         lines.append("- 数据不足，无法判断。")
     lines.append("")

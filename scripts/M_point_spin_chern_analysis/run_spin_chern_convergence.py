@@ -37,21 +37,22 @@ def parse_args() -> argparse.Namespace:
 
 def _pick_points(output_root: Path) -> list[float]:
     base = [0.55, 0.58, 0.595, 0.600, 0.605, 0.62, 0.65, 0.80, 1.00]
-    m_csv = output_root / "M_gap_scan.csv"
-    if not m_csv.exists():
-        return sorted(set(base + [1.08, 1.09, 1.10]))
+    g_csv = output_root / "global_gap_scan.csv"
+    if not g_csv.exists():
+        return sorted(set(base + [1.08, 1.09, 1.093, 1.096, 1.10]))
 
-    rows = list(csv.DictReader(m_csv.open("r", encoding="utf-8")))
+    rows = list(csv.DictReader(g_csv.open("r", encoding="utf-8")))
     rows_2nd = [r for r in rows if 1.08 <= float(r["v"]) <= 1.10]
     if not rows_2nd:
-        return sorted(set(base + [1.08, 1.09, 1.10]))
+        return sorted(set(base + [1.08, 1.09, 1.093, 1.096, 1.10]))
 
     v_candidates = sorted({float(r["v"]) for r in rows_2nd})
-    v_min = float(min(rows_2nd, key=lambda r: float(r["Delta_M"]))["v"])
+    v_min = float(min(rows_2nd, key=lambda r: float(r["Delta_global"]))["v"])
     extra = [
-        nearest_value(v_min - 0.004, v_candidates),
+        nearest_value(v_min - 0.003, v_candidates),
         v_min,
-        nearest_value(v_min + 0.004, v_candidates),
+        nearest_value(v_min + 0.003, v_candidates),
+        nearest_value(1.09, v_candidates),
     ]
     return sorted(set(base + extra))
 

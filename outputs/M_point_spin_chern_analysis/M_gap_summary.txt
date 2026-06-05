@@ -1,0 +1,7 @@
+M-point gap scan summary
+v_c_from_Delta_M_min=0.600000
+Delta_M_min=1.387779e-16
+v_at_Delta_global_min=0.600000
+Delta_global_min=1.387779e-16
+distance_to_M_at_global_min=0.000000e+00
+Delta_M is near-closing around v≈0.6.

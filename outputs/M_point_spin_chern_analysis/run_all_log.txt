@@ -1,0 +1,38 @@
+M-point spin-Chern run start: 2026-06-05T06:40:57Z
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/run_M_gap_scan.py
+[ok] m_csv=/workspace/outputs/M_point_spin_chern_analysis/M_gap_scan.csv
+[ok] g_csv=/workspace/outputs/M_point_spin_chern_analysis/global_gap_scan.csv
+[ok] vc=0.600000
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/run_M_gap_scan.py
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/run_spin_chern_convergence.py
+[ok] csv=/workspace/outputs/M_point_spin_chern_analysis/spin_chern_convergence.csv
+[ok] points=12 nk_list=[31, 51, 81, 101]
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/run_spin_chern_convergence.py
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/analyze_M_band_inversion.py
+[ok] csv=/workspace/outputs/M_point_spin_chern_analysis/M_band_inversion_summary.csv
+[ok] vc=0.600000 inversion=True
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/analyze_M_band_inversion.py
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/extract_M_effective_mass.py
+[ok] csv=/workspace/outputs/M_point_spin_chern_analysis/M_effective_mass.csv
+[ok] vc_mass_proxy=0.600000
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/extract_M_effective_mass.py
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/compare_z2_spin_chern.py
+[ok] csv=/workspace/outputs/M_point_spin_chern_analysis/z2_spin_chern_comparison.csv
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/compare_z2_spin_chern.py
+
+>>> RUN: python3 scripts/M_point_spin_chern_analysis/generate_M_point_report.py
+[ok] report=/workspace/outputs/M_point_spin_chern_analysis/M_POINT_SPIN_CHERN_REPORT.md
+>>> DONE: python3 scripts/M_point_spin_chern_analysis/generate_M_point_report.py
+
+M-point spin-Chern status summary:
+OK|python3 scripts/M_point_spin_chern_analysis/run_M_gap_scan.py
+OK|python3 scripts/M_point_spin_chern_analysis/run_spin_chern_convergence.py
+OK|python3 scripts/M_point_spin_chern_analysis/analyze_M_band_inversion.py
+OK|python3 scripts/M_point_spin_chern_analysis/extract_M_effective_mass.py
+OK|python3 scripts/M_point_spin_chern_analysis/compare_z2_spin_chern.py
+OK|python3 scripts/M_point_spin_chern_analysis/generate_M_point_report.py

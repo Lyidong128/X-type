@@ -1,0 +1,10 @@
+vc=0.600000
+v_before=0.590000
+v_after=0.610000
+band_inversion=detected
+band_inversion_major_swap=False
+band_inversion_overlap_swap=True
+overlap_vb_to_va=0.000000
+overlap_vb_to_ca=0.963365
+overlap_cb_to_va=0.902721
+overlap_cb_to_ca=0.000000

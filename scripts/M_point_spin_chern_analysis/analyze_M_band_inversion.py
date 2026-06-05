@@ -91,13 +91,31 @@ def main() -> None:
         all_rows.append(row)
         stage_data[label] = row
 
-    # 판단: before/after에서 주성분 교환 여부
+    # Inversion diagnostics:
+    # 1) major-component swap (coarse);
+    # 2) eigenvector-overlap swap (robust near avoided/true crossings).
     before = stage_data["before"]
     after = stage_data["after"]
-    inversion = (
+    inversion_major = (
         int(before["major_component_valence"]) == int(after["major_component_conduction"])
         and int(before["major_component_conduction"]) == int(after["major_component_valence"])
     )
+    # Recompute vectors for overlap-based criterion.
+    set_params(model, v=v_before, lm=args.lm, t=args.t, w=args.w, j=0.0)
+    _, e_before = np.linalg.eigh(model.Hxtype(mpt))
+    vb = e_before[:, 3]
+    cb = e_before[:, 4]
+    set_params(model, v=v_after, lm=args.lm, t=args.t, w=args.w, j=0.0)
+    _, e_after = np.linalg.eigh(model.Hxtype(mpt))
+    va = e_after[:, 3]
+    ca = e_after[:, 4]
+    ov_vb_va = float(abs(np.vdot(vb, va)))
+    ov_vb_ca = float(abs(np.vdot(vb, ca)))
+    ov_cb_va = float(abs(np.vdot(cb, va)))
+    ov_cb_ca = float(abs(np.vdot(cb, ca)))
+    inversion_overlap = (ov_vb_ca > ov_vb_va) and (ov_cb_va > ov_cb_ca)
+    inversion = inversion_major or inversion_overlap
+
     all_rows.append(
         {
             "stage": "summary",
@@ -114,6 +132,12 @@ def main() -> None:
             "major_component_valence": int(before["major_component_valence"]),
             "major_component_conduction": int(after["major_component_conduction"]),
             "band_inversion": "detected" if inversion else "not_clearly_detected",
+            "band_inversion_major_swap": bool(inversion_major),
+            "band_inversion_overlap_swap": bool(inversion_overlap),
+            "overlap_vb_to_va": ov_vb_va,
+            "overlap_vb_to_ca": ov_vb_ca,
+            "overlap_cb_to_va": ov_cb_va,
+            "overlap_cb_to_ca": ov_cb_ca,
         }
     )
 
@@ -133,6 +157,12 @@ def main() -> None:
         "major_component_valence",
         "major_component_conduction",
         "band_inversion",
+        "band_inversion_major_swap",
+        "band_inversion_overlap_swap",
+        "overlap_vb_to_va",
+        "overlap_vb_to_ca",
+        "overlap_cb_to_va",
+        "overlap_cb_to_ca",
     ]
     for i in range(8):
         fieldnames.append(f"component_{i}_weight_valence")
@@ -200,6 +230,12 @@ def main() -> None:
                 f"v_before={v_before:.6f}",
                 f"v_after={v_after:.6f}",
                 f"band_inversion={'detected' if inversion else 'not_clearly_detected'}",
+                f"band_inversion_major_swap={bool(inversion_major)}",
+                f"band_inversion_overlap_swap={bool(inversion_overlap)}",
+                f"overlap_vb_to_va={ov_vb_va:.6f}",
+                f"overlap_vb_to_ca={ov_vb_ca:.6f}",
+                f"overlap_cb_to_va={ov_cb_va:.6f}",
+                f"overlap_cb_to_ca={ov_cb_ca:.6f}",
             ]
         )
         + "\n",
