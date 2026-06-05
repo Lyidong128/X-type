@@ -29,6 +29,39 @@ class PathData:
     segment_length: float
 
 
+def low_pair_from_up_block(h4: np.ndarray) -> dict[str, object]:
+    psi_a = np.array([1.0, 1.0, 1.0, 1.0], dtype=complex) / 2.0
+    psi_b = np.array([1.0, 1.0, -1.0, -1.0], dtype=complex) / 2.0
+    evals, evecs = np.linalg.eigh(h4)
+    ov_a = np.abs(evecs.conj().T @ psi_a)
+    ov_b = np.abs(evecs.conj().T @ psi_b)
+    ia = int(np.argmax(ov_a))
+    ib = int(np.argmax(ov_b))
+    if ib == ia:
+        candidates = [j for j in range(4) if j != ia]
+        ib = max(candidates, key=lambda j: ov_b[j])
+    ea = float(np.real(evals[ia]))
+    eb = float(np.real(evals[ib]))
+    if ea <= eb:
+        iv, ic = ia, ib
+    else:
+        iv, ic = ib, ia
+    return {
+        "evals": evals,
+        "evecs": evecs,
+        "idx_a": ia,
+        "idx_b": ib,
+        "E_a": ea,
+        "E_b": eb,
+        "idx_val": iv,
+        "idx_con": ic,
+        "E_val": float(np.real(evals[iv])),
+        "E_con": float(np.real(evals[ic])),
+        "overlap_a": float(ov_a[ia]),
+        "overlap_b": float(ov_b[ib]),
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="No-SOC band evolution around M-point mass zero.")
     parser.add_argument("--model-file", default="xtype_model.py")
@@ -166,6 +199,8 @@ def plot_m_zoom_single(
     t: float,
     w: float,
     lm: float,
+    e_val_m: float,
+    e_con_m: float,
     save_path: Path,
 ) -> None:
     x = path_data.xcoords
@@ -195,8 +230,6 @@ def plot_m_zoom_single(
         ax.plot(x_local, bands_local[:, b], linewidth=1.0)
     ax.axvline(x0, color="red", linestyle="--", linewidth=0.9)
     ax.axhline(0.0, color="black", linestyle=":", linewidth=0.8)
-    e_val_m = float(bands[path_data.m_index, 3])
-    e_con_m = float(bands[path_data.m_index, 4])
     ax.scatter([x0], [e_val_m], color="blue", s=26, zorder=5, label="valence@M")
     ax.scatter([x0], [e_con_m], color="orange", s=26, zorder=5, label="conduction@M")
     ax.set_ylim(ymin, ymax)
@@ -278,6 +311,7 @@ def main() -> None:
     nseg = 120 if args.quick else 280
     path_data = build_high_symmetry_path(model, nseg=nseg)
     m_point = 0.5 * (model.b1 + model.b2)
+    up_idx = np.array([0, 2, 4, 6], dtype=int)
 
     # ---------------- Task 1/2: full bands + M-zoom ----------------
     bands_by_v: dict[float, np.ndarray] = {}
@@ -285,6 +319,9 @@ def main() -> None:
         set_params(model, v=v, lm=lm, t=t, w=w, j=0.0)
         bands = compute_bands(model, path_data)
         bands_by_v[v] = bands
+        h8_m = np.array(model.Hxtype(m_point), dtype=complex)
+        h4_m = h8_m[np.ix_(up_idx, up_idx)]
+        pair_m = low_pair_from_up_block(h4_m)
         plot_full_band_single(
             bands=bands,
             path_data=path_data,
@@ -301,6 +338,8 @@ def main() -> None:
             t=t,
             w=w,
             lm=lm,
+            e_val_m=float(pair_m["E_val"]),
+            e_con_m=float(pair_m["E_con"]),
             save_path=out_root / f"M_zoom_band_v_{token(v)}.png",
         )
 
@@ -326,9 +365,11 @@ def main() -> None:
     gap_rows = []
     for v in v_scan:
         set_params(model, v=float(v), lm=lm, t=t, w=w, j=0.0)
-        evals = np.linalg.eigvalsh(model.Hxtype(m_point))
-        e_val = float(np.real(evals[3]))
-        e_con = float(np.real(evals[4]))
+        h8 = np.array(model.Hxtype(m_point), dtype=complex)
+        h4 = h8[np.ix_(up_idx, up_idx)]
+        pair = low_pair_from_up_block(h4)
+        e_val = float(pair["E_val"])
+        e_con = float(pair["E_con"])
         delta = float(e_con - e_val)
         m_m = float(v + t - w)
         gap_rows.append(
@@ -382,14 +423,15 @@ def main() -> None:
     plt.close(fig)
 
     # ---------------- Task 4: component weights around vc ----------------
-    up_idx = np.array([0, 2, 4, 6], dtype=int)
     comp_rows = []
     for v in v_list:
         set_params(model, v=v, lm=lm, t=t, w=w, j=0.0)
         h8 = np.array(model.Hxtype(m_point), dtype=complex)
         h4 = h8[np.ix_(up_idx, up_idx)]
-        evals4, evecs4 = np.linalg.eigh(h4)
-        for state, idx in [("valence", 1), ("conduction", 2)]:
+        pair = low_pair_from_up_block(h4)
+        evals4 = pair["evals"]
+        evecs4 = pair["evecs"]
+        for state, idx in [("valence", int(pair["idx_val"])), ("conduction", int(pair["idx_con"]))]:
             vec = evecs4[:, idx]
             weights = np.abs(vec) ** 2
             weights = weights / max(float(np.sum(weights)), 1e-16)
@@ -400,6 +442,7 @@ def main() -> None:
                 "lm": lm,
                 "state": state,
                 "energy": float(np.real(evals4[idx])),
+                "state_index_in_spin_block": int(idx),
                 "major_component": int(np.argmax(weights)),
             }
             for ci in range(4):
@@ -417,6 +460,7 @@ def main() -> None:
                 "lm",
                 "state",
                 "energy",
+                "state_index_in_spin_block",
                 "major_component",
                 "component_0_weight",
                 "component_1_weight",
@@ -487,23 +531,14 @@ def main() -> None:
     inversion_by_components = cross_score < direct_score
 
     # ---------------- Task 5: low-energy levels vs v ----------------
-    psi_a = np.array([1.0, 1.0, 1.0, 1.0], dtype=complex) / 2.0
-    psi_b = np.array([1.0, 1.0, -1.0, -1.0], dtype=complex) / 2.0
     low_rows = []
     for v in v_scan:
         set_params(model, v=float(v), lm=lm, t=t, w=w, j=0.0)
         h8 = np.array(model.Hxtype(m_point), dtype=complex)
         h4 = h8[np.ix_(up_idx, up_idx)]
-        evals4, evecs4 = np.linalg.eigh(h4)
-        ov_a = np.abs(evecs4.conj().T @ psi_a)
-        ov_b = np.abs(evecs4.conj().T @ psi_b)
-        ia = int(np.argmax(ov_a))
-        ib = int(np.argmax(ov_b))
-        if ib == ia:
-            candidates = [j for j in range(4) if j != ia]
-            ib = max(candidates, key=lambda j: ov_b[j])
-        ea_num = float(np.real(evals4[ia]))
-        eb_num = float(np.real(evals4[ib]))
+        pair = low_pair_from_up_block(h4)
+        ea_num = float(pair["E_a"])
+        eb_num = float(pair["E_b"])
         ea_formula = float(v - w + 2.0 * t)
         eb_formula = float(w - v)
         low_rows.append(
@@ -516,8 +551,8 @@ def main() -> None:
                 "E_b_numeric": eb_num,
                 "E_a_formula": ea_formula,
                 "E_b_formula": eb_formula,
-                "overlap_a": float(ov_a[ia]),
-                "overlap_b": float(ov_b[ib]),
+                "overlap_a": float(pair["overlap_a"]),
+                "overlap_b": float(pair["overlap_b"]),
             }
         )
 
