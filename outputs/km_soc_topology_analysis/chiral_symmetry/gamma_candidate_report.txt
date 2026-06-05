@@ -1,0 +1,4 @@
+Candidate chiral operator selection
+selected_gamma=candidate_1
+selection_score_delta_chi_mean(lm=0,v=0.5)=5.224804e-01
+Gamma built as kron(diag([±1,±1,±1,±1]), I_spin) with 2+ and 2- signs.

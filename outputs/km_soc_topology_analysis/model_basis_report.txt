@@ -1,0 +1,21 @@
+Kane-Mele SOC model basis report
+================================
+Hamiltonian function location: /workspace/models/xtype_model.py :: Hxtype(k)
+Parameter names detected: v, t, w, lm, J
+
+Basis / internal degrees of freedom:
+- Matrix dimension = 8, interpreted as 4 orbital/site components x 2 spins.
+- From kron(orbital_part, spin_pauli) structure and state indexing, basis is orbital-major then spin.
+- Practical ordering used in code: [orb0_up, orb0_dn, orb1_up, orb1_dn, orb2_up, orb2_dn, orb3_up, orb3_dn].
+- Explicit A/B sublattice labels are not unambiguously encoded in current model file (treated as 4 components).
+
+Spin-up/down identifiable: True
+Can construct Sz operator: True
+SOC off-spin coupling ratio ||H_updn||/||H_soc|| = 0.000e+00
+SOC opposite-spin-block ratio ||H_up + H_dn||/||H_soc|| = 0.000e+00
+SOC imaginary-part ratio ||Im(H_soc)||/||H_soc|| = 1.000e+00
+
+Kane-Mele SOC assessment:
+- SOC term is spin-diagonal (Sz-like), opposite for up/down blocks, and predominantly imaginary.
+- This is consistent with Kane-Mele-type spin-dependent virtual NNN-like hopping symmetry structure.
+- Such SOC preserves TRS at model level and can support C_up=-C_down, C_total~0, Z2-like phases.

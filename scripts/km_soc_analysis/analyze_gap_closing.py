@@ -30,6 +30,8 @@ def _classify(z2_left: int, z2_right: int, gap_min: float) -> tuple[str, str, st
         return "z2_topological_transition", "high", "Z2 changes with near-closing gap."
     if z2_changed and gap_min >= 1e-4:
         return "possible_numerical_issue", "low", "Z2 changes without a clear gap closure."
+    if gap_min < 1e-3:
+        return "gapless_region", "medium", "Gap is effectively closed over this interval."
     if gap_min < 1e-4:
         return "ordinary_gap_reopening", "medium", "Gap closes/reopens without Z2 change."
     if gap_min < 5e-4:
@@ -102,28 +104,47 @@ def main() -> None:
         if len(lm_rows) < 3:
             continue
 
-        intervals: list[tuple[float, float]] = []
+        intervals: list[tuple[float, float, str]] = []
+
+        gapless_idx = [i for i, r in enumerate(lm_rows) if float(r["direct_gap"]) < 1e-3]
+        if gapless_idx:
+            start = gapless_idx[0]
+            prev = start
+            for idx in gapless_idx[1:]:
+                if idx == prev + 1:
+                    prev = idx
+                    continue
+                lo = float(lm_rows[max(0, start - 1)]["v"])
+                hi = float(lm_rows[min(len(lm_rows) - 1, prev + 1)]["v"])
+                intervals.append((lo, hi, "gapless_region"))
+                start = idx
+                prev = idx
+            lo = float(lm_rows[max(0, start - 1)]["v"])
+            hi = float(lm_rows[min(len(lm_rows) - 1, prev + 1)]["v"])
+            intervals.append((lo, hi, "gapless_region"))
+
         for i in range(len(lm_rows) - 1):
             a, b = lm_rows[i], lm_rows[i + 1]
             if int(a["z2_reliable"]) == 1 and int(b["z2_reliable"]) == 1 and int(a["z2"]) != int(b["z2"]):
-                intervals.append((float(a["v"]), float(b["v"])))
+                intervals.append((float(a["v"]), float(b["v"]), "z2_change"))
         for i in range(1, len(lm_rows) - 1):
             gm = float(lm_rows[i]["direct_gap"])
             gl = float(lm_rows[i - 1]["direct_gap"])
             gr = float(lm_rows[i + 1]["direct_gap"])
-            if gm <= gl and gm <= gr and gm < 0.03:
-                intervals.append((float(lm_rows[i - 1]["v"]), float(lm_rows[i + 1]["v"])))
+            if gm <= gl and gm <= gr and (gm < 0.01) and (gm >= 1e-3):
+                intervals.append((float(lm_rows[i - 1]["v"]), float(lm_rows[i + 1]["v"]), "local_min"))
 
         # Merge overlaps.
-        intervals = sorted(intervals)
+        intervals = sorted(intervals, key=lambda x: x[0])
         merged = []
-        for lo, hi in intervals:
+        for lo, hi, src in intervals:
             if not merged or lo > merged[-1][1] + 1e-12:
-                merged.append([lo, hi])
+                merged.append([lo, hi, {src}])
             else:
                 merged[-1][1] = max(merged[-1][1], hi)
+                merged[-1][2].add(src)
 
-        for lo, hi in merged:
+        for lo, hi, sources in merged:
             local = [r for r in lm_rows if lo - 1e-12 <= float(r["v"]) <= hi + 1e-12]
             if not local:
                 continue
@@ -132,7 +153,10 @@ def main() -> None:
             vc = float(min_row["v"])
             z2_left = int(local[0]["z2"]) if int(local[0]["z2_reliable"]) == 1 else -1
             z2_right = int(local[-1]["z2"]) if int(local[-1]["z2_reliable"]) == 1 else -1
-            ttype, reliability, comment = _classify(z2_left, z2_right, gap_min)
+            if "gapless_region" in sources:
+                ttype, reliability, comment = "gapless_region", "medium", "Contiguous gapless interval."
+            else:
+                ttype, reliability, comment = _classify(z2_left, z2_right, gap_min)
             transitions.append(
                 {
                     "transition_id": f"T{len(transitions) + 1}",

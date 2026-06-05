@@ -1,0 +1,4 @@
+transition_id,lm,v_left,v_right,z2_left,z2_right,gap_min,estimated_vc,kx_min,ky_min,transition_type,reliability,comment
+T1,0.0,0.698,1.1,0,-1,0.0,0.708,3.141592653589793,3.141592653589793,gapless_region,medium,Contiguous gapless interval.
+T2,0.1,0.598,0.602,0,0,1.3877787807814457e-16,0.6,3.141592653589793,3.141592653589793,gapless_region,medium,Contiguous gapless interval.
+T3,0.1,1.09,1.094,0,0,0.0019942816876151043,1.092,6.283185307179586,3.141592653589793,ordinary_gap_reopening,low,No robust closure detected.

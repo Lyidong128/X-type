@@ -39,7 +39,7 @@ def parse_args() -> argparse.Namespace:
 
 def _select_v_points(scan_csv: Path) -> list[float]:
     rows = list(csv.DictReader(scan_csv.open("r", encoding="utf-8")))
-    lm_rows = [r for r in rows if abs(float(r["lm"]) - 0.1) < 1e-12]
+    lm_rows = sorted([r for r in rows if abs(float(r["lm"]) - 0.1) < 1e-12], key=lambda r: float(r["v"]))
     base = {0.10, 0.30, 0.50, 0.80, 1.00}
     for i in range(len(lm_rows) - 1):
         a = lm_rows[i]
@@ -47,6 +47,22 @@ def _select_v_points(scan_csv: Path) -> list[float]:
         if int(a["z2_reliable"]) == 1 and int(b["z2_reliable"]) == 1 and int(a["z2"]) != int(b["z2"]):
             base.add(float(a["v"]))
             base.add(float(b["v"]))
+
+    # Also add points just before/after contiguous near-gapless windows.
+    small_gap_idx = [i for i, r in enumerate(lm_rows) if float(r["direct_gap"]) < 1e-2]
+    if small_gap_idx:
+        start = small_gap_idx[0]
+        prev = start
+        for idx in small_gap_idx[1:]:
+            if idx == prev + 1:
+                prev = idx
+                continue
+            base.add(float(lm_rows[max(0, start - 1)]["v"]))
+            base.add(float(lm_rows[min(len(lm_rows) - 1, prev + 1)]["v"]))
+            start = idx
+            prev = idx
+        base.add(float(lm_rows[max(0, start - 1)]["v"]))
+        base.add(float(lm_rows[min(len(lm_rows) - 1, prev + 1)]["v"]))
     return sorted(base)
 
 

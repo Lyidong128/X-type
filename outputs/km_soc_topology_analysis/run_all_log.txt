@@ -1,0 +1,50 @@
+KM SOC analysis run start: 2026-06-05T01:25:05Z
+
+>>> RUN: python3 scripts/km_soc_analysis/run_gap_z2_scan.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/gap_z2_scan/gap_z2_scan.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/gap_z2_scan
+>>> DONE: python3 scripts/km_soc_analysis/run_gap_z2_scan.py
+
+>>> RUN: python3 scripts/km_soc_analysis/run_spin_chern.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/spin_chern/spin_chern_summary.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/spin_chern
+>>> DONE: python3 scripts/km_soc_analysis/run_spin_chern.py
+
+>>> RUN: python3 scripts/km_soc_analysis/run_wilson_loop_flow.py
+[ok] summary=/workspace/outputs/km_soc_topology_analysis/wilson_loop/wilson_loop_summary.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/wilson_loop
+>>> DONE: python3 scripts/km_soc_analysis/run_wilson_loop_flow.py
+
+>>> RUN: python3 scripts/km_soc_analysis/analyze_gap_closing.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/gap_closing/transition_candidates.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/gap_closing
+>>> DONE: python3 scripts/km_soc_analysis/analyze_gap_closing.py
+
+>>> RUN: python3 scripts/km_soc_analysis/analyze_band_inversion.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/band_inversion/band_inversion_summary.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/band_inversion
+>>> DONE: python3 scripts/km_soc_analysis/analyze_band_inversion.py
+
+>>> RUN: python3 scripts/km_soc_analysis/check_chiral_symmetry_breaking.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/chiral_symmetry/chiral_breaking_summary.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/chiral_symmetry
+>>> DONE: python3 scripts/km_soc_analysis/check_chiral_symmetry_breaking.py
+
+>>> RUN: python3 scripts/km_soc_analysis/run_fu_kane_parity_optional.py
+[ok] csv=/workspace/outputs/km_soc_topology_analysis/fu_kane/fu_kane_summary.csv
+[ok] out_dir=/workspace/outputs/km_soc_topology_analysis/fu_kane
+>>> DONE: python3 scripts/km_soc_analysis/run_fu_kane_parity_optional.py
+
+>>> RUN: python3 scripts/km_soc_analysis/generate_km_soc_report.py
+[ok] report=/workspace/outputs/km_soc_topology_analysis/KM_SOC_TOPOLOGY_REPORT.md
+>>> DONE: python3 scripts/km_soc_analysis/generate_km_soc_report.py
+
+KM SOC analysis status summary:
+OK|python3 scripts/km_soc_analysis/run_gap_z2_scan.py
+OK|python3 scripts/km_soc_analysis/run_spin_chern.py
+OK|python3 scripts/km_soc_analysis/run_wilson_loop_flow.py
+OK|python3 scripts/km_soc_analysis/analyze_gap_closing.py
+OK|python3 scripts/km_soc_analysis/analyze_band_inversion.py
+OK|python3 scripts/km_soc_analysis/check_chiral_symmetry_breaking.py
+OK|python3 scripts/km_soc_analysis/run_fu_kane_parity_optional.py
+OK|python3 scripts/km_soc_analysis/generate_km_soc_report.py

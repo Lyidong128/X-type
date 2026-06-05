@@ -1,0 +1,15 @@
+point_label,v,lm,t,w,gap,direction,crossing_parity,estimated_z2,reliability,comment
+A,0.1,0.1,0.3,1.0,0.9999999999999996,kx_scan_ky,0,0,reliable,
+A,0.1,0.1,0.3,1.0,0.9999999999999996,ky_scan_kx,1,1,reliable,
+B,0.3,0.1,0.3,1.0,0.5999999999999999,kx_scan_ky,0,0,reliable,
+B,0.3,0.1,0.3,1.0,0.5999999999999999,ky_scan_kx,1,1,reliable,
+C,0.5,0.1,0.3,1.0,0.20000000000000015,kx_scan_ky,0,0,reliable,
+C,0.5,0.1,0.3,1.0,0.20000000000000015,ky_scan_kx,0,0,reliable,
+D,0.8,0.1,0.3,1.0,0.3380050848099047,kx_scan_ky,1,1,reliable,
+D,0.8,0.1,0.3,1.0,0.3380050848099047,ky_scan_kx,1,1,reliable,
+E,1.0,0.1,0.3,1.0,0.1859942816876157,kx_scan_ky,1,1,reliable,
+E,1.0,0.1,0.3,1.0,0.1859942816876157,ky_scan_kx,0,0,reliable,
+F,0.6,0.1,0.3,1.0,1.3877787807814457e-16,kx_scan_ky,1,1,uncertain,Gap below threshold; Wilson parity may be unstable.
+F,0.6,0.1,0.3,1.0,1.3877787807814457e-16,ky_scan_kx,1,1,uncertain,Gap below threshold; Wilson parity may be unstable.
+G,1.092,0.1,0.3,1.0,0.0019942816876151043,kx_scan_ky,0,0,reliable,
+G,1.092,0.1,0.3,1.0,0.0019942816876151043,ky_scan_kx,0,0,reliable,
