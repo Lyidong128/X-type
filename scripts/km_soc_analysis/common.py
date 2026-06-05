@@ -338,3 +338,55 @@ def generate_model_basis_report(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(text) + "\n", encoding="utf-8")
     return output_path
+
+
+def default_inversion_operator() -> np.ndarray:
+    """Model-specific inversion swapping orbital indices (0<->3, 1<->2)."""
+    p_orb = np.array(
+        [
+            [0.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0],
+        ],
+        dtype=float,
+    )
+    return np.kron(p_orb, np.eye(2, dtype=float)).astype(complex)
+
+
+def inversion_error(model, p_op: np.ndarray, nk: int = 7) -> float:
+    errs = []
+    for i in range(nk):
+        u = i / max(1, nk - 1)
+        for j in range(nk):
+            v = j / max(1, nk - 1)
+            k = u * model.b1 + v * model.b2
+            h = np.array(model.Hxtype(k), dtype=complex)
+            hm = np.array(model.Hxtype(-k), dtype=complex)
+            denom = max(float(np.linalg.norm(h)), 1e-16)
+            errs.append(float(np.linalg.norm(p_op @ h @ p_op.conj().T - hm) / denom))
+    return float(np.mean(errs))
+
+
+def fu_kane_z2(model, p_op: np.ndarray, n_occ: int = 4) -> tuple[int, dict[str, int], float]:
+    trims = {
+        "Gamma": np.zeros(3),
+        "X": 0.5 * model.b1,
+        "Y": 0.5 * model.b2,
+        "M": 0.5 * (model.b1 + model.b2),
+    }
+    deltas: dict[str, int] = {}
+    quality = []
+    for name, k in trims.items():
+        _, vecs = np.linalg.eigh(model.Hxtype(k))
+        occ = vecs[:, :n_occ]
+        m = occ.conj().T @ p_op @ occ
+        m = 0.5 * (m + m.conj().T)
+        evals = np.linalg.eigvalsh(m)
+        quality.append(float(np.max(np.abs(np.abs(evals) - 1.0))))
+        signs = np.sign(np.real(evals))
+        signs[signs == 0] = 1.0
+        deltas[name] = int(np.prod(signs))
+    total = int(np.prod(list(deltas.values())))
+    z2 = 0 if total > 0 else 1
+    return z2, deltas, float(np.max(quality))
