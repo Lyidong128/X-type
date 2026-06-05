@@ -1,0 +1,3 @@
+H_M spin block symbolic (up block)
+==================================
+Matrix([[0, t, t, v - w], [t, 0, v - w, t], [t, v - w, 0, t], [v - w, t, t, 0]])

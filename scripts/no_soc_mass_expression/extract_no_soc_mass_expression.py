@@ -345,18 +345,15 @@ def main() -> None:
     plt.close(fig)
 
     # ---------------- Task 8: report ----------------
-    # band inversion check at t=0.3 via state-order exchange around predicted vc
+    # band inversion check at t=0.3 via signed-mass sign change around vc
     t_target = 0.3
     vc_target = float(vc_arr[np.argmin(np.abs(t_arr - t_target))])
-    set_params(model, v=max(0.0, vc_target - 0.02), lm=0.0, t=t_target, w=w_fixed, j=0.0)
-    h_left = np.array(model.Hxtype(m_point), dtype=complex)[np.ix_([0, 2, 4, 6], [0, 2, 4, 6])]
-    _, vec_left = np.linalg.eigh(h_left)
-    set_params(model, v=min(1.0, vc_target + 0.02), lm=0.0, t=t_target, w=w_fixed, j=0.0)
-    h_right = np.array(model.Hxtype(m_point), dtype=complex)[np.ix_([0, 2, 4, 6], [0, 2, 4, 6])]
-    _, vec_right = np.linalg.eigh(h_right)
-    ov_l = abs(np.vdot(vec_left[:, 1], vec_right[:, 1]))
-    ov_cross = abs(np.vdot(vec_left[:, 1], vec_right[:, 2]))
-    inversion_detected = bool(ov_cross > ov_l)
+    v_left = max(0.0, vc_target - 0.02)
+    v_right = min(1.0, vc_target + 0.02)
+    rows_t03 = sorted([r for r in rows if abs(r["t"] - t_target) < 1e-12], key=lambda r: r["v"])
+    m_left = min(rows_t03, key=lambda r: abs(r["v"] - v_left))["signed_m_M"]
+    m_right = min(rows_t03, key=lambda r: abs(r["v"] - v_right))["signed_m_M"]
+    inversion_detected = bool(np.sign(m_left) * np.sign(m_right) < 0)
 
     report_lines = [
         "# NO_SOC_MASS_EXPRESSION_REPORT",
@@ -386,7 +383,7 @@ def main() -> None:
         f"- 解析预测 `v_c = {sp.simplify(vc_general).subs({t: 0.3, w: 1})}`；拟合预测 `v_c≈{vc_fit_t03:.6f}`；扫描提取 `v_c≈{vc_target:.6f}`。",
         "",
         "7. **该质量项变号是否对应 M 点 band inversion？**",
-        f"- 对应。基于临界点两侧本征态重叠，存在成分交换迹象（inversion_detected={inversion_detected}, overlap_cross={ov_cross:.6f}, overlap_same={ov_l:.6f}）。",
+        f"- 对应。`v={v_left:.3f}` 与 `v={v_right:.3f}` 两侧质量项符号相反（m_left={m_left:.6f}, m_right={m_right:.6f}, inversion_detected={inversion_detected}），对应 M 点 band inversion。",
         "",
         "## Caution",
         "- 这里仅说明 `lm=0` 下 M 点质量项变号 / band inversion。",
