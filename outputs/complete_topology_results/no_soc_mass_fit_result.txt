@@ -1,0 +1,13 @@
+No-SOC M-point mass fit result
+==============================
+Fit data source: signed_mass_data.csv (pair-selected low-energy states)
+fit_w1_expression: m_M(v,t,w=1) = (1)*v + (1)*t + (-1)
+a=1
+b=1
+c=-1
+R2=1
+critical_condition_w1: v_c(t) = -(b*t+c)/a
+predicted_v_c_t0p3_w1=0.7
+
+symbolic_projection_expression: m_M(v,t,w) = t + v - w
+symbolic_critical_condition: v_c = -t + w
