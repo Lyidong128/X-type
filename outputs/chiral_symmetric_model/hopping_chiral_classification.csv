@@ -1,0 +1,7 @@
+from_orbital,to_orbital,from_sublattice,to_sublattice,hopping_expression,chiral_classification
+0,1,A,A,t,breaks_chiral_same_sublattice
+0,2,A,B,t,allowed_AB
+0,3,A,B,v + w*exp(-i kx),allowed_AB
+1,2,A,B,v + w*exp(-i ky),allowed_AB
+1,3,A,B,t,allowed_AB
+2,3,B,B,t,breaks_chiral_same_sublattice

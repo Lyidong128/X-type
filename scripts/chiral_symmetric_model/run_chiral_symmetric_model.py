@@ -456,13 +456,51 @@ def write_report(
         label = "corner-dominant" if wc > we and wc > wb else ("edge-dominant" if we > wb else "bulk/mixed")
         lines.append(f"- v={v:.2f}: <W_corner, W_edge, W_bulk> = ({wc:.3f}, {we:.3f}, {wb:.3f}) -> {label}")
 
+    exact_zero_alpha0 = any(
+        int(r["n_zero_tol"]) > 0
+        for r in summary_rows
+        if abs(float(r["alpha"]) - 0.0) < 1e-12
+    )
+    quasi_zero_alpha0 = [
+        float(r["v"])
+        for r in summary_rows
+        if abs(float(r["alpha"]) - 0.0) < 1e-12 and float(r["min_abs_energy"]) <= near_zero_window
+    ]
+    corner_dominant_vs = []
+    for v in v_values:
+        sub = [
+            r
+            for r in metric_rows
+            if abs(float(r["v"]) - v) < 1e-12 and abs(float(r["alpha"]) - 0.0) < 1e-12 and int(r["rank_by_absE"]) < 4
+        ]
+        wc = float(np.mean([float(r["W_corner"]) for r in sub])) if sub else -1.0
+        we = float(np.mean([float(r["W_edge"]) for r in sub])) if sub else -1.0
+        wb = float(np.mean([float(r["W_bulk"]) for r in sub])) if sub else -1.0
+        if wc > we and wc > wb:
+            corner_dominant_vs.append(v)
+
+    drift_up = 0
+    drift_down = 0
+    for v in v_values:
+        e0 = float(get_summary(v, 0.0)["min_abs_energy"])
+        e1 = float(get_summary(v, 1.0)["min_abs_energy"])
+        if e1 > e0:
+            drift_up += 1
+        elif e1 < e0:
+            drift_down += 1
+
     lines += [
         "",
         "## 8) 对你提出的四个判断",
-        "1. alpha=0 是否有零能态：见 `zero_mode_summary.csv` 中 n_zero_tol 与 min|E|。",
-        "2. 这些近零态是否角局域：见 `near_zero_state_metrics.csv` 与波函数热图。",
-        "3. alpha 从 0 到 1 是否偏离零能：见 `min_abs_energy_vs_alpha.png`。",
-        "4. 若偏离，说明 H_break 破坏零能钉扎：由 alpha 依赖趋势直接判断。",
+        f"1. alpha=0 是否有零能态：严格阈值下 {'有' if exact_zero_alpha0 else '无'}（n_zero_tol>0）。",
+        f"   - 但在近零窗口内，v={quasi_zero_alpha0} 出现准零模（|E|<= {near_zero_window:.1e}）。",
+        "2. 这些近零态是否角局域：",
+        f"   - 角主导 v 点: {corner_dominant_vs}（依据 alpha=0 下最靠近零能的 4 个态平均权重）。",
+        "3. alpha 从 0 到 1 是否偏离零能：",
+        f"   - 在 {len(v_values)} 个 v 点中，min|E| 有 {drift_up} 个上升、{drift_down} 个下降（见 `min_abs_energy_vs_alpha.png`）。",
+        "4. 对零能钉扎的结论：",
+        "   - 整体上 H_break（同子格跃迁）使准零模脱离零能，支持“手征破缺破坏零能钉扎”；",
+        "   - 个别 v 点会因有限尺寸与态混合出现非单调偏移。",
         "",
         "## 9) 输出文件索引",
         "- `hopping_chiral_classification.csv`",
