@@ -87,8 +87,8 @@ def build_high_symmetry_path(model, nseg: int = 280) -> PathData:
     x = 0.5 * model.b1
     m = 0.5 * (model.b1 + model.b2)
     y = 0.5 * model.b2
-    nodes = [g, x, m, y, g]
-    labels = [r"$\Gamma$", "X", "M", "Y", r"$\Gamma$"]
+    nodes = [g, x, y, g, m, g]
+    labels = [r"$\Gamma$", "X", "Y", r"$\Gamma$", "M", r"$\Gamma$"]
 
     k_list = []
     tick_indices = [0]
@@ -108,8 +108,11 @@ def build_high_symmetry_path(model, nseg: int = 280) -> PathData:
         xcoords[i] = xcoords[i - 1] + float(np.linalg.norm(dk[:2]))
 
     tick_positions = [float(xcoords[idx]) for idx in tick_indices]
-    m_index = tick_indices[2]
-    segment_length = tick_positions[2] - tick_positions[1]
+    m_node_idx = labels.index("M")
+    m_index = tick_indices[m_node_idx]
+    left_len = tick_positions[m_node_idx] - tick_positions[m_node_idx - 1]
+    right_len = tick_positions[m_node_idx + 1] - tick_positions[m_node_idx]
+    segment_length = min(left_len, right_len)
     return PathData(
         kpoints=kpoints,
         xcoords=xcoords,
