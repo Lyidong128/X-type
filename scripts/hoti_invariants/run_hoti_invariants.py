@@ -375,7 +375,8 @@ def corner_charge_for_case(l: int, model_type: str, v: float, t: float, w: float
 
     rho_bg = float(n_occ / (l * l))
     delta = rho - rho_bg
-    lc = max(2, l // 6)
+    # Use a fixed corner patch for meaningful size comparison.
+    lc = 2
     c1 = float(np.sum(delta[:lc, :lc]))
     c2 = float(np.sum(delta[:lc, -lc:]))
     c3 = float(np.sum(delta[-lc:, :lc]))
