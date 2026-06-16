@@ -315,7 +315,6 @@ def run_case(
         "count_absE_lt_1e-4": counts["count_absE_lt_1e-4"],
         "count_absE_lt_1e-6": counts["count_absE_lt_1e-6"],
         "count_absE_lt_1e-8": counts["count_absE_lt_1e-8"],
-        "eigsh_method": eigsh_method,
     }
     return summary, rows_eigs, rows_near
 
@@ -410,7 +409,7 @@ def make_report(
 
     # alpha=1 zero pinning and morphology.
     a1_cases = [r for r in summary_rows if abs(float(r["alpha"]) - 1.0) < 1e-12]
-    pinning_lost = all(float(r["min_abs_E"]) > 1e-6 for r in a1_cases)
+    pinning_lost = all(int(r["count_absE_lt_1e-8"]) == 0 for r in a1_cases)
     lines.append(f"6) alpha=1 原始模型中零能钉扎是否消失：{'是' if pinning_lost else '否'}。")
 
     mix_desc = []
@@ -508,7 +507,6 @@ def main() -> None:
             "count_absE_lt_1e-4",
             "count_absE_lt_1e-6",
             "count_absE_lt_1e-8",
-            "eigsh_method",
         ],
     )
 
