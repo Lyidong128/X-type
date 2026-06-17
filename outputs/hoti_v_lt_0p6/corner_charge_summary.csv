@@ -1,0 +1,10 @@
+v,L,Q_corner_mean,Q_corner_abs_mean,Q_corner_1,Q_corner_2,Q_corner_3,Q_corner_4,status
+0.3,20,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.3,30,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.3,40,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.4,20,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.4,30,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.4,40,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.5,20,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.5,30,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition
+0.5,40,nan,nan,nan,nan,nan,nan,skipped_no_edge_gapped_cornerlike_condition

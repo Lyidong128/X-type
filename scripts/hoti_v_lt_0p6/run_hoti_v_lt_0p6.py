@@ -329,7 +329,7 @@ def add_hop_spin_independent(h: lil_matrix, i: int, j: int, amp: float) -> None:
 
 def build_obc_sparse(l: int, v: float, t: float, w: float, lm: float) -> csr_matrix:
     n = 8 * l * l
-    h = lil_matrix((n, n), dtype=np.float64)
+    h = lil_matrix((n, n), dtype=np.complex128)
 
     # orbital onsite block with SOC (spin-dependent)
     h0 = np.zeros((4, 4), dtype=float)
@@ -346,27 +346,19 @@ def build_obc_sparse(l: int, v: float, t: float, w: float, lm: float) -> csr_mat
     h0[3, 1] = t
     h0[3, 2] = t
     hs = h_soc_orbital(lm)
+    s0 = np.eye(2, dtype=complex)
+    sz = np.array([[1.0, 0.0], [0.0, -1.0]], dtype=complex)
+    onsite8 = np.kron(h0.astype(complex), s0) + np.kron(hs, sz)
 
     for iy in range(l):
         for ix in range(l):
             # onsite 8x8: H0⊗s0 + HSOC⊗sz
-            for a in range(4):
-                for b in range(4):
-                    val0 = float(np.real(h0[a, b]))
-                    vals = hs[a, b]
-                    if abs(val0) > 0 or abs(vals) > 0:
-                        # up spin
-                        iu = obc_index(ix, iy, a, 0, l)
-                        ju = obc_index(ix, iy, b, 0, l)
-                        h[iu, ju] += val0 + np.real(vals)
-                        # down spin
-                        idn = obc_index(ix, iy, a, 1, l)
-                        jdn = obc_index(ix, iy, b, 1, l)
-                        h[idn, jdn] += val0 - np.real(vals)
-                        # imag SOC off-diagonal terms
-                        if abs(np.imag(vals)) > 0:
-                            h[iu, ju] += 1j * np.imag(vals)
-                            h[idn, jdn] -= 1j * np.imag(vals)
+            start = (iy * l + ix) * 8
+            for a in range(8):
+                for b in range(8):
+                    val = onsite8[a, b]
+                    if abs(val) > 0:
+                        h[start + a, start + b] += val
 
             # inter-cell x: orb0 <-> left-cell orb3 with w (spin-independent)
             if ix > 0:
@@ -1013,7 +1005,10 @@ def main() -> None:
     all_bulk_gapped = all(int(r["is_bulk_gapped_insulator"]) == 1 for r in bulk_rows)
     report_lines.append(f"1) v<0.6 区域是否 bulk gapped: {'是' if all_bulk_gapped else '否'}.")
 
-    all_edge_gapped = all(float(r["edge_gap_x"]) > 1e-4 and float(r["edge_gap_y"]) > 1e-4 for r in edge_rows)
+    all_edge_gapped = all(
+        float(r["edge_gap_x"]) > 1e-4 and float(r["edge_gap_y"]) > 1e-4 and int(r["has_gapless_edge_states"]) == 0
+        for r in edge_rows
+    )
     report_lines.append(f"2) v<0.6 区域是否 edge gapped: {'是' if all_edge_gapped else '否'}.")
 
     has_gapless_helical = any(int(r["has_gapless_edge_states"]) == 1 for r in edge_rows)
@@ -1075,6 +1070,9 @@ def main() -> None:
         elif bulk_gapped and edge_gapped and (not gapless) and corner_ok and (qhalf or qcorner_quantized[v]):
             cls = "B. 二阶拓扑候选"
             why = "bulk/edge gapped, stable corner state, q_xy~0.5 or quantized corner charge"
+        elif bulk_gapped and gapless:
+            cls = "C. 不确定"
+            why = "ribbon edge-localized states cross near zero; more consistent with first-order edge-state phase than HOTI corner phase"
         else:
             cls = "C. 不确定"
             why = "gap or Wannier/corner-size-scaling evidence not jointly conclusive"
