@@ -1,0 +1,4 @@
+v,bulk_gap,C_up,C_down,C_spin,Z2_expected_from_spin_chern,Z2_crossing,Z2_largest_gap,crossing_number_ref_0p45,crossing_number_ref_0p50,crossing_number_ref_0p55,largest_gap_winding,unitarity_error_max,consistent_crossing,consistent_largest_gap,final_Z2,final_consistent,warning
+0.5,0.1999999999999995,-1.5902773407317583e-16,2.9155084580082237e-16,0.0,0,0,0,2,0,2,-6.007250131105117,2.2640335782267806e-14,1,1,0,1,
+0.8,0.21980621599375705,1.0,-0.9999999999999999,1.0,1,0,1,2,0,0,1.004616796513367,2.2514243816367794e-14,0,1,unresolved,0,WARNING: crossing and largest-gap Z2 methods disagree.
+1.0,0.186009279944177,1.0000000000000002,-1.0000000000000002,1.0,1,0,1,2,0,0,3.4223374600875505,2.453063852629492e-14,0,1,unresolved,0,WARNING: crossing and largest-gap Z2 methods disagree.

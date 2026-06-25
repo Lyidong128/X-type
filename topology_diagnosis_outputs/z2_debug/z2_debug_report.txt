@@ -1,0 +1,25 @@
+Z2 Wilson-loop debug report
+===========================
+
+1. Hamiltonian spin conservation
+- [H, s_z] normalized commutator check indicates spin_conserved=True.
+
+2. C_spin stability at v=0.8
+- C_spin(v=0.8)=1.0 (from spin block Chern).
+
+3. Wilson-center odd crossing at v=0.8
+- crossing counts (ref 0.45/0.50/0.55) = 2/0/0.
+- Z2_crossing(v=0.8)=0.
+
+4. crossing vs largest-gap method consistency
+- Z2_largest_gap(v=0.8)=1.
+- final_Z2(v=0.8)=unresolved.
+
+5. final_Z2 parity vs C_spin mod 2
+- final_consistent(v=0.8)=0.
+
+6. most likely inconsistency source
+- If mismatch persists, likely branch-tracking/crossing counting conventions (half-BZ counting and reference-line stability) rather than Hamiltonian spin structure.
+
+7. QSH verdict at v=0.8
+- QSH diagnosis remains inconclusive.
