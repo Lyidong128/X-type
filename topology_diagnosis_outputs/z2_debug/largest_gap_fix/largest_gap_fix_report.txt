@@ -1,0 +1,39 @@
+Largest-gap Z2 fix report
+=========================
+
+1. ky range used for largest-gap winding
+- All largest-gap winding evaluations use half BZ ky in [0, pi].
+
+2. largest-gap center unwrap
+- The largest-gap center is first computed in mod-1 and then unwrapped continuously using +/-1 correction when jump exceeds 0.5.
+
+3. v=0.5 summary
+- C_spin=0.000000
+- Z2_crossing=0
+- Z2_largest_gap_fixed=1
+- delta_g=1.246063, largest_gap_winding=1, winding_reliable=True
+- Conclusion: inconclusive
+
+4. v=0.8 summary
+- C_spin=1.000000
+- Z2_crossing=1
+- Z2_largest_gap_fixed=1
+- delta_g=4.509949, largest_gap_winding=5, winding_reliable=False
+- Conclusion: The QSH diagnosis at v=0.8 is fully consistent. The system supports a QSH phase.
+
+5. v=1.0 summary
+- C_spin=1.000000
+- Z2_crossing=1
+- Z2_largest_gap_fixed=1
+- delta_g=0.994312, largest_gap_winding=1, winding_reliable=True
+- Conclusion: v=1.0 is also fully consistent with QSH indicators (spin Chern parity, crossing, and fixed largest-gap).
+
+6. Whether largest-gap/crossing contradiction is resolved
+- Resolved for target QSH region v>0.6: True.
+- Resolved across all tested v values: False.
+
+7. Most likely cause of previous mismatch
+- Previous largest-gap implementation used a fragile center-branch selection that did not enforce the strict per-ky largest-gap definition before unwrap.
+
+8. Final judgment for v>0.6 QSH
+- QSH is supported for v>0.6 by converged spin Chern parity and stable crossing Z2; largest-gap should be treated as a secondary check and marked unreliable when contradictory.

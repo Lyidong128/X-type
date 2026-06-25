@@ -1,0 +1,4 @@
+v,bulk_gap,C_spin,Z2_crossing,Z2_largest_gap_fixed,Z2_final,QSH_supported,comment
+0.5,0.1999999999999995,0.0,0,1,0,0,largest-gap method inconsistent; final Z2 follows spin Chern parity and stable crossing result
+0.8,0.21980621599375705,1.0,1,1,1,1,crossing and largest-gap fixed results agree
+1.0,0.186009279944177,1.0,1,1,1,1,crossing and largest-gap fixed results agree

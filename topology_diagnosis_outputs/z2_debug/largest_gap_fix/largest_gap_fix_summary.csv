@@ -1,0 +1,4 @@
+v,C_spin,Z2_expected_from_spin_chern,Z2_crossing,Z2_largest_gap_old,Z2_largest_gap_fixed,delta_g,largest_gap_winding,winding_reliable,consistent_with_crossing,consistent_with_spin_chern,warning
+0.5,0.0,0,0,0,1,1.246063163522384,1,1,0,0,WARNING: largest-gap fixed Z2 disagrees with stable reference-line crossing Z2.
+0.8,1.0,1,1,0,1,4.509949059523197,5,0,1,1,WARNING: largest gap center winding is not close to an integer. The largest-gap method is unreliable.
+1.0,1.0,1,1,0,1,0.9943116447575047,1,1,1,1,
