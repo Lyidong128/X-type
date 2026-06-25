@@ -87,8 +87,10 @@ def make_hoti_diagnosis(
     pol_rows: list[dict[str, str]],
     nested_rows: list[dict[str, str]],
     open_rows: list[dict[str, str]],
+    qsh_rows: list[dict[str, str]],
 ) -> list[dict]:
     nested_by_v = {float(r["v"]): r for r in nested_rows}
+    qsh_by_v = {float(r["v"]): r for r in qsh_rows}
     out: list[dict] = []
     for r in pol_rows:
         v = float(r["v"])
@@ -111,8 +113,11 @@ def make_hoti_diagnosis(
         w_bulk = safe_float(orow, "W_bulk")
         ocls = (orow or {}).get("classification", "no_open_open_data")
 
-        final = "edge_localized_trivial_or_termination_induced"
-        comment = "No quantized bulk polarization or corner-state evidence is found."
+        cspin = safe_float(qsh_by_v.get(v), "C_spin")
+        z2_crossing = safe_int(qsh_by_v.get(v), "Z2_crossing", -1)
+
+        final = "outside_target_region"
+        comment = "Primary HOTI/SSH-like diagnosis target is v < 0.6."
 
         both_half = px_cls == "nontrivial_0p5" and py_cls == "nontrivial_0p5"
         one_half = (px_cls == "nontrivial_0p5") or (py_cls == "nontrivial_0p5")
@@ -120,17 +125,20 @@ def make_hoti_diagnosis(
         edge_dom = np.isfinite(w_edge) and np.isfinite(w_corner) and (w_edge > w_corner)
         corner_dom = np.isfinite(w_corner) and (w_corner > 0.6)
 
-        if both_half and nested_reliable and np.isfinite(qxy) and abs(qxy - 0.5) < 0.05 and corner_dom:
+        if v >= 0.6 and np.isfinite(cspin) and abs(cspin - 1.0) < 0.1 and z2_crossing == 1:
+            final = "QSH_region_not_HOTI_target"
+            comment = "This point is consistent with QSH (C_spin≈1, Z2 crossing=1), outside the v<0.6 HOTI/SSH target regime."
+        elif both_half and nested_reliable and np.isfinite(qxy) and abs(qxy - 0.5) < 0.05 and corner_dom:
             final = "HOTI_supported"
             comment = (
                 "Bulk polarization, nested Wilson loop, and corner-localized open-boundary states consistently support HOTI."
             )
-        elif one_half and (not nested_reliable) and edge_dom:
+        elif v < 0.6 and one_half and (not nested_reliable) and edge_dom:
             final = "SSH_like_edge_phase_not_HOTI"
             comment = (
                 "Wilson loop indicates SSH-like polarization, but nested Wilson loop is unreliable and open-open states are edge-localized rather than corner-localized."
             )
-        elif not_quantized and edge_dom:
+        elif v < 0.6 and not_quantized and edge_dom:
             final = "edge_localized_trivial_or_termination_induced"
             comment = "No quantized bulk polarization or corner-state evidence is found."
         elif v < 0.6 and edge_dom:
@@ -342,8 +350,10 @@ def main() -> None:
     pol_rows = read_csv(pol_path)
     nested_rows = read_csv(nested_path)
     open_rows = read_csv(open_path)
+    z2_path = Path("/workspace/topology_diagnosis_outputs/z2_debug/z2_debug_summary.csv")
+    qsh_rows = read_csv(z2_path) if z2_path.exists() else []
 
-    diag_rows = make_hoti_diagnosis(pol_rows, nested_rows, open_rows)
+    diag_rows = make_hoti_diagnosis(pol_rows, nested_rows, open_rows, qsh_rows=qsh_rows)
     write_csv(
         out_root / "hoti_diagnosis_summary.csv",
         diag_rows,
