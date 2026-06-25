@@ -342,6 +342,8 @@ def main() -> None:
             warning_parts.append(
                 "WARNING: largest gap center winding is not close to an integer. The largest-gap method is unreliable."
             )
+        if z2_fixed != z2_crossing:
+            warning_parts.append("WARNING: largest-gap fixed Z2 disagrees with stable reference-line crossing Z2.")
         if v in (0.8, 1.0) and z2_fixed == 0 and z2_crossing == 1 and z2_expected == 1:
             warning_parts.append(
                 "WARNING: largest-gap method still disagrees with both crossing Z2 and spin Chern parity. The largest-gap implementation or gap-center tracking is likely unreliable."
@@ -430,6 +432,8 @@ def main() -> None:
                 "v=1.0 shows the same pattern as v=0.8: crossing and spin Chern parity support QSH, "
                 "while largest-gap remains inconsistent."
             )
+        if abs(v - 1.0) < 1e-9 and int(round(cspin)) == 1 and z2_crossing == 1 and z2_fixed == 1:
+            verdict = "v=1.0 is also fully consistent with QSH indicators (spin Chern parity, crossing, and fixed largest-gap)."
 
         report_lines.extend(
             [
@@ -478,11 +482,13 @@ def main() -> None:
         ],
     )
 
-    solved = all(int(r["consistent_with_crossing"]) == 1 for r in fix_rows)
+    solved = all(int(r["consistent_with_crossing"]) == 1 for r in fix_rows if float(r["v"]) > 0.6)
+    solved_all = all(int(r["consistent_with_crossing"]) == 1 for r in fix_rows)
     report_lines.extend(
         [
             "6. Whether largest-gap/crossing contradiction is resolved",
-            f"- Resolved across v_list: {solved}.",
+            f"- Resolved for target QSH region v>0.6: {solved}.",
+            f"- Resolved across all tested v values: {solved_all}.",
             "",
         ]
     )
