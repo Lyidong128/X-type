@@ -1,0 +1,44 @@
+Topology diagnosis report
+=======================
+
+1) Hamiltonian source / function names
+- Reused existing model definitions from scripts.hoti_v_lt_0p6.run_hoti_v_lt_0p6:
+  h8_k(), h0_k(), h_soc_orbital(), unitary_part().
+- No physical Hamiltonian redefinition was introduced.
+
+2) Parameters
+- t=0.3, w=1.0, lm=0.1, occupied bands n_occ=4.
+
+3) finite open-open system size
+- Used sizes: [(10, 10)].
+
+4) v=0.5 in-gap-state type
+- closest-to-zero classification: edge_state
+
+5) v=0.5 weights
+- W_corner=0.310948, W_edge=0.664484, W_bulk=0.024568
+
+6) nested Wilson reliability
+- reliable(v=0.5)=False
+
+7) v=0.5 nested values
+- qxy=0.645512, p_y_nu_x=0.358689, p_x_nu_y=0.932335
+
+8) v=0.8 QSH invariants
+- C_spin=1.0, Z2=0, consistent=False
+
+9) v<0.6 SSH-like HOTI support
+- v=0.5 has edge-localized SSH-like boundary states, but no direct evidence of higher-order corner states.
+
+10) v>0.6 QSH support
+- QSH diagnosis at v=0.8 is inconclusive because spin Chern and Z2 are inconsistent.
+
+11) missing evidence / caveats
+- nested Wilson points remain unreliable when Wannier-sector gaps or sector overlaps fail thresholds.
+- open-open v=0.5 representative state is edge-dominant, not corner-dominant.
+
+Transition near v≈0.6:
+- The closing and reopening of the bulk gap near v≈0.6 indicates a topological phase transition.
+
+Warnings:
+- none

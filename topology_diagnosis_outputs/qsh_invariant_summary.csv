@@ -1,0 +1,7 @@
+v,bulk_gap,spin_conserved,commutator_norm_H_sz,C_up,C_down,C_spin,Z2,consistent,warning
+0.3,0.5999999999999999,1,0.0,1.0601848938211722e-16,8.834874115176436e-17,0.0,0,1,
+0.4,0.39999999999999936,1,0.0,4.3290883164364537e-16,-2.297067269945873e-16,0.0,0,1,
+0.5,0.1999999999999995,1,0.0,-1.5902773407317583e-16,2.9155084580082237e-16,0.0,0,1,
+0.6,1.1102230246251565e-16,1,0.0,-1.0601848938211722e-16,-2.8271597168564594e-16,0.0,0,1,
+0.8,0.21980621599375705,1,0.0,1.0,-0.9999999999999999,1.0,0,0,"WARNING: spin Chern and Z2 are inconsistent. Check occupied bands, gauge, Wilson loop implementation, or Hamiltonian spin block."
+1.0,0.186009279944177,1,0.0,1.0000000000000002,-1.0000000000000002,1.0,0,0,"WARNING: spin Chern and Z2 are inconsistent. Check occupied bands, gauge, Wilson loop implementation, or Hamiltonian spin block."
