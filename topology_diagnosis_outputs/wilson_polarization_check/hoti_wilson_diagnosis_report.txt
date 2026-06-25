@@ -1,0 +1,36 @@
+HOTI Wilson/polarization diagnosis report
+=======================================
+
+1) Does v < 0.6 show quantized Wilson-loop polarization p_x, p_y?
+  v=0.1: 2D_SSH_like_polarized (p_x=0.5000, p_y=0.5000)
+  v=0.2: 2D_SSH_like_polarized (p_x=0.5000, p_y=0.5000)
+  v=0.3: 2D_SSH_like_polarized (p_x=0.5000, p_y=0.5000)
+  v=0.4: 2D_SSH_like_polarized (p_x=0.5000, p_y=0.5000)
+  v=0.5: 2D_SSH_like_polarized (p_x=0.5000, p_y=0.5000)
+
+2) If p_x or p_y is near 0.5, what does it imply?
+- It indicates SSH-like boundary polarization tendency (dipole-like boundary topology), not a standalone HOTI proof.
+
+3) Are Wannier-sector gaps open?
+- Use `wannier_gap_x`, `wannier_gap_y` with threshold 0.05 from `wilson_polarization_summary.csv`.
+
+4) Is nested Wilson loop reliable?
+- reliable v values: none
+
+5) Does nested Wilson support qxy = 0.5?
+- reliable points with qxy≈0.5: none
+
+6) Do open-open finite-size results show corner states?
+- v=0.5 nearest |E| state: W_corner=0.310948, W_edge=0.664484, W_bulk=0.024568, classification=edge_state.
+
+7) What is v=0.5 finally?
+- v = 0.5 should be identified as a Z2-trivial SSH-like edge-localized phase rather than a confirmed higher-order topological insulator.
+- supporting indicators: C_spin(v=0.5)=0.0, Z2_crossing(v=0.5)=0.
+
+8) Why ordinary Wilson loop alone cannot prove HOTI?
+- Ordinary Wilson-loop polarization diagnoses dipole-like boundary topology, but HOTI requires consistent higher-order evidence: reliable nested Wilson (quadrupole-like indicator) and dominant corner-localized open-boundary states.
+
+9) Recommended naming for v < 0.6 in report/paper
+- The quantized Wilson-loop polarization suggests SSH-like boundary topology, but the absence of dominant corner localization prevents a HOTI assignment.
+
+Final label at v=0.5: SSH_like_edge_phase_not_HOTI.
