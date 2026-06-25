@@ -8,11 +8,11 @@ Z2 Wilson-loop debug report
 - C_spin(v=0.8)=1.0 (from spin block Chern).
 
 3. Wilson-center odd crossing at v=0.8
-- crossing counts (ref 0.45/0.50/0.55) = 2/0/0.
-- Z2_crossing(v=0.8)=0.
+- crossing counts (ref 0.45/0.50/0.55) = 45/45/45.
+- Z2_crossing(v=0.8)=1.
 
 4. crossing vs largest-gap method consistency
-- Z2_largest_gap(v=0.8)=1.
+- Z2_largest_gap(v=0.8)=0.
 - final_Z2(v=0.8)=unresolved.
 
 5. final_Z2 parity vs C_spin mod 2
