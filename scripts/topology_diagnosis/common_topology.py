@@ -5,9 +5,14 @@ from __future__ import annotations
 
 from itertools import product
 from pathlib import Path
+import sys
 
 import numpy as np
 from scipy.sparse.linalg import eigsh
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from scripts.hoti_v_lt_0p6.run_hoti_v_lt_0p6 import h0_k, h_soc_orbital, h8_k, unitary_part
 
