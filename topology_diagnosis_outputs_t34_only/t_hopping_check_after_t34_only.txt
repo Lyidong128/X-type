@@ -1,0 +1,20 @@
+t34-only hopping check
+======================
+t34 = 0.3
+
+Nonzero additional t hopping entries in orbital 4x4 block (0-based):
+  H_t[2,3] = (0.3+0j)
+  H_t[3,2] = (0.3+0j)
+
+Allowed entries: [(2, 3), (3, 2)]
+Unexpected nonzero entries: []
+Spinful extension check:
+  H_t_spinful = H_t ⊗ s0
+  up block nonzero: (2,3),(3,2)
+  dn block nonzero: (6,7),(7,6)
+  spin-flip present: False
+
+SSH(v,w) dimerization unchanged check:
+  nonzero SSH pairs remain 1-4 and 2-3 with intracell v and intercell w phases.
+
+CHECK_STATUS = PASS (only 3-4 additional t hopping exists).

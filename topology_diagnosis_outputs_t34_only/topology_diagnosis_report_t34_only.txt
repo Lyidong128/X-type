@@ -1,0 +1,13 @@
+Topological diagnosis report (t34-only)
+===================================
+
+1) Hamiltonian t34-only check: PASS
+2) bulk gap minimum located near v=1.000, gap=2.400635e-02.
+3) v<0.6 polarization at v=0.5: p_x=0.5050, p_y=0.5223.
+4) open-open at v=0.5: mean W_corner=0.3496, mean W_edge=0.6105 -> edge_state-dominant.
+5) nested Wilson at v=0.5: reliable=0, qxy=nan, supports_hoti=0.
+6) v<0.6 classification: mixed indicators, see panel data.
+7) transition near v≈0.6: NO clear gap closing at 0.6.
+8) v>0.6 representative (v=0.8): C_spin=0.000, Z2_crossing=1.
+9) z2-debug (v=0.8): Z2_final=0, QSH_supported=0.
+10) Compared with previous model (multiple t links), t34-only model removes non-3-4 extra hopping and can shift gap minima, edge-state counts, and Z2/HOTI diagnostics quantitatively.

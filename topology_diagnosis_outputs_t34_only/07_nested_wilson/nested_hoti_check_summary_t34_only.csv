@@ -1,0 +1,6 @@
+v,nested_allowed,nested_reliable,p_y_nu_x,p_x_nu_y,qxy,wannier_gap_x,wannier_gap_y,min_sector_overlap_x,min_sector_overlap_y,nested_supports_hoti,comment
+0.1,0,0,nan,nan,nan,0.009444016958928048,0.004112164659328066,0.0,0.0,0,nested_not_allowed_by_wannier_gap
+0.2,0,0,nan,nan,nan,0.0037141164954416217,0.005046701072660031,0.0,0.0,0,nested_not_allowed_by_wannier_gap
+0.3,0,0,nan,nan,nan,0.007379962986332811,0.017944077676820408,0.0,0.0,0,nested_not_allowed_by_wannier_gap
+0.4,0,0,nan,nan,nan,0.004679042284102097,0.016932375876910155,0.0,0.0,0,nested_not_allowed_by_wannier_gap
+0.5,0,0,nan,nan,nan,0.011173374415872295,0.004604269889509016,0.0,0.0,0,nested_not_allowed_by_wannier_gap

@@ -1,0 +1,4 @@
+v,C_spin,crossings_ref_0p45,crossings_ref_0p50,crossings_ref_0p55,Z2_crossing,comment
+0.5,1.6731042855615375e-16,88,91,99,1,crossing_differs_use_largest_gap_with_spin_chern
+0.8,7.951386703658793e-17,94,94,103,0,largest_gap_differs_use_crossing_with_spin_chern
+1.0,1.0,114,107,106,1,largest_gap_differs_use_crossing_with_spin_chern

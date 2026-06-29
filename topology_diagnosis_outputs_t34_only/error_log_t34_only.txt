@@ -1,0 +1,2 @@
+# t34-only error log
+[run_bulk_gap_t34_only.py] initial failure: ModuleNotFoundError: No module named 'scripts' (fixed by adding ROOT to sys.path in all t34-only run scripts).
