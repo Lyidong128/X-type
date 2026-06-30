@@ -240,12 +240,19 @@ def main() -> None:
             lines.append("9) Compared with model B, model C shows a broader QSH window in the scanned set.")
         else:
             lines.append("9) Compared with model B, model C shows similar QSH window width.")
+    elif b_on is not None and c_on is None:
+        lines.append("9) Compared with model B, model C shows a collapsed/disappeared QSH window in the scanned range.")
+    else:
+        lines.append("9) QSH-window comparison between model B and C is inconclusive from available files.")
 
     if small_p and nested_small:
         px, py = float(small_p["p_x"]), float(small_p["p_y"])
         rel = int(float(nested_small["nested_reliable"])) if str(nested_small["nested_reliable"]) != "" else 0
-        if abs(px - 0.5) < 0.05 and abs(py - 0.5) < 0.05 and rel == 0 and max_wc < 0.6:
-            lines.append("10) small-v region remains SSH-like polarized; nested Wilson is unreliable and no robust HOTI corner evidence appears.")
+        if abs(px - 0.5) < 0.05 and abs(py - 0.5) < 0.05 and rel == 0:
+            lines.append(
+                "10) small-v region remains SSH-like polarized; nested Wilson is unreliable, "
+                "and any corner-like finite-size localization is not robust HOTI evidence."
+            )
         else:
             lines.append("10) small-v region classification is mixed; no robust HOTI corner-state evidence in open-open weights.")
 
