@@ -1,0 +1,18 @@
+strict t34 + soc34-only model check
+===================================
+t34=0.3
+lambda=0.4
+
+Nonzero t entries:
+  H_t[2,3]=(0.3+0j)
+  H_t[3,2]=(0.3+0j)
+
+Nonzero SOC entries:
+  H_soc[2,3]=-0.4j
+  H_soc[3,2]=0.4j
+
+t34_only_ok=True
+soc34_only_ok=True
+spin extension: H_t⊗s0 and H_soc34⊗sz (no spin-flip hopping/SOC)
+SSH(v,w) remains only on (1,4) and (2,3) channels.
+CHECK_STATUS=PASS
