@@ -1,0 +1,7 @@
+v,crossing_number_ref_0p45,crossing_number_ref_0p50,crossing_number_ref_0p55,Z2_crossing_raw,Z2_from_spin_chern,Z2_final,consistent,warning
+0.8,94,94,103,0,0,0,1,
+0.9,93,96,100,0,1,1,0,"WARNING: Wilson crossing Z2 disagrees with spin Chern parity. Since spin is conserved, final Z2 follows C_spin mod 2."
+0.95,91,89,93,1,1,1,1,
+1.0,114,107,106,1,1,1,1,
+1.05,84,87,82,1,1,1,1,
+1.1,85,86,77,0,1,1,0,"WARNING: Wilson crossing Z2 disagrees with spin Chern parity. Since spin is conserved, final Z2 follows C_spin mod 2."

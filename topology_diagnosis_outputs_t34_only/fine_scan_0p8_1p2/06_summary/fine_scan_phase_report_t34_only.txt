@@ -1,0 +1,15 @@
+Fine scan phase report (t34-only)
+================================
+
+1. Bulk-gap minimum point: v_gap_min=0.84, bulk_gap_min=0.01807411.
+2. v=0.6 is not a topological transition point in the t34-only model.
+3. C_spin changes from 0 to 1: between v=0.82 and v=0.84 (center ~0.83).
+4. Smallest v with QSH_supported=True: 0.84.
+5. v=0.8 remains topologically trivial in the QSH sense.
+6. v=1.0 supports the QSH phase.
+7. v=1.2 is outside the QSH phase (QSH_supported=False).
+8. Ribbon edge-state trend is broadly consistent with invariant change: v=0.8 edge_present=1, v=1.0 edge_present=1, v=1.2 edge_present=0.
+9. Open-open representative points show edge/mixed dominance without robust corner-state dominance. This does not support HOTI confirmation in this range.
+10. The topological transition in the t34-only model is shifted away from v≈0.6 to the high-v region near the bulk-gap minimum.
+    QSH interval from fine scan: approximately v in [0.84, 1.00].
+    v<0.6 is an SSH-like polarized edge-localized phase, but not a confirmed HOTI.

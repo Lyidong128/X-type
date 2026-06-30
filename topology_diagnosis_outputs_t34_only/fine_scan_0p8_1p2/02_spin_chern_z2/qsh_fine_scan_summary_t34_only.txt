@@ -1,0 +1,7 @@
+nk_chern=61
+nk_z2=101
+spin_threshold=1e-08
+integer_threshold=0.001
+v_QSH_onset=0.84
+used_dense_scan=0
+scan_step=0.0200

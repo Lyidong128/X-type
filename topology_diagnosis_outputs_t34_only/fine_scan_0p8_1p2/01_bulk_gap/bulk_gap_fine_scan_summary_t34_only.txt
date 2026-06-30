@@ -1,0 +1,7 @@
+grid_nkx=151
+grid_nky=151
+v_gap_min=0.840000
+bulk_gap_min=0.0180741149
+estimated_transition_point=0.840000
+used_dense_scan=0
+scan_step=0.0200
