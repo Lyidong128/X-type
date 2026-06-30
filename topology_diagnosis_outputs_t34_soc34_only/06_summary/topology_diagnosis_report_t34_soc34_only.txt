@@ -1,0 +1,16 @@
+Topological diagnosis report for strict t34 + soc34-only model
+============================================================
+
+Model definition:
+H = H_SSH(v,w) + H_t34 + H_SOC34, with only 3-4 channel for both t and SOC.
+
+1) bulk-gap minimum at v=1.00, bulk_gap=0.00000000.
+2) v=0.6 is not a topological transition point in the t34-only model.
+3) v=0.8 remains topologically trivial in the QSH sense.
+4) v=1.0 does not satisfy QSH criterion in this strict model.
+5) v=1.2 is outside QSH support (QSH_supported=False).
+6) Model C shows no QSH interval in scanned v range.
+7) Model B (t34-only + full SOC) QSH interval from fine scan: approx [0.84, 1.00].
+8) Model A (full t + full SOC) QSH-supported points indicate interval roughly [0.80, 1.00] (available samples).
+9) Compared with model B, model C shows a collapsed/disappeared QSH window in the scanned range.
+10) small-v region remains SSH-like polarized; nested Wilson is unreliable, and any corner-like finite-size localization is not robust HOTI evidence.
