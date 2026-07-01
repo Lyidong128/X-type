@@ -206,13 +206,60 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--corner-size", type=int, default=2)
     p.add_argument("--edge-width", type=int, default=2)
     p.add_argument("--energy-window-floor", type=float, default=0.02)
-    p.add_argument("--window-gap-factor", type=float, default=0.40)
-    p.add_argument("--max-states-per-v", type=int, default=80)
+    p.add_argument("--window-gap-factor", type=float, default=0.22)
+    p.add_argument("--energy-window-max", type=float, default=0.12)
+    p.add_argument("--window-jump-ratio", type=float, default=6.0)
+    p.add_argument("--max-states-per-v", type=int, default=24)
     return p.parse_args()
 
 
 def parse_v_list(raw: str) -> list[float]:
     return [float(x.strip()) for x in raw.split(",") if x.strip()]
+
+
+def select_near_zero_states(
+    evals: np.ndarray,
+    bulk_gap: float,
+    floor: float,
+    gap_factor: float,
+    window_max: float,
+    max_states: int,
+    jump_ratio: float,
+) -> tuple[np.ndarray, float, float, float, str]:
+    abs_e = np.abs(np.asarray(evals, dtype=float))
+    order = np.argsort(abs_e)
+    abs_sorted = abs_e[order]
+    if abs_sorted.size == 0:
+        return np.array([], dtype=int), float(floor), float(floor), float(floor), "empty"
+
+    raw_window = max(float(floor), float(gap_factor) * max(float(bulk_gap), 1e-6))
+    cap_window = max(float(floor), min(raw_window, float(window_max)))
+    nin = int(np.searchsorted(abs_sorted, cap_window, side="right"))
+    fallback_used = nin == 0
+    mode = "window"
+    if fallback_used:
+        # No genuine near-zero state under current window: keep two closest for a stable visualization.
+        nin = min(2, abs_sorted.size)
+        mode = "fallback_two_closest"
+    nin = min(max(2, nin), int(max_states), abs_sorted.size)
+
+    scan_n = min(abs_sorted.size, max(12, int(max_states) * 2))
+    if (not fallback_used) and scan_n >= 6:
+        diffs = np.diff(abs_sorted[:scan_n])
+        if diffs.size > 0:
+            ref = float(np.median(diffs[: max(3, min(12, diffs.size))]))
+            if ref > 1e-12:
+                jump_idx = np.where(diffs > float(jump_ratio) * ref)[0]
+                if jump_idx.size > 0:
+                    jump_cut = int(jump_idx[0] + 1)
+                    if jump_cut >= 2:
+                        nin = min(nin, jump_cut)
+                        mode = "window_with_jump_cut"
+
+    idxs = np.sort(order[:nin].astype(int))
+    eff_window = cap_window if mode == "fallback_two_closest" else float(abs_sorted[nin - 1])
+    eff_window = max(float(floor), float(eff_window))
+    return idxs, float(raw_window), float(cap_window), float(eff_window), mode
 
 
 def plot_bulk_band(out_png: Path, v: float, title: str, h8_func, nseg: int) -> None:
@@ -307,16 +354,17 @@ def run_one_model(
         )
 
         bulk_gap, _, _ = bulk_gap_func(v)
-        ewin = max(args.energy_window_floor, args.window_gap_factor * max(bulk_gap, 1e-6))
         h_obc = open_open_builder(v)
         evals, vecs = diagonalize_open_open(h_obc, near_k=args.near_k)
-        idxs = np.where(np.abs(evals) <= ewin)[0]
-        if idxs.size == 0:
-            idxs = np.argsort(np.abs(evals))[:2]
-        if idxs.size > args.max_states_per_v:
-            order = np.argsort(np.abs(evals[idxs]))
-            idxs = idxs[order[: args.max_states_per_v]]
-        idxs = np.array(sorted(set(int(i) for i in idxs)), dtype=int)
+        idxs, ewin_raw, ewin_cap, ewin, select_mode = select_near_zero_states(
+            evals=evals,
+            bulk_gap=bulk_gap,
+            floor=args.energy_window_floor,
+            gap_factor=args.window_gap_factor,
+            window_max=args.energy_window_max,
+            max_states=args.max_states_per_v,
+            jump_ratio=args.window_jump_ratio,
+        )
 
         rho_sum = np.zeros((args.ly, args.lx), dtype=float)
         for idx in idxs:
@@ -329,6 +377,7 @@ def run_one_model(
                     "energy": float(evals[idx]),
                     "abs_energy": float(abs(evals[idx])),
                     "energy_window": float(ewin),
+                    "selection_mode": select_mode,
                 }
             )
         rho_sum = rho_sum / max(np.sum(rho_sum), 1e-15)
@@ -338,6 +387,8 @@ def run_one_model(
                 "model": spec.key,
                 "v": float(v),
                 "bulk_gap": float(bulk_gap),
+                "energy_window_raw": float(ewin_raw),
+                "energy_window_cap": float(ewin_cap),
                 "energy_window": float(ewin),
                 "num_states_summed": int(idxs.size),
                 "min_abs_energy_in_window": float(np.min(np.abs(evals[idxs]))),
@@ -345,6 +396,7 @@ def run_one_model(
                 "W_corner_sum": float(wc),
                 "W_edge_sum": float(we),
                 "W_bulk_sum": float(wb),
+                "selection_mode": select_mode,
             }
         )
 
@@ -376,7 +428,10 @@ def run_one_model(
         fig.tight_layout()
         fig.savefig(out_wf / f"wf_near_zero_sum_v{v:.1f}_{spec.key}.png", dpi=180)
         plt.close(fig)
-        print(f"[{spec.key}] v={v:.1f} gap={bulk_gap:.5f} window={ewin:.5f} states={idxs.size}")
+        print(
+            f"[{spec.key}] v={v:.1f} gap={bulk_gap:.5f} "
+            f"window_raw={ewin_raw:.5f} window_eff={ewin:.5f} states={idxs.size} mode={select_mode}"
+        )
 
     write_csv(
         out / f"summary_{spec.key}.csv",
@@ -385,6 +440,8 @@ def run_one_model(
             "model",
             "v",
             "bulk_gap",
+            "energy_window_raw",
+            "energy_window_cap",
             "energy_window",
             "num_states_summed",
             "min_abs_energy_in_window",
@@ -392,12 +449,13 @@ def run_one_model(
             "W_corner_sum",
             "W_edge_sum",
             "W_bulk_sum",
+            "selection_mode",
         ],
     )
     write_csv(
         out / f"obc_marked_states_{spec.key}.csv",
         marked_rows,
-        ["model", "v", "state_index", "energy", "abs_energy", "energy_window"],
+        ["model", "v", "state_index", "energy", "abs_energy", "energy_window", "selection_mode"],
     )
 
 
