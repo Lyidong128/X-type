@@ -206,10 +206,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--corner-size", type=int, default=2)
     p.add_argument("--edge-width", type=int, default=2)
     p.add_argument("--energy-window-floor", type=float, default=0.02)
-    p.add_argument("--window-gap-factor", type=float, default=0.22)
-    p.add_argument("--energy-window-max", type=float, default=0.12)
-    p.add_argument("--window-jump-ratio", type=float, default=6.0)
-    p.add_argument("--max-states-per-v", type=int, default=24)
+    p.add_argument("--window-gap-factor", type=float, default=0.32)
+    p.add_argument("--energy-window-max", type=float, default=0.20)
+    p.add_argument("--window-jump-ratio", type=float, default=10.0)
+    p.add_argument("--max-states-per-v", type=int, default=48)
     return p.parse_args()
 
 
