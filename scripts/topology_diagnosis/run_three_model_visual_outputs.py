@@ -34,7 +34,6 @@ from scripts.topology_diagnosis.t34_soc34_only_common import (  # noqa: E402
     ModelParams as T34Soc34Params,
     build_open_open_hamiltonian as build_open_open_c,
     build_ribbon_xopen_full as build_ribbon_c,
-    compute_bulk_gap as compute_bulk_gap_c,
     h8_t34_soc34_k,
 )
 
@@ -75,13 +74,13 @@ def h8_full_t_full_soc(kx: float, ky: float, v: float, t: float, w: float, lm: f
     return np.kron(h0_full_t_k(kx, ky, v=v, t=t, w=w), s0) + np.kron(h_soc_full_orbital(lm), sz)
 
 
-def compute_bulk_gap_a(v: float, t: float, w: float, lm: float, nk: int, n_occ: int = 4) -> tuple[float, float, float]:
+def compute_bulk_gap_from_h8(v: float, h8_func, nk: int, n_occ: int = 4) -> tuple[float, float, float]:
     kgrid = np.linspace(-np.pi, np.pi, nk, endpoint=False)
     min_gap = float("inf")
     min_kx, min_ky = 0.0, 0.0
     for kx in kgrid:
         for ky in kgrid:
-            evals = np.real(np.linalg.eigvalsh(h8_full_t_full_soc(float(kx), float(ky), v=v, t=t, w=w, lm=lm)))
+            evals = np.real(np.linalg.eigvalsh(h8_func(float(kx), float(ky), v)))
             gap = float(evals[n_occ] - evals[n_occ - 1])
             if gap < min_gap:
                 min_gap = gap
@@ -188,6 +187,21 @@ class ModelSpec:
     title: str
 
 
+def add_uniform_fm_term(h: np.ndarray, fm_out: float, fm_in: float) -> np.ndarray:
+    if abs(fm_out) < 1e-15 and abs(fm_in) < 1e-15:
+        return h
+    n = h.shape[0]
+    if n % 8 != 0:
+        raise ValueError(f"Hamiltonian size {n} is not divisible by 8.")
+    n_cells = n // 8
+    sx = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=complex)
+    sz = np.array([[1.0, 0.0], [0.0, -1.0]], dtype=complex)
+    fm_spin = float(fm_out) * sz + float(fm_in) * sx
+    fm8 = np.kron(np.eye(4, dtype=complex), fm_spin)
+    fm = np.kron(np.eye(n_cells, dtype=complex), fm8)
+    return 0.5 * ((h + fm) + (h + fm).conj().T)
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Generate A/B/C visuals (bulk/ribbon/OBC-mark/WF-sum).")
     p.add_argument("--output-root", default="/workspace/topology_diagnosis_outputs_three_models_visual")
@@ -195,6 +209,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--t", type=float, default=0.3)
     p.add_argument("--w", type=float, default=1.0)
     p.add_argument("--lm", type=float, default=0.1)
+    p.add_argument("--fm-out", type=float, default=0.0, help="Out-of-plane FM exchange (Mz * sz).")
+    p.add_argument("--fm-in", type=float, default=0.0, help="In-plane FM exchange (Mx * sx).")
     p.add_argument("--bulk-nseg", type=int, default=180)
     p.add_argument("--bulk-gap-nk", type=int, default=81)
     p.add_argument("--ribbon-nx", type=int, default=40)
@@ -339,14 +355,14 @@ def run_one_model(
         plot_bulk_band(
             out_png=out_bulk / f"bulk_band_v{token(v)}_{spec.key}.png",
             v=v,
-            title=spec.title,
+            title=f"{spec.title} | FM(out={args.fm_out:.3f}, in={args.fm_in:.3f})",
             h8_func=h8_func,
             nseg=args.bulk_nseg,
         )
         plot_ribbon(
             out_png=out_ribbon / f"ribbon_v{token(v)}_{spec.key}.png",
             v=v,
-            title=spec.title,
+            title=f"{spec.title} | FM(out={args.fm_out:.3f}, in={args.fm_in:.3f})",
             ribbon_builder=ribbon_builder,
             nx=args.ribbon_nx,
             nk=args.ribbon_nk,
@@ -467,15 +483,39 @@ def main() -> None:
     p_b = T34Params(t34=args.t, w=args.w, lm=args.lm)
     p_c = T34Soc34Params(t34=args.t, w=args.w, lm=args.lm)
 
+    h8_a = lambda kx, ky, v: add_uniform_fm_term(  # noqa: E731
+        h8_full_t_full_soc(kx, ky, v=v, t=args.t, w=args.w, lm=args.lm),
+        fm_out=args.fm_out,
+        fm_in=args.fm_in,
+    )
+    h8_b = lambda kx, ky, v: add_uniform_fm_term(  # noqa: E731
+        h8_t34_k(kx, ky, v=v, params=p_b),
+        fm_out=args.fm_out,
+        fm_in=args.fm_in,
+    )
+    h8_c = lambda kx, ky, v: add_uniform_fm_term(  # noqa: E731
+        h8_t34_soc34_k(kx, ky, v=v, params=p_c),
+        fm_out=args.fm_out,
+        fm_in=args.fm_in,
+    )
+
     run_one_model(
         base=out_root,
         spec=ModelSpec("model_a_full_t_full_soc", "Model A (full t + full SOC)"),
         v_list=v_list,
         args=args,
-        h8_func=lambda kx, ky, v: h8_full_t_full_soc(kx, ky, v=v, t=args.t, w=args.w, lm=args.lm),
-        bulk_gap_func=lambda v: compute_bulk_gap_a(v=v, t=args.t, w=args.w, lm=args.lm, nk=args.bulk_gap_nk, n_occ=4),
-        ribbon_builder=lambda ky, nx, v: build_ribbon_a(ky, nx=nx, v=v, t=args.t, w=args.w, lm=args.lm),
-        open_open_builder=lambda v: build_open_open_a(lx=args.lx, ly=args.ly, v=v, t=args.t, w=args.w, lm=args.lm),
+        h8_func=h8_a,
+        bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_a, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
+            build_ribbon_a(ky, nx=nx, v=v, t=args.t, w=args.w, lm=args.lm),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
+        open_open_builder=lambda v: add_uniform_fm_term(
+            build_open_open_a(lx=args.lx, ly=args.ly, v=v, t=args.t, w=args.w, lm=args.lm),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
     )
 
     run_one_model(
@@ -483,10 +523,18 @@ def main() -> None:
         spec=ModelSpec("model_b_t34_full_soc", "Model B (t34-only + full SOC)"),
         v_list=v_list,
         args=args,
-        h8_func=lambda kx, ky, v: h8_t34_k(kx, ky, v=v, params=p_b),
-        bulk_gap_func=lambda v: compute_bulk_gap_b(v=v, params=p_b, nk=args.bulk_gap_nk, n_occ=4),
-        ribbon_builder=lambda ky, nx, v: build_ribbon_b(ky=ky, nx=nx, v=v, params=p_b),
-        open_open_builder=lambda v: build_open_open_b(lx=args.lx, ly=args.ly, v=v, params=p_b, termination="A"),
+        h8_func=h8_b,
+        bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_b, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
+            build_ribbon_b(ky=ky, nx=nx, v=v, params=p_b),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
+        open_open_builder=lambda v: add_uniform_fm_term(
+            build_open_open_b(lx=args.lx, ly=args.ly, v=v, params=p_b, termination="A"),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
     )
 
     run_one_model(
@@ -494,10 +542,18 @@ def main() -> None:
         spec=ModelSpec("model_c_t34_soc34_only", "Model C (t34-only + SOC34-only)"),
         v_list=v_list,
         args=args,
-        h8_func=lambda kx, ky, v: h8_t34_soc34_k(kx, ky, v=v, params=p_c),
-        bulk_gap_func=lambda v: compute_bulk_gap_c(v=v, params=p_c, nk=args.bulk_gap_nk, n_occ=4),
-        ribbon_builder=lambda ky, nx, v: build_ribbon_c(ky=ky, nx=nx, v=v, params=p_c),
-        open_open_builder=lambda v: build_open_open_c(lx=args.lx, ly=args.ly, v=v, params=p_c, termination="A"),
+        h8_func=h8_c,
+        bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_c, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
+            build_ribbon_c(ky=ky, nx=nx, v=v, params=p_c),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
+        open_open_builder=lambda v: add_uniform_fm_term(
+            build_open_open_c(lx=args.lx, ly=args.ly, v=v, params=p_c, termination="A"),
+            fm_out=args.fm_out,
+            fm_in=args.fm_in,
+        ),
     )
 
     (out_root / "README.txt").write_text(
@@ -506,6 +562,7 @@ def main() -> None:
                 "three-model visual outputs",
                 f"v_list={','.join(f'{v:.3f}' for v in v_list)}",
                 f"params: t={args.t}, w={args.w}, lm={args.lm}",
+                f"ferromagnetism: fm_out={args.fm_out}, fm_in={args.fm_in}",
                 "Each model directory contains:",
                 "  01_bulk_band/",
                 "  02_ribbon/",
