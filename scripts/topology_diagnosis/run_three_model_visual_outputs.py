@@ -354,20 +354,42 @@ def plot_bulk_band(out_png: Path, v: float, title: str, h8_func, nseg: int) -> N
     ax.set_ylabel("Energy")
     ax.set_title(f"{title} | bulk band (spin-colored) | v={v:.1f}")
     ax.grid(alpha=0.2)
-    legend_handles = [
-        Line2D([0], [0], color=blend_spin_rgb(1.0), lw=2.0, label="spin-up dominant"),
-        Line2D([0], [0], color=blend_spin_rgb(0.0), lw=2.0, label="spin-down dominant"),
-    ]
+    legend_handles = spin_legend_handles()
     ax.legend(handles=legend_handles, loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(out_png, dpi=180)
     plt.close(fig)
 
 
-def plot_ribbon(out_png: Path, v: float, title: str, ribbon_builder, nx: int, nk: int, edge_cells: int) -> None:
+def spin_legend_handles() -> list[Line2D]:
+    return [
+        Line2D([0], [0], color=blend_spin_rgb(1.0), lw=2.0, label="spin-up dominant"),
+        Line2D([0], [0], color=blend_spin_rgb(0.0), lw=2.0, label="spin-down dominant"),
+    ]
+
+
+def state_edge_weight(vec: np.ndarray, lx: int, ly: int, edge_mask: np.ndarray) -> float:
+    rho = cell_density(vec, lx=lx, ly=ly)
+    total = float(np.sum(rho))
+    if total < 1e-15:
+        return 0.0
+    return float(np.sum(rho[edge_mask]) / total)
+
+
+def plot_ribbon(
+    out_png: Path,
+    v: float,
+    title: str,
+    ribbon_builder,
+    nx: int,
+    nk: int,
+    edge_cells: int,
+    edge_threshold: float = 0.35,
+) -> None:
     ky_vals = np.linspace(-np.pi, np.pi, nk, endpoint=False)
     evals_all = []
     edge_w_all = []
+    spin_w_all = []
     for ky in ky_vals:
         h = ribbon_builder(float(ky), nx, v)
         evals, vecs = np.linalg.eigh(h)
@@ -375,21 +397,67 @@ def plot_ribbon(out_png: Path, v: float, title: str, ribbon_builder, nx: int, nk
         prob = np.abs(vecs) ** 2
         prob_cell = prob.reshape(nx, 8, prob.shape[1]).sum(axis=1)
         ew = prob_cell[:edge_cells, :].sum(axis=0) + prob_cell[-edge_cells:, :].sum(axis=0)
+        sw = np.array([spin_up_weight(vecs[:, j]) for j in range(vecs.shape[1])], dtype=float)
         evals_all.append(evals)
         edge_w_all.append(ew)
+        spin_w_all.append(sw)
     evals_all = np.array(evals_all, dtype=float)
     edge_w_all = np.array(edge_w_all, dtype=float)
-    fig, ax = plt.subplots(figsize=(6.9, 4.7))
+    spin_w_all = np.array(spin_w_all, dtype=float)
+
     x = np.repeat(ky_vals / np.pi, evals_all.shape[1])
     y = evals_all.reshape(-1)
-    c = edge_w_all.reshape(-1)
-    sc = ax.scatter(x, y, c=c, s=4.5, cmap="viridis", edgecolors="none", vmin=0.0, vmax=1.0)
+    edge_w = edge_w_all.reshape(-1)
+    spin_w = spin_w_all.reshape(-1)
+    edge_mask = edge_w >= edge_threshold
+
+    fig, ax = plt.subplots(figsize=(6.9, 4.7))
+    if np.any(~edge_mask):
+        ax.scatter(
+            x[~edge_mask],
+            y[~edge_mask],
+            s=2.5,
+            color="#c8c8c8",
+            alpha=0.35,
+            edgecolors="none",
+            label="bulk / non-edge",
+        )
+    if np.any(edge_mask):
+        edge_colors = [blend_spin_rgb(w) for w in spin_w[edge_mask]]
+        edge_sizes = 3.5 + 14.0 * edge_w[edge_mask]
+        ax.scatter(
+            x[edge_mask],
+            y[edge_mask],
+            c=edge_colors,
+            s=edge_sizes,
+            alpha=0.9,
+            edgecolors="none",
+            label="edge-localized",
+        )
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
     ax.set_xlabel(r"$k_y/\pi$")
     ax.set_ylabel("Energy")
-    ax.set_title(f"{title} | ribbon x-open | v={v:.1f}")
+    ax.set_title(f"{title} | ribbon x-open (edge spin-colored) | v={v:.1f}")
     ax.grid(alpha=0.2)
-    fig.colorbar(sc, ax=ax, label="edge weight")
+    bulk_handle = Line2D(
+        [0],
+        [0],
+        marker="o",
+        color="w",
+        markerfacecolor="#c8c8c8",
+        markersize=6,
+        label="bulk / non-edge",
+    )
+    edge_handle = Line2D(
+        [0],
+        [0],
+        marker="o",
+        color="w",
+        markerfacecolor="0.45",
+        markersize=8,
+        label="edge-localized (size ~ weight)",
+    )
+    ax.legend(handles=spin_legend_handles() + [bulk_handle, edge_handle], loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(out_png, dpi=180)
     plt.close(fig)
@@ -482,16 +550,58 @@ def run_one_model(
 
         fig, ax = plt.subplots(figsize=(6.8, 4.4))
         x = np.arange(evals.size)
-        ax.plot(x, evals, marker="o", linestyle="none", markersize=2.4, color="#2a66b8", alpha=0.75, label="all states")
-        ax.scatter(idxs, evals[idxs], s=26, color="red", zorder=5, label="states used in WF sum")
+        edge_w_states = np.array(
+            [state_edge_weight(vecs[:, i], lx=args.lx, ly=args.ly, edge_mask=edge) for i in range(evals.size)],
+            dtype=float,
+        )
+        spin_w_states = np.array([spin_up_weight(vecs[:, i]) for i in range(evals.size)], dtype=float)
+        bulk_mask = edge_w_states < 0.35
+        edge_state_mask = ~bulk_mask
+        if np.any(bulk_mask):
+            ax.scatter(
+                x[bulk_mask],
+                evals[bulk_mask],
+                s=10,
+                color="#c8c8c8",
+                alpha=0.45,
+                edgecolors="none",
+                label="bulk / non-edge",
+            )
+        if np.any(edge_state_mask):
+            edge_colors = [blend_spin_rgb(w) for w in spin_w_states[edge_state_mask]]
+            edge_sizes = 14 + 40 * edge_w_states[edge_state_mask]
+            ax.scatter(
+                x[edge_state_mask],
+                evals[edge_state_mask],
+                s=edge_sizes,
+                c=edge_colors,
+                alpha=0.9,
+                edgecolors="none",
+                label="edge-localized",
+            )
+        marked_set = set(int(i) for i in idxs)
+        marked_only = np.array([i for i in range(evals.size) if i in marked_set and i not in set(x[edge_state_mask])])
+        if marked_only.size:
+            marked_colors = [blend_spin_rgb(spin_w_states[i]) for i in marked_only]
+            ax.scatter(
+                marked_only,
+                evals[marked_only],
+                s=30,
+                c=marked_colors,
+                marker="s",
+                linewidths=0.8,
+                edgecolors="black",
+                zorder=6,
+                label="WF-sum (non-edge)",
+            )
         ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
         ax.axhline(ewin, color="gray", linestyle=":", linewidth=0.8)
         ax.axhline(-ewin, color="gray", linestyle=":", linewidth=0.8)
         ax.set_xlabel("state index")
         ax.set_ylabel("energy")
-        ax.set_title(f"{spec.title} | OBC E-index (red = WF-sum states) | v={v:.1f}")
+        ax.set_title(f"{spec.title} | OBC E-index (edge spin-colored) | v={v:.1f}")
         ax.grid(alpha=0.22)
-        ax.legend(loc="best", fontsize=8)
+        ax.legend(handles=spin_legend_handles(), loc="best", fontsize=8)
         fig.tight_layout()
         fig.savefig(out_obc / f"open_open_spectrum_mark_sum_v{token(v)}_{spec.key}.png", dpi=180)
         plt.close(fig)
@@ -629,8 +739,8 @@ def main() -> None:
                 f"ferromagnetism: fm_out={args.fm_out}, fm_in={args.fm_in}",
                 "Each model directory contains:",
                 "  01_bulk_band/ (red=spin-up dominant, blue=spin-down dominant)",
-                "  02_ribbon/",
-                "  03_obc_marked/ (red points = states used in WF summation)",
+                "  02_ribbon/ (edge states: red=spin-up, blue=spin-down)",
+                "  03_obc_marked/ (edge states spin-colored by dominant spin)",
                 "  04_wf_sum/",
                 "  summary_*.csv and obc_marked_states_*.csv",
             ]
