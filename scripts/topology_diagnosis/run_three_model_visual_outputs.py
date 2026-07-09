@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import eigsh
@@ -278,23 +279,86 @@ def select_near_zero_states(
     return idxs, float(raw_window), float(cap_window), float(eff_window), mode
 
 
+def spin_up_weight(vec: np.ndarray) -> float:
+    prob = np.abs(vec) ** 2
+    total = float(np.sum(prob))
+    if total < 1e-15:
+        return 0.5
+    return float(np.sum(prob[0::2]) / total)
+
+
+def blend_spin_rgb(w_up: float) -> tuple[float, float, float]:
+    w_up = float(min(max(w_up, 0.0), 1.0))
+    w_dn = 1.0 - w_up
+    up_rgb = (0.839, 0.153, 0.157)  # red
+    dn_rgb = (0.122, 0.467, 0.706)  # blue
+    return tuple(w_up * up_rgb[i] + w_dn * dn_rgb[i] for i in range(3))
+
+
+def track_bulk_bands_spin(
+    evals_list: list[np.ndarray],
+    evecs_list: list[np.ndarray],
+) -> tuple[np.ndarray, np.ndarray]:
+    n_k = len(evals_list)
+    n_b = int(evals_list[0].size)
+    tracked_e = np.zeros((n_k, n_b), dtype=float)
+    tracked_wup = np.zeros((n_k, n_b), dtype=float)
+
+    order = list(range(n_b))
+    tracked_e[0] = evals_list[0][order]
+    for b, j in enumerate(order):
+        tracked_wup[0, b] = spin_up_weight(evecs_list[0][:, j])
+    prev_vecs = evecs_list[0][:, order]
+
+    for ik in range(1, n_k):
+        overlaps = np.abs(prev_vecs.conj().T @ evecs_list[ik])
+        used: set[int] = set()
+        order = []
+        for b in range(n_b):
+            j_best = max((j for j in range(n_b) if j not in used), key=lambda j: overlaps[b, j])
+            order.append(j_best)
+            used.add(j_best)
+        for b, j in enumerate(order):
+            tracked_e[ik, b] = float(evals_list[ik][j])
+            tracked_wup[ik, b] = spin_up_weight(evecs_list[ik][:, j])
+        prev_vecs = evecs_list[ik][:, order]
+    return tracked_e, tracked_wup
+
+
 def plot_bulk_band(out_png: Path, v: float, title: str, h8_func, nseg: int) -> None:
     kpts, xcoords, ticks, labels = build_high_symmetry_path(nseg=nseg)
-    bands = []
+    evals_list: list[np.ndarray] = []
+    evecs_list: list[np.ndarray] = []
     for k in kpts:
-        bands.append(np.real(np.linalg.eigvalsh(h8_func(float(k[0]), float(k[1]), v))))
-    bands = np.array(bands, dtype=float)
+        evals, evecs = np.linalg.eigh(h8_func(float(k[0]), float(k[1]), v))
+        evals_list.append(np.real(evals))
+        evecs_list.append(evecs)
+    bands, spin_up = track_bulk_bands_spin(evals_list=evals_list, evecs_list=evecs_list)
+
     fig, ax = plt.subplots(figsize=(7.1, 4.8))
-    for i in range(bands.shape[1]):
-        ax.plot(xcoords, bands[:, i], color="tab:blue", linewidth=0.9)
+    n_k, n_b = bands.shape
+    for b in range(n_b):
+        for ik in range(n_k - 1):
+            w_up = 0.5 * (spin_up[ik, b] + spin_up[ik + 1, b])
+            ax.plot(
+                xcoords[ik : ik + 2],
+                bands[ik : ik + 2, b],
+                color=blend_spin_rgb(w_up),
+                linewidth=1.0,
+            )
     for x in ticks:
         ax.axvline(x, color="gray", linestyle="--", linewidth=0.7, alpha=0.65)
     ax.axhline(0.0, color="black", linestyle=":", linewidth=0.8)
     ax.set_xticks(ticks)
     ax.set_xticklabels(labels)
     ax.set_ylabel("Energy")
-    ax.set_title(f"{title} | bulk band | v={v:.1f}")
+    ax.set_title(f"{title} | bulk band (spin-colored) | v={v:.1f}")
     ax.grid(alpha=0.2)
+    legend_handles = [
+        Line2D([0], [0], color=blend_spin_rgb(1.0), lw=2.0, label="spin-up dominant"),
+        Line2D([0], [0], color=blend_spin_rgb(0.0), lw=2.0, label="spin-down dominant"),
+    ]
+    ax.legend(handles=legend_handles, loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(out_png, dpi=180)
     plt.close(fig)
@@ -564,7 +628,7 @@ def main() -> None:
                 f"params: t={args.t}, w={args.w}, lm={args.lm}",
                 f"ferromagnetism: fm_out={args.fm_out}, fm_in={args.fm_in}",
                 "Each model directory contains:",
-                "  01_bulk_band/",
+                "  01_bulk_band/ (red=spin-up dominant, blue=spin-down dominant)",
                 "  02_ribbon/",
                 "  03_obc_marked/ (red points = states used in WF summation)",
                 "  04_wf_sum/",
