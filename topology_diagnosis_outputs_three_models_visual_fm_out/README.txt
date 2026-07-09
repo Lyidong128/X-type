@@ -4,7 +4,7 @@ params: t=0.3, w=1.0, lm=0.1
 ferromagnetism: fm_out=0.1, fm_in=0.0
 Each model directory contains:
   01_bulk_band/ (red=spin-up dominant, blue=spin-down dominant)
-  02_ribbon/ (edge states: red=spin-up, blue=spin-down)
+  02_ribbon/ (red=spin-up lines, blue=spin-down lines)
   03_obc_marked/ (edge states spin-colored by dominant spin)
   04_wf_sum/
   summary_*.csv and obc_marked_states_*.csv

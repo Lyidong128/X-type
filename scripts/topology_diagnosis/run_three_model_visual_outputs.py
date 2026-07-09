@@ -22,10 +22,13 @@ from scripts.topology_diagnosis.t34_only_common import (  # noqa: E402
     ModelParams as T34Params,
     build_high_symmetry_path,
     build_open_open_hamiltonian as build_open_open_b,
-    build_ribbon_xopen_full as build_ribbon_b,
+    build_ribbon_xopen_full as build_ribbon_b_full,
+    build_ribbon_xopen_spin as build_ribbon_b_spin,
     compute_bulk_gap as compute_bulk_gap_b,
     ensure_dir,
     h8_t34_k,
+    h_soc_orbital,
+    h_t34_orbital,
     region_masks,
     state_weights_2d,
     token,
@@ -34,8 +37,10 @@ from scripts.topology_diagnosis.t34_only_common import (  # noqa: E402
 from scripts.topology_diagnosis.t34_soc34_only_common import (  # noqa: E402
     ModelParams as T34Soc34Params,
     build_open_open_hamiltonian as build_open_open_c,
-    build_ribbon_xopen_full as build_ribbon_c,
+    build_ribbon_xopen_full as build_ribbon_c_full,
     h8_t34_soc34_k,
+    h_soc34_orbital,
+    h_t34_orbital as h_t34_orbital_c,
 )
 
 
@@ -87,6 +92,84 @@ def compute_bulk_gap_from_h8(v: float, h8_func, nk: int, n_occ: int = 4) -> tupl
                 min_gap = gap
                 min_kx, min_ky = float(kx), float(ky)
     return float(min_gap), float(min_kx), float(min_ky)
+
+
+SPIN_UP_COLOR = "#d62728"
+SPIN_DN_COLOR = "#1f77b4"
+
+
+def add_fm_out_to_spin_ribbon(h: np.ndarray, nx: int, spin_sign: int, fm_out: float) -> np.ndarray:
+    if abs(fm_out) < 1e-15:
+        return h
+    shift = float(spin_sign) * float(fm_out) * np.eye(4, dtype=complex)
+    fm = np.kron(np.eye(nx, dtype=complex), shift)
+    h2 = h + fm
+    return 0.5 * (h2 + h2.conj().T)
+
+
+def build_ribbon_a_spin(
+    ky: float,
+    nx: int,
+    v: float,
+    t: float,
+    w: float,
+    lm: float,
+    spin_sign: int,
+    fm_out: float = 0.0,
+) -> np.ndarray:
+    h = np.zeros((4 * nx, 4 * nx), dtype=complex)
+    h0 = np.zeros((4, 4), dtype=complex)
+    h0[0, 1] = t
+    h0[0, 2] = t
+    h0[0, 3] = v
+    h0[1, 0] = t
+    h0[1, 2] = v + w * np.exp(-1j * ky)
+    h0[1, 3] = t
+    h0[2, 0] = t
+    h0[2, 1] = v + w * np.exp(1j * ky)
+    h0[2, 3] = t
+    h0[3, 0] = v
+    h0[3, 1] = t
+    h0[3, 2] = t
+    onsite = h0 + float(spin_sign) * h_soc_full_orbital(lm)
+    tx = np.zeros((4, 4), dtype=complex)
+    tx[0, 3] = w
+    for x in range(nx):
+        s = x * 4
+        h[s : s + 4, s : s + 4] += onsite
+        if x > 0:
+            p = (x - 1) * 4
+            h[s : s + 4, p : p + 4] += tx
+            h[p : p + 4, s : s + 4] += tx.conj().T
+    return add_fm_out_to_spin_ribbon(0.5 * (h + h.conj().T), nx=nx, spin_sign=spin_sign, fm_out=fm_out)
+
+
+def build_ribbon_c_spin(
+    ky: float,
+    nx: int,
+    v: float,
+    params: T34Soc34Params,
+    spin_sign: int,
+    fm_out: float = 0.0,
+) -> np.ndarray:
+    h = np.zeros((4 * nx, 4 * nx), dtype=complex)
+    h0 = np.zeros((4, 4), dtype=complex)
+    h0[0, 3] = v
+    h0[3, 0] = v
+    h0[1, 2] = v + params.w * np.exp(-1j * ky)
+    h0[2, 1] = v + params.w * np.exp(1j * ky)
+    h0 += h_t34_orbital_c(params.t34)
+    onsite = h0 + float(spin_sign) * h_soc34_orbital(params.lm)
+    tx = np.zeros((4, 4), dtype=complex)
+    tx[0, 3] = params.w
+    for x in range(nx):
+        s = x * 4
+        h[s : s + 4, s : s + 4] += onsite
+        if x > 0:
+            p = (x - 1) * 4
+            h[s : s + 4, p : p + 4] += tx
+            h[p : p + 4, s : s + 4] += tx.conj().T
+    return add_fm_out_to_spin_ribbon(0.5 * (h + h.conj().T), nx=nx, spin_sign=spin_sign, fm_out=fm_out)
 
 
 def build_ribbon_a(ky: float, nx: int, v: float, t: float, w: float, lm: float) -> np.ndarray:
@@ -368,99 +451,134 @@ def spin_legend_handles() -> list[Line2D]:
     ]
 
 
-def state_edge_weight(vec: np.ndarray, lx: int, ly: int, edge_mask: np.ndarray) -> float:
-    rho = cell_density(vec, lx=lx, ly=ly)
-    total = float(np.sum(rho))
-    if total < 1e-15:
-        return 0.0
-    return float(np.sum(rho[edge_mask]) / total)
+def spin_line_legend_handles() -> list[Line2D]:
+    return [
+        Line2D([0], [0], color=SPIN_UP_COLOR, lw=2.0, label="spin-up"),
+        Line2D([0], [0], color=SPIN_DN_COLOR, lw=2.0, label="spin-down"),
+    ]
 
 
-def plot_ribbon(
+def compute_tracked_ribbon_bands(
+    ribbon_spin_builder,
+    v: float,
+    nx: int,
+    nk: int,
+    spin_sign: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    ky_vals = np.linspace(-np.pi, np.pi, nk, endpoint=False)
+    evals_list: list[np.ndarray] = []
+    evecs_list: list[np.ndarray] = []
+    for ky in ky_vals:
+        h = ribbon_spin_builder(float(ky), nx, v, spin_sign)
+        evals, evecs = np.linalg.eigh(h)
+        evals_list.append(np.real(evals))
+        evecs_list.append(evecs)
+    bands, _ = track_bulk_bands_spin(evals_list=evals_list, evecs_list=evecs_list)
+    return ky_vals, bands
+
+
+def plot_ribbon_spin_block_lines(
+    out_png: Path,
+    v: float,
+    title: str,
+    ribbon_spin_builder,
+    nx: int,
+    nk: int,
+) -> None:
+    ky_up, bands_up = compute_tracked_ribbon_bands(
+        ribbon_spin_builder=ribbon_spin_builder, v=v, nx=nx, nk=nk, spin_sign=+1
+    )
+    ky_dn, bands_dn = compute_tracked_ribbon_bands(
+        ribbon_spin_builder=ribbon_spin_builder, v=v, nx=nx, nk=nk, spin_sign=-1
+    )
+    x = ky_up / np.pi
+
+    fig, ax = plt.subplots(figsize=(6.9, 4.7))
+    for b in range(bands_up.shape[1]):
+        ax.plot(x, bands_up[:, b], color=SPIN_UP_COLOR, linewidth=0.9, alpha=0.9)
+    for b in range(bands_dn.shape[1]):
+        ax.plot(x, bands_dn[:, b], color=SPIN_DN_COLOR, linewidth=0.9, alpha=0.9)
+    ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
+    ax.set_xlabel(r"$k_y/\pi$")
+    ax.set_ylabel("Energy")
+    ax.set_title(f"{title} | ribbon x-open (spin-resolved lines) | v={v:.1f}")
+    ax.grid(alpha=0.2)
+    ax.legend(handles=spin_line_legend_handles(), loc="best", fontsize=8)
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=180)
+    plt.close(fig)
+
+
+def plot_ribbon_full_spin_lines(
     out_png: Path,
     v: float,
     title: str,
     ribbon_builder,
     nx: int,
     nk: int,
-    edge_cells: int,
-    edge_threshold: float = 0.35,
 ) -> None:
     ky_vals = np.linspace(-np.pi, np.pi, nk, endpoint=False)
-    evals_all = []
-    edge_w_all = []
-    spin_w_all = []
+    evals_list: list[np.ndarray] = []
+    evecs_list: list[np.ndarray] = []
     for ky in ky_vals:
         h = ribbon_builder(float(ky), nx, v)
-        evals, vecs = np.linalg.eigh(h)
-        evals = np.real(evals)
-        prob = np.abs(vecs) ** 2
-        prob_cell = prob.reshape(nx, 8, prob.shape[1]).sum(axis=1)
-        ew = prob_cell[:edge_cells, :].sum(axis=0) + prob_cell[-edge_cells:, :].sum(axis=0)
-        sw = np.array([spin_up_weight(vecs[:, j]) for j in range(vecs.shape[1])], dtype=float)
-        evals_all.append(evals)
-        edge_w_all.append(ew)
-        spin_w_all.append(sw)
-    evals_all = np.array(evals_all, dtype=float)
-    edge_w_all = np.array(edge_w_all, dtype=float)
-    spin_w_all = np.array(spin_w_all, dtype=float)
-
-    x = np.repeat(ky_vals / np.pi, evals_all.shape[1])
-    y = evals_all.reshape(-1)
-    edge_w = edge_w_all.reshape(-1)
-    spin_w = spin_w_all.reshape(-1)
-    edge_mask = edge_w >= edge_threshold
+        evals, evecs = np.linalg.eigh(h)
+        evals_list.append(np.real(evals))
+        evecs_list.append(evecs)
+    bands, spin_up = track_bulk_bands_spin(evals_list=evals_list, evecs_list=evecs_list)
+    x = ky_vals / np.pi
 
     fig, ax = plt.subplots(figsize=(6.9, 4.7))
-    if np.any(~edge_mask):
-        ax.scatter(
-            x[~edge_mask],
-            y[~edge_mask],
-            s=2.5,
-            color="#c8c8c8",
-            alpha=0.35,
-            edgecolors="none",
-            label="bulk / non-edge",
-        )
-    if np.any(edge_mask):
-        edge_colors = [blend_spin_rgb(w) for w in spin_w[edge_mask]]
-        edge_sizes = 3.5 + 14.0 * edge_w[edge_mask]
-        ax.scatter(
-            x[edge_mask],
-            y[edge_mask],
-            c=edge_colors,
-            s=edge_sizes,
-            alpha=0.9,
-            edgecolors="none",
-            label="edge-localized",
-        )
+    for b in range(bands.shape[1]):
+        color = SPIN_UP_COLOR if float(np.mean(spin_up[:, b])) >= 0.5 else SPIN_DN_COLOR
+        ax.plot(x, bands[:, b], color=color, linewidth=0.9, alpha=0.9)
     ax.axhline(0.0, color="black", linestyle="--", linewidth=0.8)
     ax.set_xlabel(r"$k_y/\pi$")
     ax.set_ylabel("Energy")
-    ax.set_title(f"{title} | ribbon x-open (edge spin-colored) | v={v:.1f}")
+    ax.set_title(f"{title} | ribbon x-open (spin-labeled lines) | v={v:.1f}")
     ax.grid(alpha=0.2)
-    bulk_handle = Line2D(
-        [0],
-        [0],
-        marker="o",
-        color="w",
-        markerfacecolor="#c8c8c8",
-        markersize=6,
-        label="bulk / non-edge",
-    )
-    edge_handle = Line2D(
-        [0],
-        [0],
-        marker="o",
-        color="w",
-        markerfacecolor="0.45",
-        markersize=8,
-        label="edge-localized (size ~ weight)",
-    )
-    ax.legend(handles=spin_legend_handles() + [bulk_handle, edge_handle], loc="best", fontsize=8)
+    ax.legend(handles=spin_line_legend_handles(), loc="best", fontsize=8)
     fig.tight_layout()
     fig.savefig(out_png, dpi=180)
     plt.close(fig)
+
+
+def plot_ribbon(
+    out_png: Path,
+    v: float,
+    title: str,
+    ribbon_spin_builder,
+    nx: int,
+    nk: int,
+    ribbon_builder=None,
+    fm_in: float = 0.0,
+) -> None:
+    if abs(fm_in) > 1e-15 and ribbon_builder is not None:
+        plot_ribbon_full_spin_lines(
+            out_png=out_png,
+            v=v,
+            title=title,
+            ribbon_builder=ribbon_builder,
+            nx=nx,
+            nk=nk,
+        )
+        return
+    plot_ribbon_spin_block_lines(
+        out_png=out_png,
+        v=v,
+        title=title,
+        ribbon_spin_builder=ribbon_spin_builder,
+        nx=nx,
+        nk=nk,
+    )
+
+
+def state_edge_weight(vec: np.ndarray, lx: int, ly: int, edge_mask: np.ndarray) -> float:
+    rho = cell_density(vec, lx=lx, ly=ly)
+    total = float(np.sum(rho))
+    if total < 1e-15:
+        return 0.0
+    return float(np.sum(rho[edge_mask]) / total)
 
 
 def run_one_model(
@@ -470,6 +588,7 @@ def run_one_model(
     args: argparse.Namespace,
     h8_func,
     bulk_gap_func,
+    ribbon_spin_builder,
     ribbon_builder,
     open_open_builder,
 ) -> None:
@@ -495,10 +614,11 @@ def run_one_model(
             out_png=out_ribbon / f"ribbon_v{token(v)}_{spec.key}.png",
             v=v,
             title=f"{spec.title} | FM(out={args.fm_out:.3f}, in={args.fm_in:.3f})",
+            ribbon_spin_builder=ribbon_spin_builder,
             ribbon_builder=ribbon_builder,
+            fm_in=args.fm_in,
             nx=args.ribbon_nx,
             nk=args.ribbon_nk,
-            edge_cells=args.edge_cells,
         )
 
         bulk_gap, _, _ = bulk_gap_func(v)
@@ -680,6 +800,16 @@ def main() -> None:
         args=args,
         h8_func=h8_a,
         bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_a, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_spin_builder=lambda ky, nx, v, spin_sign: build_ribbon_a_spin(
+            ky,
+            nx=nx,
+            v=v,
+            t=args.t,
+            w=args.w,
+            lm=args.lm,
+            spin_sign=spin_sign,
+            fm_out=args.fm_out,
+        ),
         ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
             build_ribbon_a(ky, nx=nx, v=v, t=args.t, w=args.w, lm=args.lm),
             fm_out=args.fm_out,
@@ -699,8 +829,14 @@ def main() -> None:
         args=args,
         h8_func=h8_b,
         bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_b, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_spin_builder=lambda ky, nx, v, spin_sign: add_fm_out_to_spin_ribbon(
+            build_ribbon_b_spin(ky=ky, nx=nx, v=v, params=p_b, spin_sign=spin_sign),
+            nx=nx,
+            spin_sign=spin_sign,
+            fm_out=args.fm_out,
+        ),
         ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
-            build_ribbon_b(ky=ky, nx=nx, v=v, params=p_b),
+            build_ribbon_b_full(ky=ky, nx=nx, v=v, params=p_b),
             fm_out=args.fm_out,
             fm_in=args.fm_in,
         ),
@@ -718,8 +854,16 @@ def main() -> None:
         args=args,
         h8_func=h8_c,
         bulk_gap_func=lambda v: compute_bulk_gap_from_h8(v=v, h8_func=h8_c, nk=args.bulk_gap_nk, n_occ=4),
+        ribbon_spin_builder=lambda ky, nx, v, spin_sign: build_ribbon_c_spin(
+            ky,
+            nx=nx,
+            v=v,
+            params=p_c,
+            spin_sign=spin_sign,
+            fm_out=args.fm_out,
+        ),
         ribbon_builder=lambda ky, nx, v: add_uniform_fm_term(
-            build_ribbon_c(ky=ky, nx=nx, v=v, params=p_c),
+            build_ribbon_c_full(ky=ky, nx=nx, v=v, params=p_c),
             fm_out=args.fm_out,
             fm_in=args.fm_in,
         ),
@@ -739,7 +883,7 @@ def main() -> None:
                 f"ferromagnetism: fm_out={args.fm_out}, fm_in={args.fm_in}",
                 "Each model directory contains:",
                 "  01_bulk_band/ (red=spin-up dominant, blue=spin-down dominant)",
-                "  02_ribbon/ (edge states: red=spin-up, blue=spin-down)",
+                "  02_ribbon/ (red=spin-up lines, blue=spin-down lines)",
                 "  03_obc_marked/ (edge states spin-colored by dominant spin)",
                 "  04_wf_sum/",
                 "  summary_*.csv and obc_marked_states_*.csv",
